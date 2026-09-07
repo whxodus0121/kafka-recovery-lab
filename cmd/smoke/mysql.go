@@ -5,34 +5,16 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
-	"time"
 
-	"github.com/go-sql-driver/mysql"
-	"kafka-recovery-lab/internal/config"
+	"kafka-recovery-lab/internal/mysql"
 )
 
 func mysqlSmoke(ctx context.Context, command, id string) error {
-	c, err := config.Database()
+	db, err := mysql.Open(ctx)
 	if err != nil {
 		return err
 	}
-	driverConfig := mysql.NewConfig()
-	driverConfig.Net, driverConfig.Addr = "tcp", c.Address
-	driverConfig.User, driverConfig.Passwd, driverConfig.DBName = c.User, c.Password, c.Database
-	driverConfig.Timeout = 5 * time.Second
-	driverConfig.ReadTimeout, driverConfig.WriteTimeout = 10*time.Second, 10*time.Second
-	connector, err := mysql.NewConnector(driverConfig)
-	if err != nil {
-		return fmt.Errorf("MySQL driver configuration: %w", err)
-	}
-	db := sql.OpenDB(connector)
 	defer db.Close()
-	db.SetMaxOpenConns(1)
-	db.SetMaxIdleConns(1)
-	db.SetConnMaxLifetime(time.Minute)
-	if err := db.PingContext(ctx); err != nil {
-		return fmt.Errorf("MySQL ping: %w", err)
-	}
 	if command == "mysql" {
 		var one int
 		var version, engine string

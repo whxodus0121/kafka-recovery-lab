@@ -1,131 +1,121 @@
 # kafka-recovery-lab
 
-메시지는 재전달될 수 있지만, 재고 반영은 중복되지 않고, 재시도와 복구 부하는 통제되는 구조를 단계별로 검증하는 프로젝트다.
+메시지는 재전달될 수 있지만, 재고 반영은 중복되지 않고, 재시도와 복구 부하는 통제되는 구조를 단계별로 검증하는 프로젝트다. **현재는 Phase 1 정상 흐름까지 구현**했다. 중복 차감 방지와 장애 복구는 아직 없다.
 
-현재 구현은 **Phase 0: 재현 가능한 로컬 개발 환경**까지다. 위 문장은 최종 목표이며 현재 달성한 기능을 의미하지 않는다.
+## 현재 범위
 
-## Phase 0 계약
+```text
+POST /orders → OrderCreated → orders.created.v1
+             → inventory-main-v1 Consumer → MySQL inventory 차감 → offset commit
+```
 
-| 구분 | 내용 |
+| 항목 | Phase 1 계약 |
 | --- | --- |
-| 해결할 문제 | Kafka와 MySQL을 동일 설정으로 기동하고 Go에서 실제 연결 검증 |
-| 구현 범위 | 단일 KRaft Kafka, InnoDB MySQL, 영속 volume, 명시적 topic 초기화, transport/SQL smoke 코드 |
-| 구현하지 않을 것 | API, Order/Inventory 도메인·테이블, Worker, Retry/DLQ/Backoff/Jitter, 멱등성, Replay, 계측·장애·실험 도구 |
-| 검증 방법 | 빌드·설정 테스트, 두 healthcheck, 고유 Kafka 메시지 왕복, SELECT, 고유 SQL 행 저장 → 재시작 → 조회 |
-| 완료 조건 | [실행 기록](docs/phase-0-verification.md)의 사용자 검증 항목 모두 PASS. 실행하지 않은 항목은 UNVERIFIED |
+| 문제 | HTTP 요청을 Kafka 이벤트로 전달하고 재고에 정확한 수량을 반영 |
+| 구현 | net/http API, UUID v4 이벤트, kafka-go Producer/Consumer Group, InnoDB 재고, 수동 commit |
+| 제외 | 업무 Retry/DLQ/Backoff/Jitter, 멱등성, Replay, 계측, 장애 주입, Outbox/트랜잭션 Kafka |
+| 검증 | 실제 별도 API/Worker 프로세스, HTTP·Kafka 레코드·DB 수량·브로커 offset 대조와 정상 재시작 |
+| 완료 조건 | [Phase 1 보고서](docs/phase-1-verification.md)의 8개 완료 조건 모두 PASS |
 
-## 실행 환경
+[Phase 0 기록](docs/phase-0-verification.md)과 `GATES.md`는 기준 커밋 시점의 역사적 기록이다. 현재 게이트는 `PHASE1_GATES.md`, 실제 이벤트·offset·프로세스 로그는 [JSON 증거](docs/phase-1-evidence.json)에 있다.
 
-Go 애플리케이션은 호스트에서 실행하며 Compose에는 Kafka와 MySQL 두 서비스만 둔다. Go 컨테이너, Dockerfile, 웹 프레임워크는 필요하지 않다.
+## 환경
 
-| 구성 | 고정 버전 |
+Go 프로그램은 호스트에서 실행한다. Compose 서비스는 Kafka와 MySQL 두 개다.
+
+| 구성 | 버전 |
 | --- | --- |
-| Go | 1.26.5 (`go.mod`) |
-| Apache Kafka 공식 JVM 이미지 | 4.2.0 |
-| MySQL 공식 이미지 | 8.4.8 |
-| `github.com/segmentio/kafka-go` | v0.4.51 |
-| `github.com/go-sql-driver/mysql` | v1.10.0 |
+| Go | 1.26.5 |
+| Kafka | 4.2.0, 공식 이미지 태그와 digest 고정 |
+| MySQL | 8.4.8, 공식 이미지 태그와 digest 고정 |
+| github.com/segmentio/kafka-go | v0.4.51 |
+| github.com/go-sql-driver/mysql | v1.10.0 |
 
-Docker Desktop의 Linux containers 모드와 Compose v2 이상(`--wait` 지원)이 필요하다. 두 이미지는 태그와 실제 다운로드한 digest를 함께 고정한다. 실제 사용한 Docker/Compose 버전과 이미지 digest는 실행 기록에 남긴다. Go module 경로는 저장소 주소가 아직 없으므로 `kafka-recovery-lab`을 사용한다.
+Go, PowerShell, Docker Desktop의 Linux engine 및 `--wait`를 지원하는 Compose가 필요하다. Phase 1에 새 외부 모듈·인프라를 추가하지 않았다. `go.mod`와 `go.sum`은 Phase 0과 같다. 표준 `database/sql`에 MySQL protocol driver가 필요하므로 기존 드라이버를 공유한다. ORM·HTTP 프레임워크·다른 Kafka client는 없다.
 
-## 시작하기 — PowerShell
-
-프로젝트 루트에서 실행한다. `env.ps1`은 별도 dotenv 라이브러리 없이 `.env`를 현재 PowerShell 프로세스의 환경 변수로 읽는다. 새 쉘에서 직접 `go run`을 할 때는 다시 dot-source한다.
+## 처음 시작하기 — 프로젝트 루트 PowerShell
 
 ```powershell
 . ./scripts/env.ps1 -Init
 go mod download
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1 -Check All
-```
-
-`-Init`은 `.env`가 없을 때만 생성한다. 두 비밀번호를 각각 암호학적 난수로 만들고 출력하지 않는다. 기존 `.env`는 덮어쓰지 않는다. `.env.example`의 비밀번호는 비어 있으며 `.env`는 Git에서 제외된다.
-
-위 전체 검증은 **MySQL 컨테이너를 실제로 재시작한다.** 다음 Phase에서 작업 중인 프로세스가 생기면 개별 검증을 사용한다. 중간 실패 시 즉시 중단하며, 해당 검증을 수정 후 다시 실행한다.
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1 -Check Build
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1 -Check Infrastructure
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1 -Check Topics
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1 -Check Kafka
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1 -Check MySQL
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1 -Check Persistence
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/init-inventory.ps1 -Seed
 ```
 
-간단한 상태 확인과 중지:
+`-Init`은 없는 `.env`만 생성하며 로컬 MySQL 비밀번호 두 개를 각각 난수로 만든다. `.env`는 커밋하지 않는다. 로더는 보간이나 실행 없는 제한된 `KEY=value` 형식만 지원한다. 기존 Phase 0 `.env`도 사용할 수 있다.
+
+`-Seed`는 **product 1 재고를 100으로 명시적으로 되돌린다.** 기존 API/Worker를 중지하고 미처리 Kafka 메시지가 없는 로컬 검증 환경에서만 실행한다. `-Seed`를 생략하면 스키마 생성만 수행한다. schema SQL과 seed SQL은 별도 파일이며 migration framework는 없다.
+
+별도 터미널 두 개에서 실행한다.
 
 ```powershell
-docker compose ps
-docker compose logs --tail 100 kafka mysql
-docker compose stop
-docker compose up -d --wait
+# 터미널 A
+. ./scripts/env.ps1
+go run ./cmd/worker
 ```
 
-`docker compose down`도 named volume을 보존한다. `docker compose down -v`는 데이터까지 삭제하므로 일반 종료 명령으로 사용하지 않는다.
-
-## 설정과 연결 주소
-
-| 환경 변수 | 예시/역할 |
-| --- | --- |
-| `KAFKA_BROKERS` | `127.0.0.1:9092`, 호스트 Go의 bootstrap 주소 목록 |
-| `KAFKA_PORT` | `9092`, Docker 호스트 포트 |
-| `KAFKA_ADVERTISED_HOST` | `127.0.0.1`, 호스트 클라이언트에 반환할 주소 |
-| `MYSQL_HOST`, `MYSQL_PORT` | `127.0.0.1`, `3306` |
-| `MYSQL_DATABASE`, `MYSQL_USER` | 전용 개발 DB와 비-root 애플리케이션 계정 |
-| `MYSQL_PASSWORD`, `MYSQL_ROOT_PASSWORD` | 커밋하지 않는 로컬 비밀번호 |
-| `SMOKE_TIMEOUT` | `60s`, Go 검증 전체 제한 시간 |
-
-포트 충돌 시 `.env`에서 Kafka port와 broker 주소를 함께 바꾼다. MySQL port는 Compose와 Go가 공유한다. `.env` 값이 기존 쉘의 동일 환경 변수보다 우선한다. 로더는 확장·실행 없는 제한된 `KEY=value` 형식만 허용하며 공백, 인용부호, `$` 보간을 지원하지 않는다. 생성된 비밀번호는 이 형식에 맞는 hex 문자열이다.
-
-Kafka 내부 통신은 `kafka:19092`, controller는 `kafka:29093`을 사용한다. 외부 listener와 MySQL published port는 호스트 loopback에만 bind한다. 호스트 Go 검증에서 `kafka:19092`를 사용하면 안 된다. Kafka는 로컬 전용 PLAINTEXT이며 외부 배포용 보안 구성은 아니다.
-
-MySQL 환경 변수의 DB·계정 초기화는 **빈 volume의 최초 기동**에 적용된다. `.env` 비밀번호를 바꿔도 기존 DB 계정 비밀번호가 자동 변경되지는 않는다. volume을 유지한 채 자격 증명을 변경하려면 DB 계정 자체를 명시적으로 변경해야 한다.
-
-## Topic과 probe 데이터
-
-| Topic | 파티션 | 복제 | 보관 정책 | 용도 |
-| --- | --- | --- | --- | --- |
-| `orders.created.v1` | 6 | 1 | delete, 7일 | Phase 1용 준비만 수행; 현재 이벤트 발행 없음 |
-| `phase0.smoke.v1` | 1 | 1 | delete, 7일 | Phase 0 전용 메시지 왕복 |
-
-브로커 `auto.create.topics.enable=false`와 Writer `AllowAutoTopicCreation=false`를 명시한다. `-Check Topics`가 공식 Kafka CLI로 topic을 생성한다. 두 번 실행해 재실행 가능성을 검증하고 파티션·복제·leader/ISR·cleanup·retention을 실제 조회한다. 기존 topic 설정이 다르면 실패하며 임의 변경하지 않는다. `docker compose up` 자체는 topic을 만들지 않는다.
-
-Kafka 검증은 현재 끝 offset을 읽고 고유 key/value를 동기 발행한 뒤 해당 내용을 정확히 소비한다. 과거 테스트 메시지로 성공 판정하지 않는다. smoke는 단일 파티션 직접 읽기여서 consumer group을 만들지 않는다. group commit, rebalance, crash recovery와 업무 멱등성은 검증한 것이 아니다. `MaxAttempts=1`은 smoke Writer 호출 설정이며 네트워크 클라이언트의 내부 연결 동작은 프로젝트의 업무 Retry 구현이 아니다.
-
-MySQL은 `database/sql`과 드라이버로 연결한다. driver connector를 사용해 DSN 문자열을 직접 조합하거나 출력하지 않는다. `SELECT 1, VERSION(), @@default_storage_engine`을 확인한다. 영속성 검증만 `phase0_probe`라는 InnoDB 진단 테이블에 고유 행을 삽입한다. 재시작 전후 값·engine을 확인한 후 해당 행 하나만 삭제하며 빈 진단 테이블은 유지한다. 실패 시 행과 출력 ID를 남겨 재조사할 수 있다. Order/Inventory 테이블은 없다.
-
-## 파일 구조
-
-```text
-.
-├── .env.example
-├── .gitignore
-├── compose.yaml
-├── go.mod
-├── go.sum
-├── GATES.md
-├── README.md
-├── cmd/smoke/
-│   ├── main.go
-│   ├── kafka.go
-│   └── mysql.go
-├── internal/config/
-│   ├── config.go
-│   └── config_test.go
-├── scripts/
-│   ├── env.ps1
-│   └── verify.ps1
-└── docs/
-    └── phase-0-verification.md
+```powershell
+# 터미널 B
+. ./scripts/env.ps1
+go run ./cmd/api
 ```
 
-`.git/`와 비공개 `.env`는 로컬에만 존재한다. 미래 Phase용 빈 디렉터리는 만들지 않았다. `GATES.md`는 검증 증거 장부이며 `unlazy`는 개발 중 사용한 로컬 도구일 뿐 프로젝트 실행 의존성이 아니다. 다른 개발자는 해당 스킬 없이 `verify.ps1`만 실행하면 된다.
+```powershell
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8080/orders -ContentType application/json -Body '{"productId":1,"quantity":1}'
+```
 
-## 의존성과 한계
+Ctrl+C로 정상 종료한다. 자동 검증의 `-shutdown-on-stdin-close` 옵션은 로컬 부모 프로세스가 stdin을 닫아 같은 context 취소 경로로 정상 종료시키기 위한 것으로, 기본 실행에서는 사용하지 않는다. 공개 종료 API나 장애 주입 기능은 없다.
 
-직접 Go 의존성은 두 개다. 표준 라이브러리는 Kafka wire protocol 또는 MySQL driver를 제공하지 않으므로 `kafka-go`와 `go-sql-driver/mysql`이 필요하다. ORM과 HTTP 라이브러리는 없다. 빌드에 포함되는 전이 의존성 세 개 및 모듈 그래프 전체 목록은 [실행 기록](docs/phase-0-verification.md)에 설명한다.
+## API·이벤트 계약
 
-단일 브로커와 replication factor 1은 로컬 재현 비용을 줄이지만 broker HA나 복제 내구성을 검증하지 못한다. `acks=all`도 이 한계를 없애지 않는다. named volume은 컨테이너 생명주기와 데이터 생명주기를 분리하지만 백업은 아니다. Kafka와 MySQL의 원자적 변경도 보장하지 않는다.
+`POST /orders`, Content-Type `application/json`. 양의 int64 `productId`, `quantity`가 필수다. 4096바이트 제한, 알 수 없는 필드·JSON 뒤 추가 데이터·비정수·누락·0/음수는 400으로 거절한다. 미지원 Content-Type은 415, 미지원 method는 405다.
 
-Phase 1 진입 전에 host 포트·Docker 메모리 여유·Go module 공개 주소를 확인한다. 다음 구현에서 consumer group의 수동 commit 계약을 별도로 도입하고 검증해야 한다. Phase 0 연결 성공은 향후 Retry/복구/중복 방지의 증거가 아니다.
+동기 Kafka 발행 성공 후 `202 Accepted`와 `status=accepted`, `eventId`, `orderId`를 반환한다. 202는 재고 반영 완료가 아니다. 발행 결과를 확인하지 못하면 503을 반환하며 결과가 불확실할 수 있음을 알린다. HTTP 재요청의 중복 발행을 막지 않는다.
 
-공식 근거: [Kafka 4.2 단일 노드 예제](https://raw.githubusercontent.com/apache/kafka/4.2.0/docker/examples/docker-compose-files/single-node/plaintext/docker-compose.yml), [kafka-go v0.4.51](https://github.com/segmentio/kafka-go/releases/tag/v0.4.51), [MySQL Go driver](https://github.com/go-sql-driver/mysql/tree/v1.10.0), [MySQL 8.4.8 릴리스](https://dev.mysql.com/doc/relnotes/mysql/8.4/en/news-8-4-8.html).
+```json
+{
+  "schemaVersion": 1,
+  "eventId": "640c38ca-469b-4843-a5f1-348e9889dd7e",
+  "orderId": "dbf7cafa-a3cd-4abc-86ff-b2b27eb50a17",
+  "productId": 1,
+  "quantity": 1,
+  "createdAt": "2026-09-07T01:00:00Z"
+}
+```
+
+위 JSON은 형식 예시다. 실제 값은 증거 JSON을 참조한다. ID는 crypto/rand로 만든 UUID v4, createdAt은 UTC다. Topic은 `orders.created.v1`, key는 `orderId`. Producer는 Hash balancer, acks=all, 동기 발행, `MaxAttempts=1`, 자동 topic 생성 금지를 사용한다. topic은 명시적 CLI로 6 partitions/RF=1/delete/7일 retention으로 준비한다.
+
+Consumer는 기본 `inventory-main-v1` Group으로 `FetchMessage`를 호출한다. `CommitInterval=0`은 명시적 `CommitMessages`의 동기 commit 설정이다. 자동 commit하는 `ReadMessage`를 쓰지 않는다. 그룹에 저장된 offset이 없으면 처음부터 읽는다.
+
+애플리케이션은 전 파티션을 합쳐 한 번에 한 메시지만 처리한다. `event_received → inventory_committed → offset_committed` 로그에 eventId/orderId/productId와 partition/offset을 남긴다. DB·validation·commit 실패 시 다음 메시지로 진행하지 않고 Worker가 종료된다. 따라서 실패한 메시지를 건너뛰는 후속 commit이 없다. 대신 한 실패가 이 Worker 전체 처리를 중단하는 비용이 있다.
+
+재고는 InnoDB 트랜잭션에서 조건부 원자 UPDATE로 차감한다. 성공한 row가 정확히 1개이고 DB transaction commit이 성공한 뒤 Kafka commit한다. 0행이면 상품 없음 또는 재고 부족으로 처리하며 아직 둘을 별도 복구 정책으로 분류하지 않는다. DB CHECK 제약도 음수를 금지한다.
+
+## 설정
+
+Phase 0 변수는 `.env.example`을 참조한다. 추가 선택 변수는 `API_ADDR`(기본 `127.0.0.1:8080`)와 `KAFKA_CONSUMER_GROUP`(기본 `inventory-main-v1`)뿐이다. 직접 쉘 환경 변수로 설정할 수도 있다. `.env`에 같은 키가 있으면 로더가 그 값으로 덮어쓴다.
+
+호스트 Kafka 주소는 `127.0.0.1:9092`, 내부 주소는 `kafka:19092`다. Kafka 포트를 바꾸면 `KAFKA_PORT`와 `KAFKA_BROKERS`를 함께 바꾼다. MySQL은 `127.0.0.1:3306`이다. 두 published port는 loopback에만 bind하며 Kafka PLAINTEXT는 로컬 실험용이다.
+
+MySQL named volume 초기화는 첫 기동에만 계정을 만든다. `.env` 비밀번호를 바꿔도 기존 DB 계정은 자동 변경되지 않는다. 데이터는 `docker compose stop`과 `docker compose down` 후에도 남지만 `down -v`는 volume까지 삭제한다.
+
+## 검증
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase1.ps1 -Check Build
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase1.ps1 -Check Phase0
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase1.ps1 -Check Flow
+```
+
+`-Check All`은 위 순서대로 실행한다. Phase0 검사는 MySQL을 실제 재시작하므로 먼저 애플리케이션을 중지한다. Flow 검사는 활성 Consumer Group 또는 미처리 record가 있으면 seed 전에 실패하며 offset을 강제로 바꾸지 않는다. 검증 시작 시 product 1을 100으로 seed하고, API/Worker를 임시 실행 파일로 띄운다. 검증이 성공하면 재고는 81이며 새 이벤트와 group offset은 Kafka에 남는다. 재실행 시 새로운 baseline에서 검증하고 `docs/phase-1-evidence.json`을 갱신한다.
+
+일반 `go test ./...`는 단위 테스트만 실행한다. 실제 서비스 검증은 `go test -tags=integration -count=1 -timeout=4m -v ./tests/integration`이다. 테스트 내부는 별도 실제 프로세스를 사용한다. Go module 추가 없이 Windows 프로세스 정상 종료를 확인한다.
+
+## 한계와 다음 Phase 경계
+
+DB commit과 Kafka offset commit은 원자적이지 않다. 그 사이 종료·rebalance·commit 실패가 발생하면 같은 이벤트가 재전달되어 재고가 다시 차감될 수 있다. 멱등성은 의도적으로 아직 없다. 정상 재시작 시험의 재처리 0건은 중복 메시지 방지 보장을 의미하지 않는다.
+
+이번 실제 검증은 정상 흐름과 정상 종료/재시작이다. DB 장애, 처리 중 강제 rebalance, DB commit 직후 crash, 동시 다중 Worker의 장애 내구성은 미검증이다. DB 실패 시 commit 미호출은 단위 테스트로 별도 확인했다. 단일 broker/RF=1의 HA·복제 내구성도 보장하지 않는다.
+
+seed는 local reset이며 업무 기능이 아니다. Phase 2의 장애 재현 또는 그 이후 Retry/DLQ/Idempotency/Replay는 별도 요청 전 구현하지 않는다. 전체 파일 구조·변경 역할·실측 수치는 [Phase 1 보고서](docs/phase-1-verification.md)에 있다.

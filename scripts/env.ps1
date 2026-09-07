@@ -22,6 +22,7 @@ if (-not (Test-Path -LiteralPath $envPath)) {
 # Deliberately small dotenv subset. No evaluation, expansion, quotes or comments
 # after values. Both Compose and Go receive the same literal values.
 $allowed = @('KAFKA_BROKERS', 'KAFKA_PORT', 'KAFKA_ADVERTISED_HOST', 'MYSQL_HOST', 'MYSQL_PORT', 'MYSQL_DATABASE', 'MYSQL_USER', 'MYSQL_PASSWORD', 'MYSQL_ROOT_PASSWORD', 'SMOKE_TIMEOUT')
+$optional = @('API_ADDR', 'KAFKA_CONSUMER_GROUP')
 $seen = @{}
 foreach ($line in [IO.File]::ReadAllLines($envPath)) {
     if ($line.Trim() -eq '' -or $line.TrimStart().StartsWith('#')) { continue }
@@ -29,7 +30,7 @@ foreach ($line in [IO.File]::ReadAllLines($envPath)) {
         throw 'Unsupported .env syntax: use literal KEY=value without quotes, spaces or interpolation.'
     }
     $key, $value = $Matches[1], $Matches[2]
-    if ($key -notin $allowed -or $seen.ContainsKey($key)) { throw "Unknown or duplicate .env key: $key" }
+    if (($key -notin $allowed -and $key -notin $optional) -or $seen.ContainsKey($key)) { throw "Unknown or duplicate .env key: $key" }
     $seen[$key] = $true
     [Environment]::SetEnvironmentVariable($key, $value, 'Process')
 }

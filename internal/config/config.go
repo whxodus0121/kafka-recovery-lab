@@ -71,3 +71,17 @@ func validPort(value string) bool {
 	n, err := strconv.Atoi(value)
 	return err == nil && n > 0 && n <= 65535
 }
+
+func APIAddress() string {
+	if value := os.Getenv("API_ADDR"); value != "" {
+		return value
+	}
+	return "127.0.0.1:8080"
+}
+
+func ConsumerGroup() string {
+	if value := os.Getenv("KAFKA_CONSUMER_GROUP"); value != "" {
+		return value
+	}
+	return "inventory-main-v1"
+}
