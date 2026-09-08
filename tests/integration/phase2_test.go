@@ -89,6 +89,23 @@ func scenario(t *testing.T, name string) {
 			t.Fatal(err)
 		}
 	}
+	// Creation acknowledgment can precede partition leader readiness.
+	// Match the existing Phase 3 preflight before reading the initial end offset.
+	await(t, "new partition leader", func() bool {
+		conn, err := kafka.DialLeader(ctx, "tcp", brokers[0], topic, 0)
+		if err == nil {
+			_ = conn.SetDeadline(time.Now().Add(5 * time.Second))
+			_, err = conn.ReadLastOffset()
+			conn.Close()
+		}
+		if errors.Is(err, kafka.NotLeaderForPartition) || errors.Is(err, kafka.LeaderNotAvailable) {
+			return false
+		}
+		if err != nil {
+			t.Fatal(err)
+		}
+		return true
+	})
 	await(t, "coordinator", func() bool {
 		r, err := client.FindCoordinator(ctx, &kafka.FindCoordinatorRequest{Addr: kafka.TCP(brokers...), Key: group, KeyType: kafka.CoordinatorKeyTypeConsumer})
 		if err != nil {

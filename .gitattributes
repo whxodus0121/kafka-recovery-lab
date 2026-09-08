@@ -1,0 +1,2 @@
+# Preserve raw evidence SHA-256 across Windows/Linux checkouts.
+experiments/phase4/*.json text eol=lf

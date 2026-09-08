@@ -2,7 +2,7 @@
 
 Kafka 메시지는 재전달될 수 있다는 전제에서, 재고 반영의 중복을 막고 재시도·복구 부하를 통제하는 과정을 단계별 실험으로 증명하는 Go 프로젝트다.
 
-기존 티켓 예매 프로젝트에서 단순 DLQ 처리 후 남았던 질문에서 출발했다. 현재 Phase 3에서 오류 분류, Fixed Retry와 DLQ를 구현했다. Poison 뒤 정상 record의 진행을 복구했지만 Idempotency와 Replay는 아직 없다. Phase 2에서 확인한 DB commit 후 Kafka offset commit 전 crash의 재고 **100 → 98 → 96** 중복 차감도 해결하지 않은 상태다.
+기존 티켓 예매 프로젝트에서 단순 DLQ 처리 후 남았던 질문에서 출발했다. 현재 Phase 4에서 Fixed Retry, Exponential Backoff, Full Jitter의 실제 장애 중 시도 집중과 복구를 비교했다. 예약 분산이 FIFO 대기 때문에 실제 실행 분산으로 그대로 이어지지 않는 것도 측정했다. Idempotency와 Replay는 아직 없으며, Phase 2에서 확인한 DB commit 후 Kafka offset commit 전 crash의 재고 **100 → 98 → 96** 중복 차감도 해결하지 않은 상태다.
 
 ## Architecture
 
@@ -68,6 +68,16 @@ flowchart LR
 
 [Phase 3 상세 문서](docs/phase-3-retry-dlq.md) · [검증 보고서](docs/phase-3-verification.md) · [Evidence](docs/phase-3-evidence.json)
 
+### Phase 4 — Retry Storm / Backoff / Full Jitter
+
+문제: 실패 record를 Retry로 넘기는 것만으로 재시도 집중과 복구 부하가 통제되는지는 알 수 없었다.
+
+선택·검증: 기존 Worker와 재고 함수를 유지하고 지연 전략만 확장했다. 실제 MySQL을 중단하며 동시 60건과 5건/초 지속 유입을 각각 비교했다. Header 예약 시각, 실제 시도, 초당 횟수, lag, SQL 재고, DLQ를 원시 기록으로 대조했다.
+
+핵심 결과: 지속 유입의 전체 peak는 Jitter 39회/초, Exponential 35회/초로 Jitter가 항상 더 낮지는 않았다. 최초 8초 공통 장애 구간에서는 둘 다 15회/초였다. 예약 초과 지연과 HOL을 함께 측정했으며, DB 재기동 시간이 긴 첫 실행은 원본을 보존하고 비교 셀을 다시 실행했다. 전체 복구 수치는 실제 장애 길이 편차를 포함한 단일 실행 관측이다.
+
+[Phase 4 상세 문서](docs/phase-4-backoff-jitter.md) · [검증 보고서](docs/phase-4-verification.md) · [Evidence](docs/phase-4-evidence.json) · [원시 실행](experiments/phase4/)
+
 ## Run locally
 
 프로젝트 루트 PowerShell에서 실행한다.
@@ -121,11 +131,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase2.ps1 -C
 
 # Phase 3 plus all prior regressions
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase3.ps1 -Check All
+
+# Phase 4 comparison, raw evidence audit and all prior regressions
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase4.ps1 -Check All
 ```
 
 장애 검증은 공유 로컬 MySQL 컨테이너를 실제 중지하므로 다른 애플리케이션과 병행하지 않는다. 각 시나리오는 새 product, topic, group을 사용하며 기존 offset이나 inventory를 초기화하지 않는다. Phase 2 스크립트는 `-phase2-baseline`으로 과거 실패 동작을 명시적으로 재현하며 일반 Worker에는 이 옵션을 사용하지 않는다.
 
-Phase 3 회귀 결과는 별도 경로로 저장되어 과거 verification/evidence를 덮어쓰지 않는다. Phase 1/2 스크립트를 직접 실행하면 해당 evidence를 갱신하므로 역사적 기록을 보존하려면 Phase 3 검증 진입점을 사용한다.
+Phase 4 진입점은 Phase 0~3 회귀 evidence를 별도 경로에 저장하고 최종 Phase 4 evidence에 포함한다. Phase 1~3 스크립트를 직접 실행하면 해당 Phase evidence를 갱신하므로 역사적 기록을 보존하려면 Phase 4 진입점을 사용한다. Phase 4 raw 파일은 덮어쓰지 않으며 `-Check Audit`은 저장된 결과만 다시 계산한다.
 
 ## Current limits
 
@@ -133,6 +146,7 @@ Phase 3 회귀 결과는 별도 경로로 저장되어 과거 verification/evide
 - Retry/DLQ 발행 성공과 source commit 사이 crash는 목적지 중복 발행을 만들 수 있다.
 - Retry 대기는 Worker의 다음 record 처리를 지연시키는 head-of-line blocking이 있다.
 - 단일 broker/RF=1 로컬 환경이며 broker HA를 검증하지 않았다.
-- 다중 Worker rebalance, 처리량, Retry Storm, Backoff/Jitter, Replay 부하는 아직 검증하지 않았다.
+- Backoff/Jitter 비교는 단일 Worker/partition 구성과 각 비교 셀 1회 실행에 한정된다. 실제 DB 재기동 시간 편차와 HOL이 결과에 영향을 준다.
+- 다중 Worker rebalance, 운영 규모 처리량, 반복 실험의 통계적 유의성, Replay 부하는 아직 검증하지 않았다.
 
 앞으로 각 Phase는 코드·검증 완료, 원시 verification/evidence 보존, `docs/phase-N-*.md`의 동일한 11개 섹션 작성, Development Journey 갱신, 수치·링크 대조를 모두 마친 뒤 완료 commit을 만든다.

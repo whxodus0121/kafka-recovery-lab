@@ -78,6 +78,11 @@ func Consume(ctx context.Context, reader Reader, apply func(context.Context, eve
 		}
 		if err == nil {
 			log = log.With("eventId", e.EventID, "orderId", e.OrderID, "productId", e.ProductID, "quantity", e.Quantity)
+			if policy != nil && policy.RetrySource {
+				started := time.Now().UTC()
+				log.Info("retry_attempt_started", "retryCount", md.Count, "nextAttemptAt", md.Next,
+					"startedAt", started, "overdueNs", started.Sub(md.Next).Nanoseconds())
+			}
 			log.Info("event_received")
 			if hooks.BeforeDB != nil {
 				if err := hooks.BeforeDB(ctx, e); err != nil {

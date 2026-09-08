@@ -413,6 +413,9 @@ func savePhase3(t *testing.T, root string, run map[string]any) {
 		Scenarios              []json.RawMessage `json:"scenarios"`
 	}
 	path := filepath.Join(root, "docs/phase-3-evidence.json")
+	if override := os.Getenv("PHASE3_EVIDENCE_PATH"); override != "" {
+		path = override
+	}
 	if b, err := os.ReadFile(path); err == nil {
 		if err := json.Unmarshal(b, &document); err != nil {
 			t.Error(err)

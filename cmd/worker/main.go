@@ -34,11 +34,14 @@ func run(logger *slog.Logger) error {
 	topic := flag.String("topic", event.OrdersTopic, "consumer topic; override only for isolated local scenarios")
 	faultPoint := flag.String("fault-point", "", "local only: before-db, before-db-commit, after-db-commit")
 	faultEvent := flag.String("fault-event-id", "", "the sole event targeted by the local fault")
-	retryWorker := flag.Bool("retry-worker", false, "consume the fixed retry topic with inventory logic")
+	retryWorker := flag.Bool("retry-worker", false, "consume the retry topic with inventory logic")
 	retryTopic := flag.String("retry-topic", "inventory.retry.v1", "retry destination and retry worker source")
 	dlqTopic := flag.String("dlq-topic", "inventory.dlq.v1", "dead letter destination")
 	maxRetries := flag.Int("max-retries", 3, "additional attempts after the initial failure")
-	delay := flag.Duration("retry-delay", 2*time.Second, "fixed delay before each retry")
+	delay := flag.Duration("retry-delay", 2*time.Second, "fixed delay, or base delay for exponential/jitter")
+	strategy := flag.String("retry-strategy", "fixed", "fixed, exponential or jitter (full jitter)")
+	capDelay := flag.Duration("retry-cap", 30*time.Second, "exponential/jitter upper delay cap")
+	seed := flag.Int64("retry-seed", time.Now().UnixNano(), "per-process jitter RNG seed; recorded on startup")
 	baseline := flag.Bool("phase2-baseline", false, "local regression only: stop on failures without retry/DLQ")
 	flag.Parse()
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -75,7 +78,7 @@ func run(logger *slog.Logger) error {
 	if !*baseline {
 		writer := kafka.NewFailureWriter(brokers)
 		defer writer.Close()
-		policy = &inventory.FailurePolicy{RetrySource: *retryWorker, RetryTopic: *retryTopic, DLQTopic: *dlqTopic, MaxRetries: *maxRetries, Delay: *delay, Publish: func(ctx context.Context, m kafkago.Message) error { return writer.WriteMessages(ctx, m) }}
+		policy = &inventory.FailurePolicy{RetrySource: *retryWorker, RetryTopic: *retryTopic, DLQTopic: *dlqTopic, MaxRetries: *maxRetries, Delay: *delay, Strategy: *strategy, Cap: *capDelay, Seed: *seed, Publish: func(ctx context.Context, m kafkago.Message) error { return writer.WriteMessages(ctx, m) }}
 		if err := policy.Validate(); err != nil {
 			return err
 		}
@@ -94,7 +97,8 @@ func run(logger *slog.Logger) error {
 	}
 	reader := kafka.NewConsumer(brokers, group, *topic)
 	defer reader.Close()
-	logger.Info("worker_started", "groupId", group, "topic", *topic, "phase2Baseline", *baseline)
+	logger.Info("worker_started", "groupId", group, "topic", *topic, "phase2Baseline", *baseline,
+		"retryStrategy", *strategy, "retryBase", delay.String(), "retryCap", capDelay.String(), "retrySeed", *seed)
 	err = inventory.Consume(ctx, reader, (inventory.Store{DB: db, Hooks: hooks}).Decrement, logger, hooks, policy)
 	if ctx.Err() != nil {
 		logger.Info("worker_stopped", "reason", "context canceled")

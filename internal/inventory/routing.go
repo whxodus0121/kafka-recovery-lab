@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	mathrand "math/rand"
 	"strconv"
 	"time"
 
@@ -17,6 +18,10 @@ type FailurePolicy struct {
 	RetryTopic, DLQTopic string
 	MaxRetries           int
 	Delay                time.Duration
+	Strategy             string
+	Cap                  time.Duration
+	Seed                 int64
+	random               *mathrand.Rand
 	Publish              func(context.Context, kafka.Message) error
 }
 
@@ -34,7 +39,7 @@ func (p *FailurePolicy) Validate() error {
 	if p.MaxRetries < 0 || p.MaxRetries > 100 || p.Delay <= 0 || p.Delay > time.Hour || p.RetryTopic == "" || p.DLQTopic == "" || p.RetryTopic == p.DLQTopic || p.Publish == nil {
 		return fmt.Errorf("invalid retry policy: retries 0..100, delay (0,1h], distinct topics and publisher required")
 	}
-	return nil
+	return p.validateDelay()
 }
 
 func (p *FailurePolicy) metadata(m kafka.Message) (retryMetadata, error) {
@@ -138,7 +143,8 @@ func (p *FailurePolicy) route(ctx context.Context, m kafka.Message, md retryMeta
 				out.Headers = append(out.Headers, h)
 			}
 		}
-		values := []string{strconv.Itoa(md.Count + 1), now.Add(p.Delay).Format(time.RFC3339Nano), md.First.Format(time.RFC3339Nano), code, md.Topic, strconv.Itoa(md.Partition), strconv.FormatInt(md.Offset, 10)}
+		// Calculate once at publication; consuming a persisted header never draws again.
+		values := []string{strconv.Itoa(md.Count + 1), now.Add(p.delayFor(md.Count + 1)).Format(time.RFC3339Nano), md.First.Format(time.RFC3339Nano), code, md.Topic, strconv.Itoa(md.Partition), strconv.FormatInt(md.Offset, 10)}
 		for i, key := range metadataKeys {
 			out.Headers = append(out.Headers, kafka.Header{Key: key, Value: []byte(values[i])})
 		}
