@@ -47,6 +47,7 @@ type inspector struct {
 	client     *kafka.Client
 	group      string
 	partitions []int
+	topic      string
 }
 
 func TestPhase1Flow(t *testing.T) {
@@ -67,7 +68,7 @@ func TestPhase1Flow(t *testing.T) {
 	defer db.Close()
 	transport := &kafka.Transport{}
 	defer transport.CloseIdleConnections()
-	in := inspector{t: t, ctx: ctx, brokers: brokers, group: config.ConsumerGroup(), client: &kafka.Client{Addr: kafka.TCP(brokers...), Timeout: 5 * time.Second, Transport: transport}}
+	in := inspector{t: t, ctx: ctx, brokers: brokers, group: config.ConsumerGroup(), topic: event.OrdersTopic, client: &kafka.Client{Addr: kafka.TCP(brokers...), Timeout: 5 * time.Second, Transport: transport}}
 	// Group APIs target the discovered coordinator. Discovery also initializes
 	// Kafka's internal group metadata before inspecting a never-used group.
 	await(t, "group coordinator", func() bool {
@@ -113,9 +114,9 @@ func TestPhase1Flow(t *testing.T) {
 			t.Fatalf("pending partition %d: committed=%d end=%d; refusing seed/reset", p, committed, end)
 		}
 	}
-	// Reuse the exact documented schema and seed SQL, after checking that the
-	// group has no active members or unfinished records. Never reset offsets.
-	for _, file := range []string{"migrations/001_inventory.sql", "scripts/seed-inventory.sql"} {
+	// Reuse the normal schema with a fresh product, after checking that the
+	// group has no active members or unfinished records. Never reset old rows or offsets.
+	for _, file := range []string{"migrations/001_inventory.sql"} {
 		value, err := os.ReadFile(filepath.Join(root, file))
 		if err != nil {
 			t.Fatal(err)
@@ -124,7 +125,11 @@ func TestPhase1Flow(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	if got := stock(t, ctx, db); got != 100 {
+	productID := time.Now().UnixNano()
+	if _, err := db.ExecContext(ctx, "INSERT INTO inventory (product_id,available_quantity,updated_at) VALUES (?,100,UTC_TIMESTAMP(6))", productID); err != nil {
+		t.Fatal(err)
+	}
+	if got := stock(t, ctx, db, productID); got != 100 {
 		t.Fatalf("seed=%d", got)
 	}
 	var engine string
@@ -137,7 +142,7 @@ func TestPhase1Flow(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, constraintErr := tx.ExecContext(ctx, "UPDATE inventory SET available_quantity=-1 WHERE product_id=1")
+	_, constraintErr := tx.ExecContext(ctx, "UPDATE inventory SET available_quantity=-1 WHERE product_id=?", productID)
 	_ = tx.Rollback()
 	if constraintErr == nil {
 		t.Fatal("negative stock was allowed by schema")
@@ -154,7 +159,7 @@ func TestPhase1Flow(t *testing.T) {
 	wantedStock := int64(100)
 	var worker *child
 	for index, quantity := range []int64{1, 3, 1, 2, 3, 4, 5} {
-		response := post(t, client, url, fmt.Sprintf(`{"productId":1,"quantity":%d}`, quantity), 202)
+		response := post(t, client, url, fmt.Sprintf(`{"productId":%d,"quantity":%d}`, productID, quantity), 202)
 		await(t, "exactly one published record", func() bool {
 			ends := in.ends()
 			return sum(ends)-sum(current.End) == 1
@@ -172,11 +177,11 @@ func TestPhase1Flow(t *testing.T) {
 			t.Fatal("published record coordinate not found")
 		}
 		e, err := event.Decode(message.Value)
-		if err != nil || e.EventID != response["eventId"] || e.OrderID != response["orderId"] || e.ProductID != 1 || e.Quantity != quantity || string(message.Key) != e.OrderID {
+		if err != nil || e.EventID != response["eventId"] || e.OrderID != response["orderId"] || e.ProductID != productID || e.Quantity != quantity || string(message.Key) != e.OrderID {
 			t.Fatalf("HTTP/Kafka event mismatch: %v", err)
 		}
 		if index == 0 {
-			if stock(t, ctx, db) != 100 || !reflect.DeepEqual(before.Committed, next.Committed) {
+			if stock(t, ctx, db, productID) != 100 || !reflect.DeepEqual(before.Committed, next.Committed) {
 				t.Fatal("stock/offset changed before worker start")
 			}
 			worker = start(t, root, workerBin, nil)
@@ -184,7 +189,7 @@ func TestPhase1Flow(t *testing.T) {
 		}
 		wantedStock -= quantity
 		await(t, "DB and broker commit", func() bool {
-			return stock(t, ctx, db) == wantedStock && in.committed()[message.Partition] == message.Offset+1
+			return stock(t, ctx, db, productID) == wantedStock && in.committed()[message.Partition] == message.Offset+1
 		})
 		// The actual worker log sequence is additional ordering evidence; broker
 		// OffsetFetch and independent SQL reads above are the state oracle.
@@ -192,7 +197,7 @@ func TestPhase1Flow(t *testing.T) {
 			return worker.log.ordered(e.EventID, "event_received", "inventory_committed", "offset_committed")
 		})
 		records = append(records, observed{e, message.Partition, message.Offset, wantedStock, message.Offset + 1})
-		t.Logf("event=%s order=%s product=1 quantity=%d partition=%d recordOffset=%d committed=%d stock=%d", e.EventID, e.OrderID, quantity, message.Partition, message.Offset, message.Offset+1, wantedStock)
+		t.Logf("event=%s order=%s product=%d quantity=%d partition=%d recordOffset=%d committed=%d stock=%d", e.EventID, e.OrderID, productID, quantity, message.Partition, message.Offset, message.Offset+1, wantedStock)
 		current = in.snapshot()
 	}
 	validEnd := in.snapshot()
@@ -200,7 +205,7 @@ func TestPhase1Flow(t *testing.T) {
 	for _, input := range invalid {
 		post(t, client, url, input, 400)
 	}
-	if got := in.snapshot(); !reflect.DeepEqual(got, validEnd) || stock(t, ctx, db) != 81 {
+	if got := in.snapshot(); !reflect.DeepEqual(got, validEnd) || stock(t, ctx, db, productID) != 81 {
 		t.Fatal("invalid HTTP changed Kafka offsets or inventory")
 	}
 	worker.stop(t)
@@ -214,7 +219,7 @@ func TestPhase1Flow(t *testing.T) {
 	// MaxWait is 1 second; this observes five fetch intervals with no new data.
 	time.Sleep(5 * time.Second)
 	afterRestart := in.snapshot()
-	if stock(t, ctx, db) != 81 || !reflect.DeepEqual(afterRestart, validEnd) || restarted.log.has("event_received") {
+	if stock(t, ctx, db, productID) != 81 || !reflect.DeepEqual(afterRestart, validEnd) || restarted.log.has("event_received") {
 		t.Fatal("committed normal messages were processed again after restart")
 	}
 	restarted.stop(t)
@@ -224,7 +229,7 @@ func TestPhase1Flow(t *testing.T) {
 	}
 	evidence := map[string]any{
 		"verifiedAt": time.Now().UTC(), "group": in.group,
-		"initialStock": 100, "finalStock": 81, "quantitySum": 19,
+		"initialStock": 100, "finalStock": 81, "quantitySum": 19, "productId": productID,
 		"acceptedHTTP": 7, "rejectedHTTP": len(invalid), "records": records,
 		"before": before, "after": validEnd, "afterRestart": afterRestart,
 		"workerPID": worker.cmd.Process.Pid, "restartedWorkerPID": restarted.cmd.Process.Pid,
@@ -235,16 +240,20 @@ func TestPhase1Flow(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(root, "docs/phase-1-evidence.json"), append(value, '\n'), 0644); err != nil {
+	outputPath := os.Getenv("PHASE1_EVIDENCE_PATH")
+	if outputPath == "" {
+		outputPath = filepath.Join(root, "docs/phase-1-evidence.json")
+	}
+	if err := os.WriteFile(outputPath, append(value, '\n'), 0644); err != nil {
 		t.Fatal(err)
 	}
 	t.Logf("initial=100 quantity_sum=19 final=81 accepted=7 rejected=%d before=%+v after=%+v workerPID=%d restartedPID=%d restarted_processed=0", len(invalid), before, validEnd, worker.cmd.Process.Pid, restarted.cmd.Process.Pid)
 }
 
-func stock(t *testing.T, ctx context.Context, db *sql.DB) int64 {
+func stock(t *testing.T, ctx context.Context, db *sql.DB, productID int64) int64 {
 	t.Helper()
 	var quantity int64
-	if err := db.QueryRowContext(ctx, "SELECT available_quantity FROM inventory WHERE product_id=1").Scan(&quantity); err != nil {
+	if err := db.QueryRowContext(ctx, "SELECT available_quantity FROM inventory WHERE product_id=?", productID).Scan(&quantity); err != nil {
 		t.Fatal(err)
 	}
 	return quantity
@@ -285,7 +294,7 @@ func post(t *testing.T, client *http.Client, url, body string, status int) map[s
 func (i inspector) ends() map[int]int64 {
 	result := map[int]int64{}
 	for _, partition := range i.partitions {
-		conn, err := kafka.DialLeader(i.ctx, "tcp", i.brokers[0], event.OrdersTopic, partition)
+		conn, err := kafka.DialLeader(i.ctx, "tcp", i.brokers[0], i.topic, partition)
 		if err != nil {
 			i.t.Fatal(err)
 		}
@@ -300,7 +309,7 @@ func (i inspector) ends() map[int]int64 {
 	return result
 }
 func (i inspector) committed() map[int]int64 {
-	response, err := i.client.OffsetFetch(i.ctx, &kafka.OffsetFetchRequest{GroupID: i.group, Topics: map[string][]int{event.OrdersTopic: i.partitions}})
+	response, err := i.client.OffsetFetch(i.ctx, &kafka.OffsetFetchRequest{GroupID: i.group, Topics: map[string][]int{i.topic: i.partitions}})
 	if err != nil {
 		i.t.Fatal(err)
 	}
@@ -311,7 +320,7 @@ func (i inspector) committed() map[int]int64 {
 	for _, p := range i.partitions {
 		result[p] = -1
 	}
-	for _, p := range response.Topics[event.OrdersTopic] {
+	for _, p := range response.Topics[i.topic] {
 		if p.Error != nil {
 			i.t.Fatal(p.Error)
 		}
@@ -338,7 +347,7 @@ func (i inspector) members() int {
 	return len(g.Members)
 }
 func (i inspector) read(partition int, offset int64) kafka.Message {
-	r := kafka.NewReader(kafka.ReaderConfig{Brokers: i.brokers, Topic: event.OrdersTopic, Partition: partition, MinBytes: 1, MaxBytes: 1e6, MaxWait: time.Second})
+	r := kafka.NewReader(kafka.ReaderConfig{Brokers: i.brokers, Topic: i.topic, Partition: partition, MinBytes: 1, MaxBytes: 1e6, MaxWait: time.Second})
 	defer r.Close()
 	if err := r.SetOffset(offset); err != nil {
 		i.t.Fatal(err)
@@ -424,9 +433,9 @@ func build(t *testing.T, root, name string) string {
 	}
 	return path
 }
-func start(t *testing.T, root, binary string, overrides []string) *child {
+func start(t *testing.T, root, binary string, overrides []string, arguments ...string) *child {
 	t.Helper()
-	c := &child{cmd: exec.Command(binary, "-shutdown-on-stdin-close"), log: &logBuffer{}, done: make(chan error, 1)}
+	c := &child{cmd: exec.Command(binary, append([]string{"-shutdown-on-stdin-close"}, arguments...)...), log: &logBuffer{}, done: make(chan error, 1)}
 	c.cmd.Dir = root
 	c.cmd.Env = append(os.Environ(), overrides...)
 	c.cmd.Stdout, c.cmd.Stderr = c.log, c.log

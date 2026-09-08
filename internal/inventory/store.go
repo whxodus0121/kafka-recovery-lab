@@ -9,7 +9,10 @@ import (
 	"kafka-recovery-lab/internal/event"
 )
 
-type Store struct{ DB *sql.DB }
+type Store struct {
+	DB    *sql.DB
+	Hooks Hooks
+}
 
 func (s Store) Decrement(ctx context.Context, e event.OrderCreated) error {
 	if err := e.Validate(); err != nil {
@@ -37,5 +40,10 @@ func (s Store) Decrement(ctx context.Context, e event.OrderCreated) error {
 		return fmt.Errorf("unexpected affected row count: %d", rows)
 	}
 	// A successful return means the DB transaction committed, not just UPDATE.
+	if s.Hooks.BeforeCommit != nil {
+		if err := s.Hooks.BeforeCommit(ctx, e); err != nil {
+			return err
+		}
+	}
 	return tx.Commit()
 }

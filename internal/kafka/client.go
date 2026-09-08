@@ -34,9 +34,9 @@ func (p *Producer) Publish(ctx context.Context, e event.OrderCreated) error {
 
 func (p *Producer) Close() error { return p.writer.Close() }
 
-func NewConsumer(brokers []string, groupID string) *kafkago.Reader {
+func NewConsumer(brokers []string, groupID, topic string) *kafkago.Reader {
 	return kafkago.NewReader(kafkago.ReaderConfig{
-		Brokers: brokers, Topic: event.OrdersTopic, GroupID: groupID,
+		Brokers: brokers, Topic: topic, GroupID: groupID,
 		// Zero means synchronous EXPLICIT CommitMessages, not automatic commits.
 		CommitInterval: 0, StartOffset: kafkago.FirstOffset,
 		QueueCapacity: 1, MinBytes: 1, MaxBytes: 1e6, MaxWait: time.Second,

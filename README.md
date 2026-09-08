@@ -1,6 +1,6 @@
 # kafka-recovery-lab
 
-메시지는 재전달될 수 있지만, 재고 반영은 중복되지 않고, 재시도와 복구 부하는 통제되는 구조를 단계별로 검증하는 프로젝트다. **현재는 Phase 1 정상 흐름까지 구현**했다. 중복 차감 방지와 장애 복구는 아직 없다.
+메시지는 재전달될 수 있지만, 재고 반영은 중복되지 않고, 재시도와 복구 부하는 통제되는 구조를 단계별로 검증하는 프로젝트다. **현재 Phase 2는 기존 티켓 예매 프로젝트에서 남았던 장애 경계의 재현 단계**다. 중복 차감 방지와 장애 복구는 아직 없다. 실측 결과는 [Phase 2 보고서](docs/phase-2-verification.md), [증거 JSON](docs/phase-2-evidence.json), 완료 조건은 `PHASE2_GATES.md`를 참조한다.
 
 ## 현재 범위
 
@@ -13,11 +13,11 @@ POST /orders → OrderCreated → orders.created.v1
 | --- | --- |
 | 문제 | HTTP 요청을 Kafka 이벤트로 전달하고 재고에 정확한 수량을 반영 |
 | 구현 | net/http API, UUID v4 이벤트, kafka-go Producer/Consumer Group, InnoDB 재고, 수동 commit |
-| 제외 | 업무 Retry/DLQ/Backoff/Jitter, 멱등성, Replay, 계측, 장애 주입, Outbox/트랜잭션 Kafka |
+| 제외 | 업무 Retry/DLQ/Backoff/Jitter, 멱등성, Replay, 계측, Outbox/트랜잭션 Kafka |
 | 검증 | 실제 별도 API/Worker 프로세스, HTTP·Kafka 레코드·DB 수량·브로커 offset 대조와 정상 재시작 |
 | 완료 조건 | [Phase 1 보고서](docs/phase-1-verification.md)의 8개 완료 조건 모두 PASS |
 
-[Phase 0 기록](docs/phase-0-verification.md)과 `GATES.md`는 기준 커밋 시점의 역사적 기록이다. 현재 게이트는 `PHASE1_GATES.md`, 실제 이벤트·offset·프로세스 로그는 [JSON 증거](docs/phase-1-evidence.json)에 있다.
+[Phase 0 기록](docs/phase-0-verification.md)과 `GATES.md`, `PHASE1_GATES.md`, [Phase 1 JSON 증거](docs/phase-1-evidence.json)는 각 기준 커밋 시점의 역사적 기록이다.
 
 ## 환경
 
@@ -65,7 +65,7 @@ go run ./cmd/api
 Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8080/orders -ContentType application/json -Body '{"productId":1,"quantity":1}'
 ```
 
-Ctrl+C로 정상 종료한다. 자동 검증의 `-shutdown-on-stdin-close` 옵션은 로컬 부모 프로세스가 stdin을 닫아 같은 context 취소 경로로 정상 종료시키기 위한 것으로, 기본 실행에서는 사용하지 않는다. 공개 종료 API나 장애 주입 기능은 없다.
+Ctrl+C로 정상 종료한다. 자동 검증의 `-shutdown-on-stdin-close` 옵션은 로컬 부모 프로세스가 stdin을 닫아 같은 context 취소 경로로 정상 종료시키기 위한 것으로, 기본 실행에서는 사용하지 않는다. 공개 종료 API는 없다. Phase 2 fault는 별도 CLI 설정이며 기본 실행에서는 hook이 모두 nil이다.
 
 ## API·이벤트 계약
 
@@ -108,7 +108,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase1.ps1 -C
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase1.ps1 -Check Flow
 ```
 
-`-Check All`은 위 순서대로 실행한다. Phase0 검사는 MySQL을 실제 재시작하므로 먼저 애플리케이션을 중지한다. Flow 검사는 활성 Consumer Group 또는 미처리 record가 있으면 seed 전에 실패하며 offset을 강제로 바꾸지 않는다. 검증 시작 시 product 1을 100으로 seed하고, API/Worker를 임시 실행 파일로 띄운다. 검증이 성공하면 재고는 81이며 새 이벤트와 group offset은 Kafka에 남는다. 재실행 시 새로운 baseline에서 검증하고 `docs/phase-1-evidence.json`을 갱신한다.
+`-Check All`은 위 순서대로 실행한다. Phase0 검사는 MySQL을 실제 재시작하므로 먼저 애플리케이션을 중지한다. Flow 검사는 활성 Consumer Group 또는 미처리 record가 있으면 실패하며 offset을 강제로 바꾸지 않는다. 현재 검증은 매번 새 product에 재고 100을 INSERT하고, API/Worker를 임시 실행 파일로 띄운다. 성공하면 해당 재고는 81이며 기존 product를 초기화하지 않는다. 직접 Flow 실행 시 `docs/phase-1-evidence.json`을 갱신하며, Phase 2 스크립트는 출력 경로를 `bin/phase2-regression.json`으로 지정하여 역사적 증거를 보존한다.
 
 일반 `go test ./...`는 단위 테스트만 실행한다. 실제 서비스 검증은 `go test -tags=integration -count=1 -timeout=4m -v ./tests/integration`이다. 테스트 내부는 별도 실제 프로세스를 사용한다. Go module 추가 없이 Windows 프로세스 정상 종료를 확인한다.
 
@@ -116,6 +116,18 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase1.ps1 -C
 
 DB commit과 Kafka offset commit은 원자적이지 않다. 그 사이 종료·rebalance·commit 실패가 발생하면 같은 이벤트가 재전달되어 재고가 다시 차감될 수 있다. 멱등성은 의도적으로 아직 없다. 정상 재시작 시험의 재처리 0건은 중복 메시지 방지 보장을 의미하지 않는다.
 
-이번 실제 검증은 정상 흐름과 정상 종료/재시작이다. DB 장애, 처리 중 강제 rebalance, DB commit 직후 crash, 동시 다중 Worker의 장애 내구성은 미검증이다. DB 실패 시 commit 미호출은 단위 테스트로 별도 확인했다. 단일 broker/RF=1의 HA·복제 내구성도 보장하지 않는다.
+Phase 2 검증은 DB 장애, DB commit 전/후 crash, poison message에 한정한다. 처리 중 강제 rebalance, 동시 다중 Worker 장애 내구성, 단일 broker/RF=1의 HA·복제 내구성은 검증하지 않는다.
 
-seed는 local reset이며 업무 기능이 아니다. Phase 2의 장애 재현 또는 그 이후 Retry/DLQ/Idempotency/Replay는 별도 요청 전 구현하지 않는다. 전체 파일 구조·변경 역할·실측 수치는 [Phase 1 보고서](docs/phase-1-verification.md)에 있다.
+seed는 local reset이며 업무 기능이 아니다. 장애 실험에서는 실행하지 않는다. Retry/DLQ/Idempotency/Replay는 별도 요청 전 구현하지 않는다.
+
+## Phase 2 재현
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase2.ps1 -Check All
+```
+
+개별 검사는 Build, Regression, A, B, C, D다. A는 공유 로컬 MySQL 컨테이너를 실제 정지·복구하므로 다른 애플리케이션을 먼저 종료한다. 모든 검사는 순차 실행한다. 매 실행마다 새 product/topic/group을 만들고, Kafka offset reset이나 기존 inventory 복원을 하지 않는다. D의 poison과 뒤 정상 record는 전용 topic에 미처리 상태로 남는다. 이 격리는 정상 그룹을 보존하는 대신 단일 partition 실험으로 범위를 제한하고 실험 데이터가 쌓이는 비용이 있다.
+
+Worker의 `-fault-point`는 before-db(표준입력 continue로 해제), before-db-commit(exit 86), after-db-commit(exit 87) 세 경계만 지원한다. `-fault-event-id`로 한 이벤트만 지정하며 이벤트 payload에는 실험 설정을 넣지 않는다. `-topic`의 기본값은 orders.created.v1이고 실험에서만 격리 topic으로 바꾼다. crash hook은 Go defer를 우회하여 실제 DB 연결 단절을 재현한다.
+
+Phase 2 테스트는 `integration,phase2` 두 build tag가 모두 있어야 실행된다. 기본 단위 테스트나 Phase 1 integration 실행에 장애 실험이 섞이지 않는다. 증거 JSON은 시나리오 실행 기록을 누적하고 실패 기록도 보존한다.
