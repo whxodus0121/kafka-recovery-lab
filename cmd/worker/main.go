@@ -4,11 +4,14 @@ import (
 	"bufio"
 	"context"
 	"flag"
+	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	kafkago "github.com/segmentio/kafka-go"
 
 	"kafka-recovery-lab/internal/config"
 	"kafka-recovery-lab/internal/event"
@@ -31,6 +34,12 @@ func run(logger *slog.Logger) error {
 	topic := flag.String("topic", event.OrdersTopic, "consumer topic; override only for isolated local scenarios")
 	faultPoint := flag.String("fault-point", "", "local only: before-db, before-db-commit, after-db-commit")
 	faultEvent := flag.String("fault-event-id", "", "the sole event targeted by the local fault")
+	retryWorker := flag.Bool("retry-worker", false, "consume the fixed retry topic with inventory logic")
+	retryTopic := flag.String("retry-topic", "inventory.retry.v1", "retry destination and retry worker source")
+	dlqTopic := flag.String("dlq-topic", "inventory.dlq.v1", "dead letter destination")
+	maxRetries := flag.Int("max-retries", 3, "additional attempts after the initial failure")
+	delay := flag.Duration("retry-delay", 2*time.Second, "fixed delay before each retry")
+	baseline := flag.Bool("phase2-baseline", false, "local regression only: stop on failures without retry/DLQ")
 	flag.Parse()
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -59,17 +68,34 @@ func run(logger *slog.Logger) error {
 	if err != nil {
 		return err
 	}
-	connectCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
-	db, err := mysql.Open(connectCtx)
-	cancel()
+	if *retryWorker {
+		*topic = *retryTopic
+	}
+	var policy *inventory.FailurePolicy
+	if !*baseline {
+		writer := kafka.NewFailureWriter(brokers)
+		defer writer.Close()
+		policy = &inventory.FailurePolicy{RetrySource: *retryWorker, RetryTopic: *retryTopic, DLQTopic: *dlqTopic, MaxRetries: *maxRetries, Delay: *delay, Publish: func(ctx context.Context, m kafkago.Message) error { return writer.WriteMessages(ctx, m) }}
+		if err := policy.Validate(); err != nil {
+			return err
+		}
+		if *topic == *dlqTopic || (!*retryWorker && *topic == *retryTopic) {
+			return fmt.Errorf("source and destination topics conflict")
+		}
+	}
+	db, err := mysql.Pool()
 	if err != nil {
 		return err
 	}
 	defer db.Close()
-	reader := kafka.NewConsumer(brokers, config.ConsumerGroup(), *topic)
+	group := config.ConsumerGroup()
+	if *retryWorker && os.Getenv("KAFKA_CONSUMER_GROUP") == "" {
+		group = "inventory-retry-v1"
+	}
+	reader := kafka.NewConsumer(brokers, group, *topic)
 	defer reader.Close()
-	logger.Info("worker_started", "groupId", config.ConsumerGroup())
-	err = inventory.Consume(ctx, reader, (inventory.Store{DB: db, Hooks: hooks}).Decrement, logger, hooks)
+	logger.Info("worker_started", "groupId", group, "topic", *topic, "phase2Baseline", *baseline)
+	err = inventory.Consume(ctx, reader, (inventory.Store{DB: db, Hooks: hooks}).Decrement, logger, hooks, policy)
 	if ctx.Err() != nil {
 		logger.Info("worker_stopped", "reason", "context canceled")
 		return nil

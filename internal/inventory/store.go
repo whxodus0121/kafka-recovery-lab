@@ -3,7 +3,6 @@ package inventory
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 
 	"kafka-recovery-lab/internal/event"
@@ -34,7 +33,15 @@ func (s Store) Decrement(ctx context.Context, e event.OrderCreated) error {
 		return err
 	}
 	if rows == 0 {
-		return errors.New("product missing or insufficient inventory")
+		var id int64
+		err := tx.QueryRowContext(ctx, "SELECT product_id FROM inventory WHERE product_id=?", e.ProductID).Scan(&id)
+		if err == sql.ErrNoRows {
+			return ErrProductMissing
+		}
+		if err != nil {
+			return err
+		}
+		return ErrInsufficientInventory
 	}
 	if rows != 1 {
 		return fmt.Errorf("unexpected affected row count: %d", rows)

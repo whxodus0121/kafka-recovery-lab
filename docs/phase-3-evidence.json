@@ -1,0 +1,2784 @@
+{
+  "initializationFailures": [
+    {
+      "scenario": "Normal",
+      "status": "FAIL",
+      "stage": "initial broker snapshot",
+      "error": "Not Leader For Partition",
+      "source": "First scripts/verify-phase3.ps1 -Check Scenarios execution output; failure occurred before the original evidence defer was registered; record identifiers were not captured"
+    },
+    {
+      "scenario": "Recovery",
+      "status": "FAIL",
+      "stage": "initial broker snapshot",
+      "error": "Not Leader For Partition",
+      "source": "First scripts/verify-phase3.ps1 -Check Scenarios execution output; failure occurred before the original evidence defer was registered; record identifiers were not captured"
+    },
+    {
+      "scenario": "Metadata",
+      "status": "FAIL",
+      "stage": "initial broker snapshot",
+      "error": "Not Leader For Partition",
+      "source": "First scripts/verify-phase3.ps1 -Check Scenarios execution output; failure occurred before the original evidence defer was registered; record identifiers were not captured"
+    },
+    {
+      "scenario": "RetryPublishFailure",
+      "status": "FAIL",
+      "stage": "initial broker snapshot",
+      "error": "Not Leader For Partition",
+      "source": "First scripts/verify-phase3.ps1 -Check Scenarios execution output; failure occurred before the original evidence defer was registered; record identifiers were not captured"
+    }
+  ],
+  "regression": {
+    "regression": {
+      "acceptedHTTP": 7,
+      "after": {
+        "end": {
+          "0": 7,
+          "1": 4,
+          "2": 6,
+          "3": 2,
+          "4": 7,
+          "5": 3
+        },
+        "committed": {
+          "0": 7,
+          "1": 4,
+          "2": 6,
+          "3": 2,
+          "4": 7,
+          "5": 3
+        }
+      },
+      "afterRestart": {
+        "end": {
+          "0": 7,
+          "1": 4,
+          "2": 6,
+          "3": 2,
+          "4": 7,
+          "5": 3
+        },
+        "committed": {
+          "0": 7,
+          "1": 4,
+          "2": 6,
+          "3": 2,
+          "4": 7,
+          "5": 3
+        }
+      },
+      "apiLog": "{\"time\":\"2026-09-08T13:45:02.5011227+09:00\",\"level\":\"INFO\",\"msg\":\"api_started\",\"address\":\"127.0.0.1:2757\"}\n{\"time\":\"2026-09-08T13:45:02.6128976+09:00\",\"level\":\"INFO\",\"msg\":\"order_published\",\"eventId\":\"018cd9d8-da63-436f-a095-6805e4103af6\",\"orderId\":\"64c1992c-8cf9-4088-85ae-63ab7ba7578a\",\"productId\":1788842699527058100,\"quantity\":1,\"topic\":\"orders.created.v1\"}\n{\"time\":\"2026-09-08T13:45:02.9800334+09:00\",\"level\":\"INFO\",\"msg\":\"order_published\",\"eventId\":\"ccc06b34-2307-485e-a653-961a70a23d10\",\"orderId\":\"3cf74ce1-5bb1-4ee0-973d-992c290d5146\",\"productId\":1788842699527058100,\"quantity\":3,\"topic\":\"orders.created.v1\"}\n{\"time\":\"2026-09-08T13:45:03.2135299+09:00\",\"level\":\"INFO\",\"msg\":\"order_published\",\"eventId\":\"e4f248ba-d60c-4416-a81f-1dc42b919b0f\",\"orderId\":\"6811d669-3bcc-4d97-b809-bd61dd36ea31\",\"productId\":1788842699527058100,\"quantity\":1,\"topic\":\"orders.created.v1\"}\n{\"time\":\"2026-09-08T13:45:03.3516135+09:00\",\"level\":\"INFO\",\"msg\":\"order_published\",\"eventId\":\"d0df91d2-849e-4ae4-8f37-1986be020d57\",\"orderId\":\"e246f973-aba5-46d5-a18b-ae5c501a1ee7\",\"productId\":1788842699527058100,\"quantity\":2,\"topic\":\"orders.created.v1\"}\n{\"time\":\"2026-09-08T13:45:03.5124919+09:00\",\"level\":\"INFO\",\"msg\":\"order_published\",\"eventId\":\"f6e37c4a-d3dc-4312-b5e8-928234aff607\",\"orderId\":\"8e4559cf-9d68-4d16-9235-4a51f543643e\",\"productId\":1788842699527058100,\"quantity\":3,\"topic\":\"orders.created.v1\"}\n{\"time\":\"2026-09-08T13:45:03.6294905+09:00\",\"level\":\"INFO\",\"msg\":\"order_published\",\"eventId\":\"b09b6ecf-dbbf-4656-9bee-ebe475258fab\",\"orderId\":\"4ac4d323-64de-4a9d-85ce-e15cf12a07b1\",\"productId\":1788842699527058100,\"quantity\":4,\"topic\":\"orders.created.v1\"}\n{\"time\":\"2026-09-08T13:45:03.843036+09:00\",\"level\":\"INFO\",\"msg\":\"order_published\",\"eventId\":\"704ce61a-b956-4bba-9c52-8926109e4896\",\"orderId\":\"845155d1-d54e-4579-84e2-4c8613c37bec\",\"productId\":1788842699527058100,\"quantity\":5,\"topic\":\"orders.created.v1\"}\n{\"time\":\"2026-09-08T13:45:10.2496179+09:00\",\"level\":\"INFO\",\"msg\":\"api_stopped\"}\n",
+      "before": {
+        "end": {
+          "0": 6,
+          "1": 4,
+          "2": 5,
+          "3": 2,
+          "4": 4,
+          "5": 1
+        },
+        "committed": {
+          "0": 6,
+          "1": 4,
+          "2": 5,
+          "3": 2,
+          "4": 4,
+          "5": 1
+        }
+      },
+      "finalStock": 81,
+      "group": "inventory-main-v1",
+      "initialStock": 100,
+      "productId": 1788842699527058100,
+      "quantitySum": 19,
+      "records": [
+        {
+          "event": {
+            "schemaVersion": 1,
+            "eventId": "018cd9d8-da63-436f-a095-6805e4103af6",
+            "orderId": "64c1992c-8cf9-4088-85ae-63ab7ba7578a",
+            "productId": 1788842699527058100,
+            "quantity": 1,
+            "createdAt": "2026-09-08T04:45:02.5882307Z"
+          },
+          "partition": 5,
+          "offset": 1,
+          "stock": 99,
+          "committedOffset": 2
+        },
+        {
+          "event": {
+            "schemaVersion": 1,
+            "eventId": "ccc06b34-2307-485e-a653-961a70a23d10",
+            "orderId": "3cf74ce1-5bb1-4ee0-973d-992c290d5146",
+            "productId": 1788842699527058100,
+            "quantity": 3,
+            "createdAt": "2026-09-08T04:45:02.9680368Z"
+          },
+          "partition": 4,
+          "offset": 4,
+          "stock": 96,
+          "committedOffset": 5
+        },
+        {
+          "event": {
+            "schemaVersion": 1,
+            "eventId": "e4f248ba-d60c-4416-a81f-1dc42b919b0f",
+            "orderId": "6811d669-3bcc-4d97-b809-bd61dd36ea31",
+            "productId": 1788842699527058100,
+            "quantity": 1,
+            "createdAt": "2026-09-08T04:45:03.1999414Z"
+          },
+          "partition": 4,
+          "offset": 5,
+          "stock": 95,
+          "committedOffset": 6
+        },
+        {
+          "event": {
+            "schemaVersion": 1,
+            "eventId": "d0df91d2-849e-4ae4-8f37-1986be020d57",
+            "orderId": "e246f973-aba5-46d5-a18b-ae5c501a1ee7",
+            "productId": 1788842699527058100,
+            "quantity": 2,
+            "createdAt": "2026-09-08T04:45:03.3385358Z"
+          },
+          "partition": 4,
+          "offset": 6,
+          "stock": 93,
+          "committedOffset": 7
+        },
+        {
+          "event": {
+            "schemaVersion": 1,
+            "eventId": "f6e37c4a-d3dc-4312-b5e8-928234aff607",
+            "orderId": "8e4559cf-9d68-4d16-9235-4a51f543643e",
+            "productId": 1788842699527058100,
+            "quantity": 3,
+            "createdAt": "2026-09-08T04:45:03.4904905Z"
+          },
+          "partition": 0,
+          "offset": 6,
+          "stock": 90,
+          "committedOffset": 7
+        },
+        {
+          "event": {
+            "schemaVersion": 1,
+            "eventId": "b09b6ecf-dbbf-4656-9bee-ebe475258fab",
+            "orderId": "4ac4d323-64de-4a9d-85ce-e15cf12a07b1",
+            "productId": 1788842699527058100,
+            "quantity": 4,
+            "createdAt": "2026-09-08T04:45:03.617494Z"
+          },
+          "partition": 5,
+          "offset": 2,
+          "stock": 86,
+          "committedOffset": 3
+        },
+        {
+          "event": {
+            "schemaVersion": 1,
+            "eventId": "704ce61a-b956-4bba-9c52-8926109e4896",
+            "orderId": "845155d1-d54e-4579-84e2-4c8613c37bec",
+            "productId": 1788842699527058100,
+            "quantity": 5,
+            "createdAt": "2026-09-08T04:45:03.8190381Z"
+          },
+          "partition": 2,
+          "offset": 5,
+          "stock": 81,
+          "committedOffset": 6
+        }
+      ],
+      "rejectedHTTP": 5,
+      "restartObservationSeconds": 5,
+      "restartedProcessed": 0,
+      "restartedWorkerLog": "{\"time\":\"2026-09-08T13:45:04.4308725+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":12160,\"groupId\":\"inventory-main-v1\",\"topic\":\"orders.created.v1\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:45:09.56221+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":12160,\"reason\":\"context canceled\"}\n",
+      "restartedWorkerPID": 12160,
+      "verifiedAt": "2026-09-08T04:45:10.2549111Z",
+      "workerLog": "{\"time\":\"2026-09-08T13:45:02.842787+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":28612,\"groupId\":\"inventory-main-v1\",\"topic\":\"orders.created.v1\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:45:02.9063287+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":5,\"offset\":1,\"key\":\"64c1992c-8cf9-4088-85ae-63ab7ba7578a\",\"valueSHA256\":\"12aa214971aa16159f534ed24ebb9f233c78753c49a859cb16bf55f62f54ce12\"}\n{\"time\":\"2026-09-08T13:45:02.9063287+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":5,\"offset\":1,\"eventId\":\"018cd9d8-da63-436f-a095-6805e4103af6\",\"orderId\":\"64c1992c-8cf9-4088-85ae-63ab7ba7578a\",\"productId\":1788842699527058100,\"quantity\":1}\n{\"time\":\"2026-09-08T13:45:02.9143361+09:00\",\"level\":\"INFO\",\"msg\":\"inventory_committed\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":5,\"offset\":1,\"eventId\":\"018cd9d8-da63-436f-a095-6805e4103af6\",\"orderId\":\"64c1992c-8cf9-4088-85ae-63ab7ba7578a\",\"productId\":1788842699527058100,\"quantity\":1}\n{\"time\":\"2026-09-08T13:45:02.9159435+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":5,\"offset\":1,\"eventId\":\"018cd9d8-da63-436f-a095-6805e4103af6\",\"orderId\":\"64c1992c-8cf9-4088-85ae-63ab7ba7578a\",\"productId\":1788842699527058100,\"quantity\":1,\"committedOffset\":2}\n{\"time\":\"2026-09-08T13:45:02.9810357+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":4,\"offset\":4,\"key\":\"3cf74ce1-5bb1-4ee0-973d-992c290d5146\",\"valueSHA256\":\"590c931e8f95be41d7b6252dc4cb3b482b17de4e43263b5167a8e89fba8efb12\"}\n{\"time\":\"2026-09-08T13:45:02.9810357+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":4,\"offset\":4,\"eventId\":\"ccc06b34-2307-485e-a653-961a70a23d10\",\"orderId\":\"3cf74ce1-5bb1-4ee0-973d-992c290d5146\",\"productId\":1788842699527058100,\"quantity\":3}\n{\"time\":\"2026-09-08T13:45:02.9850362+09:00\",\"level\":\"INFO\",\"msg\":\"inventory_committed\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":4,\"offset\":4,\"eventId\":\"ccc06b34-2307-485e-a653-961a70a23d10\",\"orderId\":\"3cf74ce1-5bb1-4ee0-973d-992c290d5146\",\"productId\":1788842699527058100,\"quantity\":3}\n{\"time\":\"2026-09-08T13:45:02.9870351+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":4,\"offset\":4,\"eventId\":\"ccc06b34-2307-485e-a653-961a70a23d10\",\"orderId\":\"3cf74ce1-5bb1-4ee0-973d-992c290d5146\",\"productId\":1788842699527058100,\"quantity\":3,\"committedOffset\":5}\n{\"time\":\"2026-09-08T13:45:03.2135299+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":4,\"offset\":5,\"key\":\"6811d669-3bcc-4d97-b809-bd61dd36ea31\",\"valueSHA256\":\"7053315e5d0a2f5f6341e191e5aace2a43d381b86da8e2ac9c57fcd28e24c7f3\"}\n{\"time\":\"2026-09-08T13:45:03.2135299+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":4,\"offset\":5,\"eventId\":\"e4f248ba-d60c-4416-a81f-1dc42b919b0f\",\"orderId\":\"6811d669-3bcc-4d97-b809-bd61dd36ea31\",\"productId\":1788842699527058100,\"quantity\":1}\n{\"time\":\"2026-09-08T13:45:03.220513+09:00\",\"level\":\"INFO\",\"msg\":\"inventory_committed\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":4,\"offset\":5,\"eventId\":\"e4f248ba-d60c-4416-a81f-1dc42b919b0f\",\"orderId\":\"6811d669-3bcc-4d97-b809-bd61dd36ea31\",\"productId\":1788842699527058100,\"quantity\":1}\n{\"time\":\"2026-09-08T13:45:03.2226431+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":4,\"offset\":5,\"eventId\":\"e4f248ba-d60c-4416-a81f-1dc42b919b0f\",\"orderId\":\"6811d669-3bcc-4d97-b809-bd61dd36ea31\",\"productId\":1788842699527058100,\"quantity\":1,\"committedOffset\":6}\n{\"time\":\"2026-09-08T13:45:03.3516135+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":4,\"offset\":6,\"key\":\"e246f973-aba5-46d5-a18b-ae5c501a1ee7\",\"valueSHA256\":\"5aa708fb8e3af17fd85096c2f9e1893a4609b56836cc75fa7ea87e601c9dbe64\"}\n{\"time\":\"2026-09-08T13:45:03.3516135+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":4,\"offset\":6,\"eventId\":\"d0df91d2-849e-4ae4-8f37-1986be020d57\",\"orderId\":\"e246f973-aba5-46d5-a18b-ae5c501a1ee7\",\"productId\":1788842699527058100,\"quantity\":2}\n{\"time\":\"2026-09-08T13:45:03.3574406+09:00\",\"level\":\"INFO\",\"msg\":\"inventory_committed\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":4,\"offset\":6,\"eventId\":\"d0df91d2-849e-4ae4-8f37-1986be020d57\",\"orderId\":\"e246f973-aba5-46d5-a18b-ae5c501a1ee7\",\"productId\":1788842699527058100,\"quantity\":2}\n{\"time\":\"2026-09-08T13:45:03.3595681+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":4,\"offset\":6,\"eventId\":\"d0df91d2-849e-4ae4-8f37-1986be020d57\",\"orderId\":\"e246f973-aba5-46d5-a18b-ae5c501a1ee7\",\"productId\":1788842699527058100,\"quantity\":2,\"committedOffset\":7}\n{\"time\":\"2026-09-08T13:45:03.5124919+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":0,\"offset\":6,\"key\":\"8e4559cf-9d68-4d16-9235-4a51f543643e\",\"valueSHA256\":\"99b6e376bf301edf9c2c9ec9000220dc456a8cf70d68aab7b168ae8099978b99\"}\n{\"time\":\"2026-09-08T13:45:03.5124919+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":0,\"offset\":6,\"eventId\":\"f6e37c4a-d3dc-4312-b5e8-928234aff607\",\"orderId\":\"8e4559cf-9d68-4d16-9235-4a51f543643e\",\"productId\":1788842699527058100,\"quantity\":3}\n{\"time\":\"2026-09-08T13:45:03.5234909+09:00\",\"level\":\"INFO\",\"msg\":\"inventory_committed\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":0,\"offset\":6,\"eventId\":\"f6e37c4a-d3dc-4312-b5e8-928234aff607\",\"orderId\":\"8e4559cf-9d68-4d16-9235-4a51f543643e\",\"productId\":1788842699527058100,\"quantity\":3}\n{\"time\":\"2026-09-08T13:45:03.5254927+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":0,\"offset\":6,\"eventId\":\"f6e37c4a-d3dc-4312-b5e8-928234aff607\",\"orderId\":\"8e4559cf-9d68-4d16-9235-4a51f543643e\",\"productId\":1788842699527058100,\"quantity\":3,\"committedOffset\":7}\n{\"time\":\"2026-09-08T13:45:03.6294905+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":5,\"offset\":2,\"key\":\"4ac4d323-64de-4a9d-85ce-e15cf12a07b1\",\"valueSHA256\":\"83f054633c9acbeba132ca1ef7c21992dc33d854165e6badce9f61ef825331c9\"}\n{\"time\":\"2026-09-08T13:45:03.6294905+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":5,\"offset\":2,\"eventId\":\"b09b6ecf-dbbf-4656-9bee-ebe475258fab\",\"orderId\":\"4ac4d323-64de-4a9d-85ce-e15cf12a07b1\",\"productId\":1788842699527058100,\"quantity\":4}\n{\"time\":\"2026-09-08T13:45:03.6508908+09:00\",\"level\":\"INFO\",\"msg\":\"inventory_committed\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":5,\"offset\":2,\"eventId\":\"b09b6ecf-dbbf-4656-9bee-ebe475258fab\",\"orderId\":\"4ac4d323-64de-4a9d-85ce-e15cf12a07b1\",\"productId\":1788842699527058100,\"quantity\":4}\n{\"time\":\"2026-09-08T13:45:03.6550724+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":5,\"offset\":2,\"eventId\":\"b09b6ecf-dbbf-4656-9bee-ebe475258fab\",\"orderId\":\"4ac4d323-64de-4a9d-85ce-e15cf12a07b1\",\"productId\":1788842699527058100,\"quantity\":4,\"committedOffset\":3}\n{\"time\":\"2026-09-08T13:45:03.843036+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":2,\"offset\":5,\"key\":\"845155d1-d54e-4579-84e2-4c8613c37bec\",\"valueSHA256\":\"82e6225993362ba5befc7ca523eb3274bfdc70e78ba6cce03153ec1efe4db8bb\"}\n{\"time\":\"2026-09-08T13:45:03.843036+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":2,\"offset\":5,\"eventId\":\"704ce61a-b956-4bba-9c52-8926109e4896\",\"orderId\":\"845155d1-d54e-4579-84e2-4c8613c37bec\",\"productId\":1788842699527058100,\"quantity\":5}\n{\"time\":\"2026-09-08T13:45:03.8500383+09:00\",\"level\":\"INFO\",\"msg\":\"inventory_committed\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":2,\"offset\":5,\"eventId\":\"704ce61a-b956-4bba-9c52-8926109e4896\",\"orderId\":\"845155d1-d54e-4579-84e2-4c8613c37bec\",\"productId\":1788842699527058100,\"quantity\":5}\n{\"time\":\"2026-09-08T13:45:03.8520355+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":28612,\"topic\":\"orders.created.v1\",\"partition\":2,\"offset\":5,\"eventId\":\"704ce61a-b956-4bba-9c52-8926109e4896\",\"orderId\":\"845155d1-d54e-4579-84e2-4c8613c37bec\",\"productId\":1788842699527058100,\"quantity\":5,\"committedOffset\":6}\n{\"time\":\"2026-09-08T13:45:04.0315508+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":28612,\"reason\":\"context canceled\"}\n",
+      "workerPID": 28612
+    },
+    "scenarios": [
+      {
+        "afterPublish": {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        "afterRestart": {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": 1
+          }
+        },
+        "before": {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        "duringFault": {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        "event": {
+          "schemaVersion": 1,
+          "eventId": "3a7d6c60-fd29-478f-a435-c3ef76251928",
+          "orderId": "e96f6c90-1e7a-49af-b758-c5b15ef9f2f0",
+          "productId": 1788842712763533200,
+          "quantity": 2,
+          "createdAt": "2026-09-08T04:45:12.7635332Z"
+        },
+        "exitCode": 1,
+        "faultInventory": null,
+        "finalInventory": 98,
+        "finishedAt": "2026-09-08T04:45:25.3332927Z",
+        "group": "phase2-a-3a7d6c60-fd29-478f-a435-c3ef76251928",
+        "historicalInventoryUnchanged": true,
+        "initialInventory": 100,
+        "mysqlDuringFault": "exited",
+        "offsetReset": false,
+        "partition": 0,
+        "recordOffset": 0,
+        "restartExitCode": 0,
+        "restartWorkerLog": "{\"time\":\"2026-09-08T13:45:25.2014964+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":7376,\"groupId\":\"phase2-a-3a7d6c60-fd29-478f-a435-c3ef76251928\",\"topic\":\"phase2.a.3a7d6c60-fd29-478f-a435-c3ef76251928\",\"phase2Baseline\":true}\n{\"time\":\"2026-09-08T13:45:25.2648624+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":7376,\"topic\":\"phase2.a.3a7d6c60-fd29-478f-a435-c3ef76251928\",\"partition\":0,\"offset\":0,\"key\":\"e96f6c90-1e7a-49af-b758-c5b15ef9f2f0\",\"valueSHA256\":\"8c23a96600c16dc3fb0fbd6959f096e1f54119c0242e26fea69216604693fcf9\"}\n{\"time\":\"2026-09-08T13:45:25.2648624+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":7376,\"topic\":\"phase2.a.3a7d6c60-fd29-478f-a435-c3ef76251928\",\"partition\":0,\"offset\":0,\"eventId\":\"3a7d6c60-fd29-478f-a435-c3ef76251928\",\"orderId\":\"e96f6c90-1e7a-49af-b758-c5b15ef9f2f0\",\"productId\":1788842712763533200,\"quantity\":2}\n{\"time\":\"2026-09-08T13:45:25.2716539+09:00\",\"level\":\"INFO\",\"msg\":\"inventory_committed\",\"pid\":7376,\"topic\":\"phase2.a.3a7d6c60-fd29-478f-a435-c3ef76251928\",\"partition\":0,\"offset\":0,\"eventId\":\"3a7d6c60-fd29-478f-a435-c3ef76251928\",\"orderId\":\"e96f6c90-1e7a-49af-b758-c5b15ef9f2f0\",\"productId\":1788842712763533200,\"quantity\":2}\n{\"time\":\"2026-09-08T13:45:25.2898556+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":7376,\"topic\":\"phase2.a.3a7d6c60-fd29-478f-a435-c3ef76251928\",\"partition\":0,\"offset\":0,\"eventId\":\"3a7d6c60-fd29-478f-a435-c3ef76251928\",\"orderId\":\"e96f6c90-1e7a-49af-b758-c5b15ef9f2f0\",\"productId\":1788842712763533200,\"quantity\":2,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:45:25.2967023+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":7376,\"reason\":\"context canceled\"}\n",
+        "restartWorkerPID": 7376,
+        "restoredBeforeRestartInventory": 100,
+        "runId": "3a7d6c60-fd29-478f-a435-c3ef76251928",
+        "scenario": "A",
+        "startedAt": "2026-09-08T04:45:12.7635332Z",
+        "status": "PASS",
+        "topic": "phase2.a.3a7d6c60-fd29-478f-a435-c3ef76251928",
+        "valueSHA256": "8c23a96600c16dc3fb0fbd6959f096e1f54119c0242e26fea69216604693fcf9",
+        "workerLog": "{\"time\":\"2026-09-08T13:45:14.3463299+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":24068,\"groupId\":\"phase2-a-3a7d6c60-fd29-478f-a435-c3ef76251928\",\"topic\":\"phase2.a.3a7d6c60-fd29-478f-a435-c3ef76251928\",\"phase2Baseline\":true}\n{\"time\":\"2026-09-08T13:45:14.3757987+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":24068,\"topic\":\"phase2.a.3a7d6c60-fd29-478f-a435-c3ef76251928\",\"partition\":0,\"offset\":0,\"key\":\"e96f6c90-1e7a-49af-b758-c5b15ef9f2f0\",\"valueSHA256\":\"8c23a96600c16dc3fb0fbd6959f096e1f54119c0242e26fea69216604693fcf9\"}\n{\"time\":\"2026-09-08T13:45:14.3763226+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":24068,\"topic\":\"phase2.a.3a7d6c60-fd29-478f-a435-c3ef76251928\",\"partition\":0,\"offset\":0,\"eventId\":\"3a7d6c60-fd29-478f-a435-c3ef76251928\",\"orderId\":\"e96f6c90-1e7a-49af-b758-c5b15ef9f2f0\",\"productId\":1788842712763533200,\"quantity\":2}\n{\"time\":\"2026-09-08T13:45:14.3763226+09:00\",\"level\":\"INFO\",\"msg\":\"fault_reached\",\"pid\":24068,\"point\":\"before-db\",\"eventId\":\"3a7d6c60-fd29-478f-a435-c3ef76251928\",\"orderId\":\"e96f6c90-1e7a-49af-b758-c5b15ef9f2f0\",\"productId\":1788842712763533200}\n{\"time\":\"2026-09-08T13:45:18.5788791+09:00\",\"level\":\"ERROR\",\"msg\":\"inventory_failed\",\"pid\":24068,\"topic\":\"phase2.a.3a7d6c60-fd29-478f-a435-c3ef76251928\",\"partition\":0,\"offset\":0,\"eventId\":\"3a7d6c60-fd29-478f-a435-c3ef76251928\",\"orderId\":\"e96f6c90-1e7a-49af-b758-c5b15ef9f2f0\",\"productId\":1788842712763533200,\"quantity\":2,\"error\":\"dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.\"}\n{\"time\":\"2026-09-08T13:45:19.1519233+09:00\",\"level\":\"ERROR\",\"msg\":\"worker_stopped\",\"pid\":24068,\"error\":\"processing at phase2.a.3a7d6c60-fd29-478f-a435-c3ef76251928/0/0: dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.\"}\n",
+        "workerPID": 24068
+      },
+      {
+        "afterPublish": {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        "afterRestart": {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": 1
+          }
+        },
+        "before": {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        "duringFault": {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        "event": {
+          "schemaVersion": 1,
+          "eventId": "031c6655-73e1-417f-95a2-eb3c535d7b7f",
+          "orderId": "5ebb5fa7-69fc-4626-976c-2e5ee43173ba",
+          "productId": 1788842727685410000,
+          "quantity": 2,
+          "createdAt": "2026-09-08T04:45:27.68541Z"
+        },
+        "exitCode": 86,
+        "faultInventory": 100,
+        "finalInventory": 98,
+        "finishedAt": "2026-09-08T04:45:39.769209Z",
+        "group": "phase2-b-031c6655-73e1-417f-95a2-eb3c535d7b7f",
+        "historicalInventoryUnchanged": true,
+        "initialInventory": 100,
+        "offsetReset": false,
+        "partition": 0,
+        "recordOffset": 0,
+        "restartExitCode": 0,
+        "restartWorkerLog": "{\"time\":\"2026-09-08T13:45:29.7102286+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":32872,\"groupId\":\"phase2-b-031c6655-73e1-417f-95a2-eb3c535d7b7f\",\"topic\":\"phase2.b.031c6655-73e1-417f-95a2-eb3c535d7b7f\",\"phase2Baseline\":true}\n{\"time\":\"2026-09-08T13:45:39.6717527+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":32872,\"topic\":\"phase2.b.031c6655-73e1-417f-95a2-eb3c535d7b7f\",\"partition\":0,\"offset\":0,\"key\":\"5ebb5fa7-69fc-4626-976c-2e5ee43173ba\",\"valueSHA256\":\"877a91c4ef037a2df1156f4677f6c5d4fa07a29646b62e83a449ce3f81e00e67\"}\n{\"time\":\"2026-09-08T13:45:39.6717527+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":32872,\"topic\":\"phase2.b.031c6655-73e1-417f-95a2-eb3c535d7b7f\",\"partition\":0,\"offset\":0,\"eventId\":\"031c6655-73e1-417f-95a2-eb3c535d7b7f\",\"orderId\":\"5ebb5fa7-69fc-4626-976c-2e5ee43173ba\",\"productId\":1788842727685410000,\"quantity\":2}\n{\"time\":\"2026-09-08T13:45:39.6792387+09:00\",\"level\":\"INFO\",\"msg\":\"inventory_committed\",\"pid\":32872,\"topic\":\"phase2.b.031c6655-73e1-417f-95a2-eb3c535d7b7f\",\"partition\":0,\"offset\":0,\"eventId\":\"031c6655-73e1-417f-95a2-eb3c535d7b7f\",\"orderId\":\"5ebb5fa7-69fc-4626-976c-2e5ee43173ba\",\"productId\":1788842727685410000,\"quantity\":2}\n{\"time\":\"2026-09-08T13:45:39.6813579+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":32872,\"topic\":\"phase2.b.031c6655-73e1-417f-95a2-eb3c535d7b7f\",\"partition\":0,\"offset\":0,\"eventId\":\"031c6655-73e1-417f-95a2-eb3c535d7b7f\",\"orderId\":\"5ebb5fa7-69fc-4626-976c-2e5ee43173ba\",\"productId\":1788842727685410000,\"quantity\":2,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:45:39.7452077+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":32872,\"reason\":\"context canceled\"}\n",
+        "restartWorkerPID": 32872,
+        "runId": "031c6655-73e1-417f-95a2-eb3c535d7b7f",
+        "scenario": "B",
+        "startedAt": "2026-09-08T04:45:27.68541Z",
+        "status": "PASS",
+        "topic": "phase2.b.031c6655-73e1-417f-95a2-eb3c535d7b7f",
+        "valueSHA256": "877a91c4ef037a2df1156f4677f6c5d4fa07a29646b62e83a449ce3f81e00e67",
+        "workerLog": "{\"time\":\"2026-09-08T13:45:29.6221086+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":28872,\"groupId\":\"phase2-b-031c6655-73e1-417f-95a2-eb3c535d7b7f\",\"topic\":\"phase2.b.031c6655-73e1-417f-95a2-eb3c535d7b7f\",\"phase2Baseline\":true}\n{\"time\":\"2026-09-08T13:45:29.6721208+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":28872,\"topic\":\"phase2.b.031c6655-73e1-417f-95a2-eb3c535d7b7f\",\"partition\":0,\"offset\":0,\"key\":\"5ebb5fa7-69fc-4626-976c-2e5ee43173ba\",\"valueSHA256\":\"877a91c4ef037a2df1156f4677f6c5d4fa07a29646b62e83a449ce3f81e00e67\"}\n{\"time\":\"2026-09-08T13:45:29.67265+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":28872,\"topic\":\"phase2.b.031c6655-73e1-417f-95a2-eb3c535d7b7f\",\"partition\":0,\"offset\":0,\"eventId\":\"031c6655-73e1-417f-95a2-eb3c535d7b7f\",\"orderId\":\"5ebb5fa7-69fc-4626-976c-2e5ee43173ba\",\"productId\":1788842727685410000,\"quantity\":2}\n{\"time\":\"2026-09-08T13:45:29.6768661+09:00\",\"level\":\"INFO\",\"msg\":\"fault_reached\",\"pid\":28872,\"point\":\"before-db-commit\",\"eventId\":\"031c6655-73e1-417f-95a2-eb3c535d7b7f\",\"orderId\":\"5ebb5fa7-69fc-4626-976c-2e5ee43173ba\",\"productId\":1788842727685410000}\n",
+        "workerPID": 28872
+      },
+      {
+        "afterPublish": {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        "afterRestart": {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": 1
+          }
+        },
+        "before": {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        "duringFault": {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        "event": {
+          "schemaVersion": 1,
+          "eventId": "3592e012-3528-4f3d-86ab-d76c6c4e32c4",
+          "orderId": "e5e671d4-74e4-4853-b137-4854d2eb5932",
+          "productId": 1788842742122637400,
+          "quantity": 2,
+          "createdAt": "2026-09-08T04:45:42.1226374Z"
+        },
+        "exitCode": 87,
+        "faultInventory": 98,
+        "finalInventory": 96,
+        "finishedAt": "2026-09-08T04:45:54.2806899Z",
+        "group": "phase2-c-3592e012-3528-4f3d-86ab-d76c6c4e32c4",
+        "historicalInventoryUnchanged": true,
+        "initialInventory": 100,
+        "offsetReset": false,
+        "partition": 0,
+        "recordOffset": 0,
+        "restartExitCode": 0,
+        "restartWorkerLog": "{\"time\":\"2026-09-08T13:45:44.2205504+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":32504,\"groupId\":\"phase2-c-3592e012-3528-4f3d-86ab-d76c6c4e32c4\",\"topic\":\"phase2.c.3592e012-3528-4f3d-86ab-d76c6c4e32c4\",\"phase2Baseline\":true}\n{\"time\":\"2026-09-08T13:45:54.1727866+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":32504,\"topic\":\"phase2.c.3592e012-3528-4f3d-86ab-d76c6c4e32c4\",\"partition\":0,\"offset\":0,\"key\":\"e5e671d4-74e4-4853-b137-4854d2eb5932\",\"valueSHA256\":\"e771f7a11f21c8883bfb33791b7a5482a7c4fec4033ec3e1baa12a0fcdeea65b\"}\n{\"time\":\"2026-09-08T13:45:54.1733421+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":32504,\"topic\":\"phase2.c.3592e012-3528-4f3d-86ab-d76c6c4e32c4\",\"partition\":0,\"offset\":0,\"eventId\":\"3592e012-3528-4f3d-86ab-d76c6c4e32c4\",\"orderId\":\"e5e671d4-74e4-4853-b137-4854d2eb5932\",\"productId\":1788842742122637400,\"quantity\":2}\n{\"time\":\"2026-09-08T13:45:54.180015+09:00\",\"level\":\"INFO\",\"msg\":\"inventory_committed\",\"pid\":32504,\"topic\":\"phase2.c.3592e012-3528-4f3d-86ab-d76c6c4e32c4\",\"partition\":0,\"offset\":0,\"eventId\":\"3592e012-3528-4f3d-86ab-d76c6c4e32c4\",\"orderId\":\"e5e671d4-74e4-4853-b137-4854d2eb5932\",\"productId\":1788842742122637400,\"quantity\":2}\n{\"time\":\"2026-09-08T13:45:54.1810148+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":32504,\"topic\":\"phase2.c.3592e012-3528-4f3d-86ab-d76c6c4e32c4\",\"partition\":0,\"offset\":0,\"eventId\":\"3592e012-3528-4f3d-86ab-d76c6c4e32c4\",\"orderId\":\"e5e671d4-74e4-4853-b137-4854d2eb5932\",\"productId\":1788842742122637400,\"quantity\":2,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:45:54.2357586+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":32504,\"reason\":\"context canceled\"}\n",
+        "restartWorkerPID": 32504,
+        "runId": "3592e012-3528-4f3d-86ab-d76c6c4e32c4",
+        "scenario": "C",
+        "startedAt": "2026-09-08T04:45:42.1226374Z",
+        "status": "PASS",
+        "topic": "phase2.c.3592e012-3528-4f3d-86ab-d76c6c4e32c4",
+        "valueSHA256": "e771f7a11f21c8883bfb33791b7a5482a7c4fec4033ec3e1baa12a0fcdeea65b",
+        "workerLog": "{\"time\":\"2026-09-08T13:45:44.1440451+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":30672,\"groupId\":\"phase2-c-3592e012-3528-4f3d-86ab-d76c6c4e32c4\",\"topic\":\"phase2.c.3592e012-3528-4f3d-86ab-d76c6c4e32c4\",\"phase2Baseline\":true}\n{\"time\":\"2026-09-08T13:45:44.1763163+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":30672,\"topic\":\"phase2.c.3592e012-3528-4f3d-86ab-d76c6c4e32c4\",\"partition\":0,\"offset\":0,\"key\":\"e5e671d4-74e4-4853-b137-4854d2eb5932\",\"valueSHA256\":\"e771f7a11f21c8883bfb33791b7a5482a7c4fec4033ec3e1baa12a0fcdeea65b\"}\n{\"time\":\"2026-09-08T13:45:44.1763163+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":30672,\"topic\":\"phase2.c.3592e012-3528-4f3d-86ab-d76c6c4e32c4\",\"partition\":0,\"offset\":0,\"eventId\":\"3592e012-3528-4f3d-86ab-d76c6c4e32c4\",\"orderId\":\"e5e671d4-74e4-4853-b137-4854d2eb5932\",\"productId\":1788842742122637400,\"quantity\":2}\n{\"time\":\"2026-09-08T13:45:44.1848606+09:00\",\"level\":\"INFO\",\"msg\":\"inventory_committed\",\"pid\":30672,\"topic\":\"phase2.c.3592e012-3528-4f3d-86ab-d76c6c4e32c4\",\"partition\":0,\"offset\":0,\"eventId\":\"3592e012-3528-4f3d-86ab-d76c6c4e32c4\",\"orderId\":\"e5e671d4-74e4-4853-b137-4854d2eb5932\",\"productId\":1788842742122637400,\"quantity\":2}\n{\"time\":\"2026-09-08T13:45:44.1848606+09:00\",\"level\":\"INFO\",\"msg\":\"fault_reached\",\"pid\":30672,\"point\":\"after-db-commit\",\"eventId\":\"3592e012-3528-4f3d-86ab-d76c6c4e32c4\",\"orderId\":\"e5e671d4-74e4-4853-b137-4854d2eb5932\",\"productId\":1788842742122637400}\n",
+        "workerPID": 30672
+      },
+      {
+        "afterPublish": {
+          "end": {
+            "0": 2
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        "afterRestart": {
+          "end": {
+            "0": 2
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        "before": {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        "duringFault": {
+          "end": {
+            "0": 2
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        "event": {
+          "schemaVersion": 2,
+          "eventId": "73d9b5ff-126e-4c06-86da-969943e92ee6",
+          "orderId": "9ec1f5ad-1169-4858-a837-910878579e22",
+          "productId": 1788842756590803200,
+          "quantity": 2,
+          "createdAt": "2026-09-08T04:45:56.5908032Z"
+        },
+        "exitCode": 1,
+        "faultInventory": 100,
+        "finalInventory": 100,
+        "finishedAt": "2026-09-08T04:45:58.648093Z",
+        "group": "phase2-d-73d9b5ff-126e-4c06-86da-969943e92ee6",
+        "historicalInventoryUnchanged": true,
+        "initialInventory": 100,
+        "offsetReset": false,
+        "partition": 0,
+        "recordOffset": 0,
+        "restartExitCode": 1,
+        "restartWorkerLog": "{\"time\":\"2026-09-08T13:45:58.5738949+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":7776,\"groupId\":\"phase2-d-73d9b5ff-126e-4c06-86da-969943e92ee6\",\"topic\":\"phase2.d.73d9b5ff-126e-4c06-86da-969943e92ee6\",\"phase2Baseline\":true}\n{\"time\":\"2026-09-08T13:45:58.6051373+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":7776,\"topic\":\"phase2.d.73d9b5ff-126e-4c06-86da-969943e92ee6\",\"partition\":0,\"offset\":0,\"key\":\"9ec1f5ad-1169-4858-a837-910878579e22\",\"valueSHA256\":\"60ddf94638da49f6049b3ac29a84b2ac74311ca3a42a173bb87fbc32f71df4d8\"}\n{\"time\":\"2026-09-08T13:45:58.6204796+09:00\",\"level\":\"ERROR\",\"msg\":\"worker_stopped\",\"pid\":7776,\"error\":\"processing at phase2.d.73d9b5ff-126e-4c06-86da-969943e92ee6/0/0: invalid OrderCreated: schemaVersion=1, UUID v4 IDs, positive productId/quantity and UTC createdAt required\"}\n",
+        "restartWorkerPID": 7776,
+        "runId": "73d9b5ff-126e-4c06-86da-969943e92ee6",
+        "scenario": "D",
+        "startedAt": "2026-09-08T04:45:56.5908032Z",
+        "status": "PASS",
+        "successor": {
+          "schemaVersion": 1,
+          "eventId": "db330edf-ecc6-4b18-b7aa-84d86c89b741",
+          "orderId": "b9731c6d-1452-459e-a910-4adbc3d3efd8",
+          "productId": 1788842756590803200,
+          "quantity": 1,
+          "createdAt": "2026-09-08T04:45:56.7837218Z"
+        },
+        "successorBlocked": true,
+        "topic": "phase2.d.73d9b5ff-126e-4c06-86da-969943e92ee6",
+        "valueSHA256": "60ddf94638da49f6049b3ac29a84b2ac74311ca3a42a173bb87fbc32f71df4d8",
+        "workerLog": "{\"time\":\"2026-09-08T13:45:58.5009889+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":25892,\"groupId\":\"phase2-d-73d9b5ff-126e-4c06-86da-969943e92ee6\",\"topic\":\"phase2.d.73d9b5ff-126e-4c06-86da-969943e92ee6\",\"phase2Baseline\":true}\n{\"time\":\"2026-09-08T13:45:58.5295688+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":25892,\"topic\":\"phase2.d.73d9b5ff-126e-4c06-86da-969943e92ee6\",\"partition\":0,\"offset\":0,\"key\":\"9ec1f5ad-1169-4858-a837-910878579e22\",\"valueSHA256\":\"60ddf94638da49f6049b3ac29a84b2ac74311ca3a42a173bb87fbc32f71df4d8\"}\n{\"time\":\"2026-09-08T13:45:58.5501429+09:00\",\"level\":\"ERROR\",\"msg\":\"worker_stopped\",\"pid\":25892,\"error\":\"processing at phase2.d.73d9b5ff-126e-4c06-86da-969943e92ee6/0/0: invalid OrderCreated: schemaVersion=1, UUID v4 IDs, positive productId/quantity and UTC createdAt required\"}\n",
+        "workerPID": 25892
+      }
+    ]
+  },
+  "scenarios": [
+    {
+      "after": [
+        {
+          "end": {
+            "0": 2
+          },
+          "committed": {
+            "0": 2
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "before": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "deadLetters": [
+        {
+          "dlqId": "f2f98a2fe0f44bf8e2fa714a754d9bb2",
+          "originalKey": "NGRmMzBkOGItNWQ3NC00YjY1LTk1YzEtOWVmMjdiZWQwZTJj",
+          "originalRawValue": "e2ludmFsaWQtanNvbg==",
+          "sourceHeaders": null,
+          "originalTopic": "phase3.ef512f90-1935-4cd8-b376-61c80bb391e2.main",
+          "originalPartition": 0,
+          "originalOffset": 0,
+          "retryCount": 0,
+          "errorCode": "MALFORMED_JSON",
+          "errorMessage": "MALFORMED_JSON",
+          "failedAt": "2026-09-08T04:40:19.9997377Z"
+        }
+      ],
+      "delaySeconds": 2,
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "ef512f90-1935-4cd8-b376-61c80bb391e2",
+        "orderId": "4df30d8b-5d74-4b65-95c1-9ef27bed0e2c",
+        "productId": 1788842416512619500,
+        "quantity": 2,
+        "createdAt": "2026-09-08T04:40:16.5126195Z"
+      },
+      "finalInventory": 98,
+      "finishedAt": "2026-09-08T04:40:21.0878351Z",
+      "historicalInventoryUnchanged": true,
+      "initialInventory": 100,
+      "mainGroup": "phase3.ef512f90-1935-4cd8-b376-61c80bb391e2-0",
+      "maxRetries": 3,
+      "retryGroup": "phase3.ef512f90-1935-4cd8-b376-61c80bb391e2-1",
+      "retryRecords": [],
+      "runId": "phase3.ef512f90-1935-4cd8-b376-61c80bb391e2",
+      "scenario": "Poison",
+      "source": {
+        "Topic": "phase3.ef512f90-1935-4cd8-b376-61c80bb391e2.main",
+        "Partition": 0,
+        "Offset": 0,
+        "HighWaterMark": 2,
+        "Key": "NGRmMzBkOGItNWQ3NC00YjY1LTk1YzEtOWVmMjdiZWQwZTJj",
+        "Value": "e2ludmFsaWQtanNvbg==",
+        "Headers": null,
+        "WriterData": null,
+        "Time": "2026-09-08T04:40:17.457Z"
+      },
+      "startedAt": "2026-09-08T04:40:17.2843313Z",
+      "status": "PASS",
+      "topics": [
+        "phase3.ef512f90-1935-4cd8-b376-61c80bb391e2.main",
+        "phase3.ef512f90-1935-4cd8-b376-61c80bb391e2.retry",
+        "phase3.ef512f90-1935-4cd8-b376-61c80bb391e2.dlq"
+      ],
+      "workers": [
+        {
+          "exitCode": 0,
+          "log": "{\"time\":\"2026-09-08T13:40:19.5565002+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":27056,\"groupId\":\"phase3.ef512f90-1935-4cd8-b376-61c80bb391e2-0\",\"topic\":\"phase3.ef512f90-1935-4cd8-b376-61c80bb391e2.main\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:40:19.9997377+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":27056,\"topic\":\"phase3.ef512f90-1935-4cd8-b376-61c80bb391e2.main\",\"partition\":0,\"offset\":0,\"key\":\"4df30d8b-5d74-4b65-95c1-9ef27bed0e2c\",\"valueSHA256\":\"9b60fca5ee82ffb9afc0d382b727815b0b0e70a096b08a1ccb82cc2ec8909066\"}\n{\"time\":\"2026-09-08T13:40:20.0177257+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":27056,\"topic\":\"phase3.ef512f90-1935-4cd8-b376-61c80bb391e2.main\",\"partition\":0,\"offset\":0,\"destination\":\"phase3.ef512f90-1935-4cd8-b376-61c80bb391e2.dlq\",\"errorCode\":\"MALFORMED_JSON\",\"retryCount\":0}\n{\"time\":\"2026-09-08T13:40:20.2508064+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":27056,\"topic\":\"phase3.ef512f90-1935-4cd8-b376-61c80bb391e2.main\",\"partition\":0,\"offset\":0,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:40:20.2508064+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":27056,\"topic\":\"phase3.ef512f90-1935-4cd8-b376-61c80bb391e2.main\",\"partition\":0,\"offset\":1,\"key\":\"4df30d8b-5d74-4b65-95c1-9ef27bed0e2c\",\"valueSHA256\":\"91f66bd7eeec766a0a264c24cb6a463e8185e5ea1646b1cd7925ddc19052dfee\"}\n{\"time\":\"2026-09-08T13:40:20.2508064+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":27056,\"topic\":\"phase3.ef512f90-1935-4cd8-b376-61c80bb391e2.main\",\"partition\":0,\"offset\":1,\"eventId\":\"ef512f90-1935-4cd8-b376-61c80bb391e2\",\"orderId\":\"4df30d8b-5d74-4b65-95c1-9ef27bed0e2c\",\"productId\":1788842416512619500,\"quantity\":2}\n{\"time\":\"2026-09-08T13:40:20.3335008+09:00\",\"level\":\"INFO\",\"msg\":\"inventory_committed\",\"pid\":27056,\"topic\":\"phase3.ef512f90-1935-4cd8-b376-61c80bb391e2.main\",\"partition\":0,\"offset\":1,\"eventId\":\"ef512f90-1935-4cd8-b376-61c80bb391e2\",\"orderId\":\"4df30d8b-5d74-4b65-95c1-9ef27bed0e2c\",\"productId\":1788842416512619500,\"quantity\":2}\n{\"time\":\"2026-09-08T13:40:20.3454702+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":27056,\"topic\":\"phase3.ef512f90-1935-4cd8-b376-61c80bb391e2.main\",\"partition\":0,\"offset\":1,\"eventId\":\"ef512f90-1935-4cd8-b376-61c80bb391e2\",\"orderId\":\"4df30d8b-5d74-4b65-95c1-9ef27bed0e2c\",\"productId\":1788842416512619500,\"quantity\":2,\"committedOffset\":2}\n{\"time\":\"2026-09-08T13:40:20.4383893+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":27056,\"reason\":\"context canceled\"}\n",
+          "pid": 27056
+        }
+      ]
+    },
+    {
+      "after": [
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": 1
+          }
+        },
+        {
+          "end": {
+            "0": 3
+          },
+          "committed": {
+            "0": 3
+          }
+        },
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "afterMainFailure": [
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": 1
+          }
+        },
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "before": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "deadLetters": [
+        {
+          "dlqId": "83a398af4a0400f245acf82da0b39b71",
+          "originalKey": "MWRkZTgxNWQtYjE3MC00NTIzLWJhYzctODA3YjAxNWQ4OWNj",
+          "originalRawValue": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiOWVlMzU1N2ItMjkyMS00MGQ5LTliNjMtMWE3NjZlYzNhZjVlIiwib3JkZXJJZCI6IjFkZGU4MTVkLWIxNzAtNDUyMy1iYWM3LTgwN2IwMTVkODljYyIsInByb2R1Y3RJZCI6MTc4ODg0MjQyMTE3MjcxMTMwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDA6MjEuMTcyNzExM1oifQ==",
+          "sourceHeaders": [
+            {
+              "Key": "retry-count",
+              "Value": "Mw=="
+            },
+            {
+              "Key": "next-attempt-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0MDo0NS40MTk2OTUxWg=="
+            },
+            {
+              "Key": "first-failed-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0MDozOS40MTc5MzQ1Wg=="
+            },
+            {
+              "Key": "last-error-code",
+              "Value": "REJfQ09OTkVDVElPTg=="
+            },
+            {
+              "Key": "original-topic",
+              "Value": "cGhhc2UzLjllZTM1NTdiLTI5MjEtNDBkOS05YjYzLTFhNzY2ZWMzYWY1ZS5tYWlu"
+            },
+            {
+              "Key": "original-partition",
+              "Value": "MA=="
+            },
+            {
+              "Key": "original-offset",
+              "Value": "MA=="
+            }
+          ],
+          "originalTopic": "phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.main",
+          "originalPartition": 0,
+          "originalOffset": 0,
+          "retryCount": 3,
+          "errorCode": "DB_CONNECTION",
+          "errorMessage": "retry limit reached: DB_CONNECTION",
+          "failedAt": "2026-09-08T04:40:45.4208106Z"
+        }
+      ],
+      "delaySeconds": 2,
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "9ee3557b-2921-40d9-9b63-1a766ec3af5e",
+        "orderId": "1dde815d-b170-4523-bac7-807b015d89cc",
+        "productId": 1788842421172711300,
+        "quantity": 2,
+        "createdAt": "2026-09-08T04:40:21.1727113Z"
+      },
+      "finalInventory": 100,
+      "finishedAt": "2026-09-08T04:41:04.4584376Z",
+      "historicalInventoryUnchanged": true,
+      "initialInventory": 100,
+      "mainGroup": "phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e-0",
+      "maxRetries": 3,
+      "retryGroup": "phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e-1",
+      "retryRecords": [
+        {
+          "Topic": "phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry",
+          "Partition": 0,
+          "Offset": 0,
+          "HighWaterMark": 3,
+          "Key": "MWRkZTgxNWQtYjE3MC00NTIzLWJhYzctODA3YjAxNWQ4OWNj",
+          "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiOWVlMzU1N2ItMjkyMS00MGQ5LTliNjMtMWE3NjZlYzNhZjVlIiwib3JkZXJJZCI6IjFkZGU4MTVkLWIxNzAtNDUyMy1iYWM3LTgwN2IwMTVkODljYyIsInByb2R1Y3RJZCI6MTc4ODg0MjQyMTE3MjcxMTMwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDA6MjEuMTcyNzExM1oifQ==",
+          "Headers": [
+            {
+              "Key": "retry-count",
+              "Value": "MQ=="
+            },
+            {
+              "Key": "next-attempt-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0MDo0MS40MTc5MzQ1Wg=="
+            },
+            {
+              "Key": "first-failed-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0MDozOS40MTc5MzQ1Wg=="
+            },
+            {
+              "Key": "last-error-code",
+              "Value": "REJfQ09OTkVDVElPTg=="
+            },
+            {
+              "Key": "original-topic",
+              "Value": "cGhhc2UzLjllZTM1NTdiLTI5MjEtNDBkOS05YjYzLTFhNzY2ZWMzYWY1ZS5tYWlu"
+            },
+            {
+              "Key": "original-partition",
+              "Value": "MA=="
+            },
+            {
+              "Key": "original-offset",
+              "Value": "MA=="
+            }
+          ],
+          "WriterData": null,
+          "Time": "2026-09-08T04:40:39.433Z"
+        },
+        {
+          "Topic": "phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry",
+          "Partition": 0,
+          "Offset": 1,
+          "HighWaterMark": 3,
+          "Key": "MWRkZTgxNWQtYjE3MC00NTIzLWJhYzctODA3YjAxNWQ4OWNj",
+          "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiOWVlMzU1N2ItMjkyMS00MGQ5LTliNjMtMWE3NjZlYzNhZjVlIiwib3JkZXJJZCI6IjFkZGU4MTVkLWIxNzAtNDUyMy1iYWM3LTgwN2IwMTVkODljYyIsInByb2R1Y3RJZCI6MTc4ODg0MjQyMTE3MjcxMTMwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDA6MjEuMTcyNzExM1oifQ==",
+          "Headers": [
+            {
+              "Key": "retry-count",
+              "Value": "Mg=="
+            },
+            {
+              "Key": "next-attempt-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0MDo0My40MTkzNDU1Wg=="
+            },
+            {
+              "Key": "first-failed-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0MDozOS40MTc5MzQ1Wg=="
+            },
+            {
+              "Key": "last-error-code",
+              "Value": "REJfQ09OTkVDVElPTg=="
+            },
+            {
+              "Key": "original-topic",
+              "Value": "cGhhc2UzLjllZTM1NTdiLTI5MjEtNDBkOS05YjYzLTFhNzY2ZWMzYWY1ZS5tYWlu"
+            },
+            {
+              "Key": "original-partition",
+              "Value": "MA=="
+            },
+            {
+              "Key": "original-offset",
+              "Value": "MA=="
+            }
+          ],
+          "WriterData": null,
+          "Time": "2026-09-08T04:40:41.455Z"
+        },
+        {
+          "Topic": "phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry",
+          "Partition": 0,
+          "Offset": 2,
+          "HighWaterMark": 3,
+          "Key": "MWRkZTgxNWQtYjE3MC00NTIzLWJhYzctODA3YjAxNWQ4OWNj",
+          "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiOWVlMzU1N2ItMjkyMS00MGQ5LTliNjMtMWE3NjZlYzNhZjVlIiwib3JkZXJJZCI6IjFkZGU4MTVkLWIxNzAtNDUyMy1iYWM3LTgwN2IwMTVkODljYyIsInByb2R1Y3RJZCI6MTc4ODg0MjQyMTE3MjcxMTMwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDA6MjEuMTcyNzExM1oifQ==",
+          "Headers": [
+            {
+              "Key": "retry-count",
+              "Value": "Mw=="
+            },
+            {
+              "Key": "next-attempt-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0MDo0NS40MTk2OTUxWg=="
+            },
+            {
+              "Key": "first-failed-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0MDozOS40MTc5MzQ1Wg=="
+            },
+            {
+              "Key": "last-error-code",
+              "Value": "REJfQ09OTkVDVElPTg=="
+            },
+            {
+              "Key": "original-topic",
+              "Value": "cGhhc2UzLjllZTM1NTdiLTI5MjEtNDBkOS05YjYzLTFhNzY2ZWMzYWY1ZS5tYWlu"
+            },
+            {
+              "Key": "original-partition",
+              "Value": "MA=="
+            },
+            {
+              "Key": "original-offset",
+              "Value": "MA=="
+            }
+          ],
+          "WriterData": null,
+          "Time": "2026-09-08T04:40:43.43Z"
+        }
+      ],
+      "runId": "phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e",
+      "scenario": "Exhaustion",
+      "source": {
+        "Topic": "phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.main",
+        "Partition": 0,
+        "Offset": 0,
+        "HighWaterMark": 1,
+        "Key": "MWRkZTgxNWQtYjE3MC00NTIzLWJhYzctODA3YjAxNWQ4OWNj",
+        "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiOWVlMzU1N2ItMjkyMS00MGQ5LTliNjMtMWE3NjZlYzNhZjVlIiwib3JkZXJJZCI6IjFkZGU4MTVkLWIxNzAtNDUyMy1iYWM3LTgwN2IwMTVkODljYyIsInByb2R1Y3RJZCI6MTc4ODg0MjQyMTE3MjcxMTMwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDA6MjEuMTcyNzExM1oifQ==",
+        "Headers": null,
+        "WriterData": null,
+        "Time": "2026-09-08T04:40:21.461Z"
+      },
+      "startedAt": "2026-09-08T04:40:21.426044Z",
+      "status": "PASS",
+      "topics": [
+        "phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.main",
+        "phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry",
+        "phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.dlq"
+      ],
+      "workers": [
+        {
+          "exitCode": 0,
+          "log": "{\"time\":\"2026-09-08T13:40:23.0732685+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":29760,\"groupId\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e-0\",\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.main\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:40:23.1026374+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":29760,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.main\",\"partition\":0,\"offset\":0,\"key\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"valueSHA256\":\"238e2be23f3590b2f87585905823cc0d3cc3278b3c016e3f5af3993275065d3c\"}\n{\"time\":\"2026-09-08T13:40:23.1026374+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":29760,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.main\",\"partition\":0,\"offset\":0,\"eventId\":\"9ee3557b-2921-40d9-9b63-1a766ec3af5e\",\"orderId\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"productId\":1788842421172711300,\"quantity\":2}\n{\"time\":\"2026-09-08T13:40:23.1026374+09:00\",\"level\":\"INFO\",\"msg\":\"fault_reached\",\"pid\":29760,\"point\":\"before-db\",\"eventId\":\"9ee3557b-2921-40d9-9b63-1a766ec3af5e\",\"orderId\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"productId\":1788842421172711300}\n{\"time\":\"2026-09-08T13:40:39.4174+09:00\",\"level\":\"ERROR\",\"msg\":\"inventory_failed\",\"pid\":29760,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.main\",\"partition\":0,\"offset\":0,\"eventId\":\"9ee3557b-2921-40d9-9b63-1a766ec3af5e\",\"orderId\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"productId\":1788842421172711300,\"quantity\":2,\"error\":\"dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.\"}\n{\"time\":\"2026-09-08T13:40:39.704987+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":29760,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.main\",\"partition\":0,\"offset\":0,\"eventId\":\"9ee3557b-2921-40d9-9b63-1a766ec3af5e\",\"orderId\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"productId\":1788842421172711300,\"quantity\":2,\"destination\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"errorCode\":\"DB_CONNECTION\",\"retryCount\":0}\n{\"time\":\"2026-09-08T13:40:39.7070987+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":29760,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.main\",\"partition\":0,\"offset\":0,\"eventId\":\"9ee3557b-2921-40d9-9b63-1a766ec3af5e\",\"orderId\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"productId\":1788842421172711300,\"quantity\":2,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:40:39.8087367+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":29760,\"reason\":\"context canceled\"}\n",
+          "pid": 29760
+        },
+        {
+          "exitCode": 0,
+          "log": "{\"time\":\"2026-09-08T13:40:40.0402424+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":8944,\"groupId\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e-1\",\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:40:40.0762426+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":0,\"key\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"valueSHA256\":\"238e2be23f3590b2f87585905823cc0d3cc3278b3c016e3f5af3993275065d3c\"}\n{\"time\":\"2026-09-08T13:40:40.0762426+09:00\",\"level\":\"INFO\",\"msg\":\"retry_wait\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":0,\"retryCount\":1,\"nextAttemptAt\":\"2026-09-08T04:40:41.4179345Z\"}\n{\"time\":\"2026-09-08T13:40:41.4185032+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":0,\"eventId\":\"9ee3557b-2921-40d9-9b63-1a766ec3af5e\",\"orderId\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"productId\":1788842421172711300,\"quantity\":2}\n{\"time\":\"2026-09-08T13:40:41.4187835+09:00\",\"level\":\"ERROR\",\"msg\":\"inventory_failed\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":0,\"eventId\":\"9ee3557b-2921-40d9-9b63-1a766ec3af5e\",\"orderId\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"productId\":1788842421172711300,\"quantity\":2,\"error\":\"dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.\"}\n{\"time\":\"2026-09-08T13:40:41.4660364+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":0,\"eventId\":\"9ee3557b-2921-40d9-9b63-1a766ec3af5e\",\"orderId\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"productId\":1788842421172711300,\"quantity\":2,\"destination\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"errorCode\":\"DB_CONNECTION\",\"retryCount\":1}\n{\"time\":\"2026-09-08T13:40:41.5120162+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":0,\"eventId\":\"9ee3557b-2921-40d9-9b63-1a766ec3af5e\",\"orderId\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"productId\":1788842421172711300,\"quantity\":2,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:40:41.5120162+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":1,\"key\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"valueSHA256\":\"238e2be23f3590b2f87585905823cc0d3cc3278b3c016e3f5af3993275065d3c\"}\n{\"time\":\"2026-09-08T13:40:41.5120162+09:00\",\"level\":\"INFO\",\"msg\":\"retry_wait\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":1,\"retryCount\":2,\"nextAttemptAt\":\"2026-09-08T04:40:43.4193455Z\"}\n{\"time\":\"2026-09-08T13:40:43.4196951+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":1,\"eventId\":\"9ee3557b-2921-40d9-9b63-1a766ec3af5e\",\"orderId\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"productId\":1788842421172711300,\"quantity\":2}\n{\"time\":\"2026-09-08T13:40:43.4196951+09:00\",\"level\":\"ERROR\",\"msg\":\"inventory_failed\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":1,\"eventId\":\"9ee3557b-2921-40d9-9b63-1a766ec3af5e\",\"orderId\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"productId\":1788842421172711300,\"quantity\":2,\"error\":\"dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.\"}\n{\"time\":\"2026-09-08T13:40:43.4326201+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":1,\"eventId\":\"9ee3557b-2921-40d9-9b63-1a766ec3af5e\",\"orderId\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"productId\":1788842421172711300,\"quantity\":2,\"destination\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"errorCode\":\"DB_CONNECTION\",\"retryCount\":2}\n{\"time\":\"2026-09-08T13:40:43.4347672+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":1,\"eventId\":\"9ee3557b-2921-40d9-9b63-1a766ec3af5e\",\"orderId\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"productId\":1788842421172711300,\"quantity\":2,\"committedOffset\":2}\n{\"time\":\"2026-09-08T13:40:43.4347672+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":2,\"key\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"valueSHA256\":\"238e2be23f3590b2f87585905823cc0d3cc3278b3c016e3f5af3993275065d3c\"}\n{\"time\":\"2026-09-08T13:40:43.4347672+09:00\",\"level\":\"INFO\",\"msg\":\"retry_wait\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":2,\"retryCount\":3,\"nextAttemptAt\":\"2026-09-08T04:40:45.4196951Z\"}\n{\"time\":\"2026-09-08T13:40:45.4206697+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":2,\"eventId\":\"9ee3557b-2921-40d9-9b63-1a766ec3af5e\",\"orderId\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"productId\":1788842421172711300,\"quantity\":2}\n{\"time\":\"2026-09-08T13:40:45.4208106+09:00\",\"level\":\"ERROR\",\"msg\":\"inventory_failed\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":2,\"eventId\":\"9ee3557b-2921-40d9-9b63-1a766ec3af5e\",\"orderId\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"productId\":1788842421172711300,\"quantity\":2,\"error\":\"dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.\"}\n{\"time\":\"2026-09-08T13:40:45.441155+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":2,\"eventId\":\"9ee3557b-2921-40d9-9b63-1a766ec3af5e\",\"orderId\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"productId\":1788842421172711300,\"quantity\":2,\"destination\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.dlq\",\"errorCode\":\"DB_CONNECTION\",\"retryCount\":3}\n{\"time\":\"2026-09-08T13:40:45.4421529+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":8944,\"topic\":\"phase3.9ee3557b-2921-40d9-9b63-1a766ec3af5e.retry\",\"partition\":0,\"offset\":2,\"eventId\":\"9ee3557b-2921-40d9-9b63-1a766ec3af5e\",\"orderId\":\"1dde815d-b170-4523-bac7-807b015d89cc\",\"productId\":1788842421172711300,\"quantity\":2,\"committedOffset\":3}\n{\"time\":\"2026-09-08T13:40:45.564238+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":8944,\"reason\":\"context canceled\"}\n",
+          "pid": 8944
+        }
+      ]
+    },
+    {
+      "after": [
+        {
+          "end": {
+            "0": 2
+          },
+          "committed": {
+            "0": 2
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 2
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "before": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "deadLetters": [
+        {
+          "dlqId": "7689e8d7b82bd9b8ede1aea1983ae140",
+          "originalKey": "YWVmMWU5MDMtNDVkNi00NzllLWJlNDAtYzdiMjIyODJmMjRl",
+          "originalRawValue": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiZDY1NGU3OWYtYThkZi00ZGFmLTlmMjktMjIxYjJhZWIwMzZjIiwib3JkZXJJZCI6ImFlZjFlOTAzLTQ1ZDYtNDc5ZS1iZTQwLWM3YjIyMjgyZjI0ZSIsInByb2R1Y3RJZCI6MTc4ODg0MjQ2NDUxNzMxMzMwMCwicXVhbnRpdHkiOjEwMSwiY3JlYXRlZEF0IjoiMjAyNi0wOS0wOFQwNDo0MTowNC41MTczMTMzWiJ9",
+          "sourceHeaders": null,
+          "originalTopic": "phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.main",
+          "originalPartition": 0,
+          "originalOffset": 0,
+          "retryCount": 0,
+          "errorCode": "INSUFFICIENT_INVENTORY",
+          "errorMessage": "INSUFFICIENT_INVENTORY",
+          "failedAt": "2026-09-08T04:41:06.3642649Z"
+        },
+        {
+          "dlqId": "e5b0a7b414649224f90136663f4935f0",
+          "originalKey": "YzI5ZmQzZTgtNjRkYS00NzQzLWFhNDAtYTVkNWFhNWQxZWMx",
+          "originalRawValue": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiNzJkMzlhNWUtMGNlNS00ODMzLWIwNDItZjRlYmMxNDM0ZGRjIiwib3JkZXJJZCI6ImMyOWZkM2U4LTY0ZGEtNDc0My1hYTQwLWE1ZDVhYTVkMWVjMSIsInByb2R1Y3RJZCI6MTc4ODg0MjQ2NDUxNzMxMzMwMSwicXVhbnRpdHkiOjEsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDE6MDQuNzI1MzI2NFoifQ==",
+          "sourceHeaders": null,
+          "originalTopic": "phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.main",
+          "originalPartition": 0,
+          "originalOffset": 1,
+          "retryCount": 0,
+          "errorCode": "PRODUCT_MISSING",
+          "errorMessage": "PRODUCT_MISSING",
+          "failedAt": "2026-09-08T04:41:06.4106312Z"
+        }
+      ],
+      "delaySeconds": 2,
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "d654e79f-a8df-4daf-9f29-221b2aeb036c",
+        "orderId": "aef1e903-45d6-479e-be40-c7b22282f24e",
+        "productId": 1788842464517313300,
+        "quantity": 2,
+        "createdAt": "2026-09-08T04:41:04.5173133Z"
+      },
+      "finalInventory": 100,
+      "finishedAt": "2026-09-08T04:41:07.3235973Z",
+      "historicalInventoryUnchanged": true,
+      "initialInventory": 100,
+      "mainGroup": "phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c-0",
+      "maxRetries": 3,
+      "missingProductEvent": {
+        "schemaVersion": 1,
+        "eventId": "72d39a5e-0ce5-4833-b042-f4ebc1434ddc",
+        "orderId": "c29fd3e8-64da-4743-aa40-a5d5aa5d1ec1",
+        "productId": 1788842464517313301,
+        "quantity": 1,
+        "createdAt": "2026-09-08T04:41:04.7253264Z"
+      },
+      "retryGroup": "phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c-1",
+      "retryRecords": [],
+      "runId": "phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c",
+      "scenario": "Domain",
+      "source": {
+        "Topic": "phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.main",
+        "Partition": 0,
+        "Offset": 0,
+        "HighWaterMark": 2,
+        "Key": "YWVmMWU5MDMtNDVkNi00NzllLWJlNDAtYzdiMjIyODJmMjRl",
+        "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiZDY1NGU3OWYtYThkZi00ZGFmLTlmMjktMjIxYjJhZWIwMzZjIiwib3JkZXJJZCI6ImFlZjFlOTAzLTQ1ZDYtNDc5ZS1iZTQwLWM3YjIyMjgyZjI0ZSIsInByb2R1Y3RJZCI6MTc4ODg0MjQ2NDUxNzMxMzMwMCwicXVhbnRpdHkiOjEwMSwiY3JlYXRlZEF0IjoiMjAyNi0wOS0wOFQwNDo0MTowNC41MTczMTMzWiJ9",
+        "Headers": null,
+        "WriterData": null,
+        "Time": "2026-09-08T04:41:04.722Z"
+      },
+      "startedAt": "2026-09-08T04:41:04.6989076Z",
+      "status": "PASS",
+      "topics": [
+        "phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.main",
+        "phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.retry",
+        "phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.dlq"
+      ],
+      "workers": [
+        {
+          "exitCode": 0,
+          "log": "{\"time\":\"2026-09-08T13:41:06.3288809+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":24328,\"groupId\":\"phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c-0\",\"topic\":\"phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.main\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:41:06.3584568+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":24328,\"topic\":\"phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.main\",\"partition\":0,\"offset\":0,\"key\":\"aef1e903-45d6-479e-be40-c7b22282f24e\",\"valueSHA256\":\"d7c15d4a7dc01c7ea8d6690ac8e7d3f983c789b574af3aa97fdb3ecaa54a5219\"}\n{\"time\":\"2026-09-08T13:41:06.3589752+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":24328,\"topic\":\"phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.main\",\"partition\":0,\"offset\":0,\"eventId\":\"d654e79f-a8df-4daf-9f29-221b2aeb036c\",\"orderId\":\"aef1e903-45d6-479e-be40-c7b22282f24e\",\"productId\":1788842464517313300,\"quantity\":101}\n{\"time\":\"2026-09-08T13:41:06.3642649+09:00\",\"level\":\"ERROR\",\"msg\":\"inventory_failed\",\"pid\":24328,\"topic\":\"phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.main\",\"partition\":0,\"offset\":0,\"eventId\":\"d654e79f-a8df-4daf-9f29-221b2aeb036c\",\"orderId\":\"aef1e903-45d6-479e-be40-c7b22282f24e\",\"productId\":1788842464517313300,\"quantity\":101,\"error\":\"insufficient inventory\"}\n{\"time\":\"2026-09-08T13:41:06.400097+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":24328,\"topic\":\"phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.main\",\"partition\":0,\"offset\":0,\"eventId\":\"d654e79f-a8df-4daf-9f29-221b2aeb036c\",\"orderId\":\"aef1e903-45d6-479e-be40-c7b22282f24e\",\"productId\":1788842464517313300,\"quantity\":101,\"destination\":\"phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.dlq\",\"errorCode\":\"INSUFFICIENT_INVENTORY\",\"retryCount\":0}\n{\"time\":\"2026-09-08T13:41:06.4011411+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":24328,\"topic\":\"phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.main\",\"partition\":0,\"offset\":0,\"eventId\":\"d654e79f-a8df-4daf-9f29-221b2aeb036c\",\"orderId\":\"aef1e903-45d6-479e-be40-c7b22282f24e\",\"productId\":1788842464517313300,\"quantity\":101,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:41:06.4011411+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":24328,\"topic\":\"phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.main\",\"partition\":0,\"offset\":1,\"key\":\"c29fd3e8-64da-4743-aa40-a5d5aa5d1ec1\",\"valueSHA256\":\"dc42c1374d68c4b3bcfad105fee813da5daf499c7f5667f4f98e82adc1f368be\"}\n{\"time\":\"2026-09-08T13:41:06.4016637+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":24328,\"topic\":\"phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.main\",\"partition\":0,\"offset\":1,\"eventId\":\"72d39a5e-0ce5-4833-b042-f4ebc1434ddc\",\"orderId\":\"c29fd3e8-64da-4743-aa40-a5d5aa5d1ec1\",\"productId\":1788842464517313301,\"quantity\":1}\n{\"time\":\"2026-09-08T13:41:06.4106272+09:00\",\"level\":\"ERROR\",\"msg\":\"inventory_failed\",\"pid\":24328,\"topic\":\"phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.main\",\"partition\":0,\"offset\":1,\"eventId\":\"72d39a5e-0ce5-4833-b042-f4ebc1434ddc\",\"orderId\":\"c29fd3e8-64da-4743-aa40-a5d5aa5d1ec1\",\"productId\":1788842464517313301,\"quantity\":1,\"error\":\"product missing\"}\n{\"time\":\"2026-09-08T13:41:06.4221808+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":24328,\"topic\":\"phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.main\",\"partition\":0,\"offset\":1,\"eventId\":\"72d39a5e-0ce5-4833-b042-f4ebc1434ddc\",\"orderId\":\"c29fd3e8-64da-4743-aa40-a5d5aa5d1ec1\",\"productId\":1788842464517313301,\"quantity\":1,\"destination\":\"phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.dlq\",\"errorCode\":\"PRODUCT_MISSING\",\"retryCount\":0}\n{\"time\":\"2026-09-08T13:41:06.4237401+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":24328,\"topic\":\"phase3.d654e79f-a8df-4daf-9f29-221b2aeb036c.main\",\"partition\":0,\"offset\":1,\"eventId\":\"72d39a5e-0ce5-4833-b042-f4ebc1434ddc\",\"orderId\":\"c29fd3e8-64da-4743-aa40-a5d5aa5d1ec1\",\"productId\":1788842464517313301,\"quantity\":1,\"committedOffset\":2}\n{\"time\":\"2026-09-08T13:41:06.5214546+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":24328,\"reason\":\"context canceled\"}\n",
+          "pid": 24328
+        }
+      ]
+    },
+    {
+      "after": [
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "before": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "deadLetters": [],
+      "delaySeconds": 2,
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "0cb94f53-f217-4f3b-8238-45ffbaacf23e",
+        "orderId": "8a979013-00ed-495b-ac74-07e4b173a3a5",
+        "productId": 1788842467979307400,
+        "quantity": 2,
+        "createdAt": "2026-09-08T04:41:07.9793074Z"
+      },
+      "finalInventory": 100,
+      "finishedAt": "2026-09-08T04:41:09.9489584Z",
+      "historicalInventoryUnchanged": true,
+      "initialInventory": 100,
+      "mainGroup": "phase3.0cb94f53-f217-4f3b-8238-45ffbaacf23e-0",
+      "maxRetries": 3,
+      "retryGroup": "phase3.0cb94f53-f217-4f3b-8238-45ffbaacf23e-1",
+      "retryRecords": [],
+      "runId": "phase3.0cb94f53-f217-4f3b-8238-45ffbaacf23e",
+      "scenario": "DLQPublishFailure",
+      "source": {
+        "Topic": "phase3.0cb94f53-f217-4f3b-8238-45ffbaacf23e.main",
+        "Partition": 0,
+        "Offset": 0,
+        "HighWaterMark": 1,
+        "Key": "OGE5NzkwMTMtMDBlZC00OTViLWFjNzQtMDdlNGIxNzNhM2E1",
+        "Value": "e2ludmFsaWQtanNvbg==",
+        "Headers": null,
+        "WriterData": null,
+        "Time": "2026-09-08T04:41:08.153Z"
+      },
+      "startedAt": "2026-09-08T04:41:08.131777Z",
+      "status": "PASS",
+      "topics": [
+        "phase3.0cb94f53-f217-4f3b-8238-45ffbaacf23e.main",
+        "phase3.0cb94f53-f217-4f3b-8238-45ffbaacf23e.retry",
+        "phase3.0cb94f53-f217-4f3b-8238-45ffbaacf23e.dlq"
+      ],
+      "workers": [
+        {
+          "exitCode": 1,
+          "log": "{\"time\":\"2026-09-08T13:41:09.7645193+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":23660,\"groupId\":\"phase3.0cb94f53-f217-4f3b-8238-45ffbaacf23e-0\",\"topic\":\"phase3.0cb94f53-f217-4f3b-8238-45ffbaacf23e.main\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:41:09.806641+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":23660,\"topic\":\"phase3.0cb94f53-f217-4f3b-8238-45ffbaacf23e.main\",\"partition\":0,\"offset\":0,\"key\":\"8a979013-00ed-495b-ac74-07e4b173a3a5\",\"valueSHA256\":\"9b60fca5ee82ffb9afc0d382b727815b0b0e70a096b08a1ccb82cc2ec8909066\"}\n{\"time\":\"2026-09-08T13:41:09.8337172+09:00\",\"level\":\"ERROR\",\"msg\":\"worker_stopped\",\"pid\":23660,\"error\":\"publish failure destination=phase3.0cb94f53-f217-4f3b-8238-45ffbaacf23e.missing: [3] Unknown Topic Or Partition: the request is for a topic or partition that does not exist on this broker\"}\n",
+          "pid": 23660
+        }
+      ]
+    },
+    {
+      "after": [
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": 1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "before": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "deadLetters": [],
+      "delaySeconds": 2,
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "c1155a1b-8c1c-466c-b47e-86b13dbe7a51",
+        "orderId": "dd4da52b-b552-471a-9fa8-3d6c38965bf7",
+        "productId": 1788842511243564900,
+        "quantity": 2,
+        "createdAt": "2026-09-08T04:41:51.2435649Z"
+      },
+      "finalInventory": 98,
+      "finishedAt": "2026-09-08T04:41:53.2117883Z",
+      "historicalInventoryUnchanged": true,
+      "initialInventory": 100,
+      "mainGroup": "phase3.c1155a1b-8c1c-466c-b47e-86b13dbe7a51-0",
+      "maxRetries": 3,
+      "retryGroup": "phase3.c1155a1b-8c1c-466c-b47e-86b13dbe7a51-1",
+      "retryRecords": [],
+      "runId": "phase3.c1155a1b-8c1c-466c-b47e-86b13dbe7a51",
+      "scenario": "Normal",
+      "source": {
+        "Topic": "phase3.c1155a1b-8c1c-466c-b47e-86b13dbe7a51.main",
+        "Partition": 0,
+        "Offset": 0,
+        "HighWaterMark": 1,
+        "Key": "ZGQ0ZGE1MmItYjU1Mi00NzFhLTlmYTgtM2Q2YzM4OTY1YmY3",
+        "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiYzExNTVhMWItOGMxYy00NjZjLWI0N2UtODZiMTNkYmU3YTUxIiwib3JkZXJJZCI6ImRkNGRhNTJiLWI1NTItNDcxYS05ZmE4LTNkNmMzODk2NWJmNyIsInByb2R1Y3RJZCI6MTc4ODg0MjUxMTI0MzU2NDkwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDE6NTEuMjQzNTY0OVoifQ==",
+        "Headers": null,
+        "WriterData": null,
+        "Time": "2026-09-08T04:41:51.46Z"
+      },
+      "startedAt": "2026-09-08T04:41:51.4206548Z",
+      "status": "PASS",
+      "topics": [
+        "phase3.c1155a1b-8c1c-466c-b47e-86b13dbe7a51.main",
+        "phase3.c1155a1b-8c1c-466c-b47e-86b13dbe7a51.retry",
+        "phase3.c1155a1b-8c1c-466c-b47e-86b13dbe7a51.dlq"
+      ],
+      "workers": [
+        {
+          "exitCode": 0,
+          "log": "{\"time\":\"2026-09-08T13:41:53.0634478+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":33572,\"groupId\":\"phase3.c1155a1b-8c1c-466c-b47e-86b13dbe7a51-0\",\"topic\":\"phase3.c1155a1b-8c1c-466c-b47e-86b13dbe7a51.main\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:41:53.0912981+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":33572,\"topic\":\"phase3.c1155a1b-8c1c-466c-b47e-86b13dbe7a51.main\",\"partition\":0,\"offset\":0,\"key\":\"dd4da52b-b552-471a-9fa8-3d6c38965bf7\",\"valueSHA256\":\"3dc293cc752956f1338ccb52e000b18a9797e1b3c2461b333c9314c2dc3dc2af\"}\n{\"time\":\"2026-09-08T13:41:53.09181+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":33572,\"topic\":\"phase3.c1155a1b-8c1c-466c-b47e-86b13dbe7a51.main\",\"partition\":0,\"offset\":0,\"eventId\":\"c1155a1b-8c1c-466c-b47e-86b13dbe7a51\",\"orderId\":\"dd4da52b-b552-471a-9fa8-3d6c38965bf7\",\"productId\":1788842511243564900,\"quantity\":2}\n{\"time\":\"2026-09-08T13:41:53.0975368+09:00\",\"level\":\"INFO\",\"msg\":\"inventory_committed\",\"pid\":33572,\"topic\":\"phase3.c1155a1b-8c1c-466c-b47e-86b13dbe7a51.main\",\"partition\":0,\"offset\":0,\"eventId\":\"c1155a1b-8c1c-466c-b47e-86b13dbe7a51\",\"orderId\":\"dd4da52b-b552-471a-9fa8-3d6c38965bf7\",\"productId\":1788842511243564900,\"quantity\":2}\n{\"time\":\"2026-09-08T13:41:53.0985791+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":33572,\"topic\":\"phase3.c1155a1b-8c1c-466c-b47e-86b13dbe7a51.main\",\"partition\":0,\"offset\":0,\"eventId\":\"c1155a1b-8c1c-466c-b47e-86b13dbe7a51\",\"orderId\":\"dd4da52b-b552-471a-9fa8-3d6c38965bf7\",\"productId\":1788842511243564900,\"quantity\":2,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:41:53.1547751+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":33572,\"reason\":\"context canceled\"}\n",
+          "pid": 33572
+        }
+      ]
+    },
+    {
+      "after": [
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": 1
+          }
+        },
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": 1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "afterMainFailure": [
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": 1
+          }
+        },
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "before": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "deadLetters": [],
+      "delaySeconds": 12,
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "7796e24e-11ba-442f-b765-7c1843604919",
+        "orderId": "4dfaa823-05c1-4331-8fa4-a4836b5ed7ca",
+        "productId": 1788842513220240300,
+        "quantity": 2,
+        "createdAt": "2026-09-08T04:41:53.2202403Z"
+      },
+      "finalInventory": 98,
+      "finishedAt": "2026-09-08T04:42:18.6421153Z",
+      "historicalInventoryUnchanged": true,
+      "initialInventory": 100,
+      "inventoryBeforeRetry": 100,
+      "mainGroup": "phase3.7796e24e-11ba-442f-b765-7c1843604919-0",
+      "maxRetries": 3,
+      "nextAttemptAt": "2026-09-08T04:42:11.4398338Z",
+      "retryGroup": "phase3.7796e24e-11ba-442f-b765-7c1843604919-1",
+      "retryProcessedAt": "2026-09-08T13:42:17.8087693+09:00",
+      "retryRecords": [
+        {
+          "Topic": "phase3.7796e24e-11ba-442f-b765-7c1843604919.retry",
+          "Partition": 0,
+          "Offset": 0,
+          "HighWaterMark": 1,
+          "Key": "NGRmYWE4MjMtMDVjMS00MzMxLThmYTQtYTQ4MzZiNWVkN2Nh",
+          "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiNzc5NmUyNGUtMTFiYS00NDJmLWI3NjUtN2MxODQzNjA0OTE5Iiwib3JkZXJJZCI6IjRkZmFhODIzLTA1YzEtNDMzMS04ZmE0LWE0ODM2YjVlZDdjYSIsInByb2R1Y3RJZCI6MTc4ODg0MjUxMzIyMDI0MDMwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDE6NTMuMjIwMjQwM1oifQ==",
+          "Headers": [
+            {
+              "Key": "retry-count",
+              "Value": "MQ=="
+            },
+            {
+              "Key": "next-attempt-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0MjoxMS40Mzk4MzM4Wg=="
+            },
+            {
+              "Key": "first-failed-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0MTo1OS40Mzk4MzM4Wg=="
+            },
+            {
+              "Key": "last-error-code",
+              "Value": "REJfQ09OTkVDVElPTg=="
+            },
+            {
+              "Key": "original-topic",
+              "Value": "cGhhc2UzLjc3OTZlMjRlLTExYmEtNDQyZi1iNzY1LTdjMTg0MzYwNDkxOS5tYWlu"
+            },
+            {
+              "Key": "original-partition",
+              "Value": "MA=="
+            },
+            {
+              "Key": "original-offset",
+              "Value": "MA=="
+            }
+          ],
+          "WriterData": null,
+          "Time": "2026-09-08T04:41:59.455Z"
+        }
+      ],
+      "runId": "phase3.7796e24e-11ba-442f-b765-7c1843604919",
+      "scenario": "Recovery",
+      "source": {
+        "Topic": "phase3.7796e24e-11ba-442f-b765-7c1843604919.main",
+        "Partition": 0,
+        "Offset": 0,
+        "HighWaterMark": 1,
+        "Key": "NGRmYWE4MjMtMDVjMS00MzMxLThmYTQtYTQ4MzZiNWVkN2Nh",
+        "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiNzc5NmUyNGUtMTFiYS00NDJmLWI3NjUtN2MxODQzNjA0OTE5Iiwib3JkZXJJZCI6IjRkZmFhODIzLTA1YzEtNDMzMS04ZmE0LWE0ODM2YjVlZDdjYSIsInByb2R1Y3RJZCI6MTc4ODg0MjUxMzIyMDI0MDMwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDE6NTMuMjIwMjQwM1oifQ==",
+        "Headers": null,
+        "WriterData": null,
+        "Time": "2026-09-08T04:41:53.576Z"
+      },
+      "startedAt": "2026-09-08T04:41:53.540719Z",
+      "status": "PASS",
+      "topics": [
+        "phase3.7796e24e-11ba-442f-b765-7c1843604919.main",
+        "phase3.7796e24e-11ba-442f-b765-7c1843604919.retry",
+        "phase3.7796e24e-11ba-442f-b765-7c1843604919.dlq"
+      ],
+      "workers": [
+        {
+          "exitCode": 0,
+          "log": "{\"time\":\"2026-09-08T13:41:55.3080478+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":28480,\"groupId\":\"phase3.7796e24e-11ba-442f-b765-7c1843604919-0\",\"topic\":\"phase3.7796e24e-11ba-442f-b765-7c1843604919.main\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:41:55.3421108+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":28480,\"topic\":\"phase3.7796e24e-11ba-442f-b765-7c1843604919.main\",\"partition\":0,\"offset\":0,\"key\":\"4dfaa823-05c1-4331-8fa4-a4836b5ed7ca\",\"valueSHA256\":\"258fc328573001b9053608e6281b65333a791913ef8291ec3165f12991aa4a5a\"}\n{\"time\":\"2026-09-08T13:41:55.3421108+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":28480,\"topic\":\"phase3.7796e24e-11ba-442f-b765-7c1843604919.main\",\"partition\":0,\"offset\":0,\"eventId\":\"7796e24e-11ba-442f-b765-7c1843604919\",\"orderId\":\"4dfaa823-05c1-4331-8fa4-a4836b5ed7ca\",\"productId\":1788842513220240300,\"quantity\":2}\n{\"time\":\"2026-09-08T13:41:55.3421108+09:00\",\"level\":\"INFO\",\"msg\":\"fault_reached\",\"pid\":28480,\"point\":\"before-db\",\"eventId\":\"7796e24e-11ba-442f-b765-7c1843604919\",\"orderId\":\"4dfaa823-05c1-4331-8fa4-a4836b5ed7ca\",\"productId\":1788842513220240300}\n{\"time\":\"2026-09-08T13:41:59.4398338+09:00\",\"level\":\"ERROR\",\"msg\":\"inventory_failed\",\"pid\":28480,\"topic\":\"phase3.7796e24e-11ba-442f-b765-7c1843604919.main\",\"partition\":0,\"offset\":0,\"eventId\":\"7796e24e-11ba-442f-b765-7c1843604919\",\"orderId\":\"4dfaa823-05c1-4331-8fa4-a4836b5ed7ca\",\"productId\":1788842513220240300,\"quantity\":2,\"error\":\"dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.\"}\n{\"time\":\"2026-09-08T13:41:59.4582588+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":28480,\"topic\":\"phase3.7796e24e-11ba-442f-b765-7c1843604919.main\",\"partition\":0,\"offset\":0,\"eventId\":\"7796e24e-11ba-442f-b765-7c1843604919\",\"orderId\":\"4dfaa823-05c1-4331-8fa4-a4836b5ed7ca\",\"productId\":1788842513220240300,\"quantity\":2,\"destination\":\"phase3.7796e24e-11ba-442f-b765-7c1843604919.retry\",\"errorCode\":\"DB_CONNECTION\",\"retryCount\":0}\n{\"time\":\"2026-09-08T13:41:59.4681348+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":28480,\"topic\":\"phase3.7796e24e-11ba-442f-b765-7c1843604919.main\",\"partition\":0,\"offset\":0,\"eventId\":\"7796e24e-11ba-442f-b765-7c1843604919\",\"orderId\":\"4dfaa823-05c1-4331-8fa4-a4836b5ed7ca\",\"productId\":1788842513220240300,\"quantity\":2,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:41:59.5442306+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":28480,\"reason\":\"context canceled\"}\n",
+          "pid": 28480
+        },
+        {
+          "exitCode": 0,
+          "log": "{\"time\":\"2026-09-08T13:42:17.7733209+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":27740,\"groupId\":\"phase3.7796e24e-11ba-442f-b765-7c1843604919-1\",\"topic\":\"phase3.7796e24e-11ba-442f-b765-7c1843604919.retry\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:42:17.808244+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":27740,\"topic\":\"phase3.7796e24e-11ba-442f-b765-7c1843604919.retry\",\"partition\":0,\"offset\":0,\"key\":\"4dfaa823-05c1-4331-8fa4-a4836b5ed7ca\",\"valueSHA256\":\"258fc328573001b9053608e6281b65333a791913ef8291ec3165f12991aa4a5a\"}\n{\"time\":\"2026-09-08T13:42:17.8087693+09:00\",\"level\":\"INFO\",\"msg\":\"retry_wait\",\"pid\":27740,\"topic\":\"phase3.7796e24e-11ba-442f-b765-7c1843604919.retry\",\"partition\":0,\"offset\":0,\"retryCount\":1,\"nextAttemptAt\":\"2026-09-08T04:42:11.4398338Z\"}\n{\"time\":\"2026-09-08T13:42:17.8087693+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":27740,\"topic\":\"phase3.7796e24e-11ba-442f-b765-7c1843604919.retry\",\"partition\":0,\"offset\":0,\"eventId\":\"7796e24e-11ba-442f-b765-7c1843604919\",\"orderId\":\"4dfaa823-05c1-4331-8fa4-a4836b5ed7ca\",\"productId\":1788842513220240300,\"quantity\":2}\n{\"time\":\"2026-09-08T13:42:17.8151279+09:00\",\"level\":\"INFO\",\"msg\":\"inventory_committed\",\"pid\":27740,\"topic\":\"phase3.7796e24e-11ba-442f-b765-7c1843604919.retry\",\"partition\":0,\"offset\":0,\"eventId\":\"7796e24e-11ba-442f-b765-7c1843604919\",\"orderId\":\"4dfaa823-05c1-4331-8fa4-a4836b5ed7ca\",\"productId\":1788842513220240300,\"quantity\":2}\n{\"time\":\"2026-09-08T13:42:17.8161661+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":27740,\"topic\":\"phase3.7796e24e-11ba-442f-b765-7c1843604919.retry\",\"partition\":0,\"offset\":0,\"eventId\":\"7796e24e-11ba-442f-b765-7c1843604919\",\"orderId\":\"4dfaa823-05c1-4331-8fa4-a4836b5ed7ca\",\"productId\":1788842513220240300,\"quantity\":2,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:42:17.874424+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":27740,\"reason\":\"context canceled\"}\n",
+          "pid": 27740
+        }
+      ]
+    },
+    {
+      "after": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": 1
+          }
+        },
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "before": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "deadLetters": [
+        {
+          "dlqId": "01f79543cc55bce415590de2d5221939",
+          "originalKey": "NmEzMWM1NDgtNTg3NC00MDI1LWEzYTMtZGZiNmFiMmI3OWMz",
+          "originalRawValue": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiM2M4YjhlY2EtZjUyMy00NmZlLWJjYmQtN2ZjZWViNTY3Y2NkIiwib3JkZXJJZCI6IjZhMzFjNTQ4LTU4NzQtNDAyNS1hM2EzLWRmYjZhYjJiNzljMyIsInByb2R1Y3RJZCI6MTc4ODg0MjUzODY1MDAxMDQwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDI6MTguNjUwMDEwNFoifQ==",
+          "sourceHeaders": [
+            {
+              "Key": "retry-count",
+              "Value": "LTE="
+            }
+          ],
+          "originalTopic": "phase3.3c8b8eca-f523-46fe-bcbd-7fceeb567ccd.retry",
+          "originalPartition": 0,
+          "originalOffset": 0,
+          "retryCount": null,
+          "errorCode": "INVALID_RETRY_METADATA",
+          "errorMessage": "INVALID_RETRY_METADATA",
+          "failedAt": "2026-09-08T04:42:20.4184867Z"
+        }
+      ],
+      "delaySeconds": 2,
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "3c8b8eca-f523-46fe-bcbd-7fceeb567ccd",
+        "orderId": "6a31c548-5874-4025-a3a3-dfb6ab2b79c3",
+        "productId": 1788842538650010400,
+        "quantity": 2,
+        "createdAt": "2026-09-08T04:42:18.6500104Z"
+      },
+      "finalInventory": 100,
+      "finishedAt": "2026-09-08T04:42:21.2747937Z",
+      "historicalInventoryUnchanged": true,
+      "initialInventory": 100,
+      "mainGroup": "phase3.3c8b8eca-f523-46fe-bcbd-7fceeb567ccd-0",
+      "maxRetries": 3,
+      "retryGroup": "phase3.3c8b8eca-f523-46fe-bcbd-7fceeb567ccd-1",
+      "retryRecords": [
+        {
+          "Topic": "phase3.3c8b8eca-f523-46fe-bcbd-7fceeb567ccd.retry",
+          "Partition": 0,
+          "Offset": 0,
+          "HighWaterMark": 1,
+          "Key": "NmEzMWM1NDgtNTg3NC00MDI1LWEzYTMtZGZiNmFiMmI3OWMz",
+          "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiM2M4YjhlY2EtZjUyMy00NmZlLWJjYmQtN2ZjZWViNTY3Y2NkIiwib3JkZXJJZCI6IjZhMzFjNTQ4LTU4NzQtNDAyNS1hM2EzLWRmYjZhYjJiNzljMyIsInByb2R1Y3RJZCI6MTc4ODg0MjUzODY1MDAxMDQwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDI6MTguNjUwMDEwNFoifQ==",
+          "Headers": [
+            {
+              "Key": "retry-count",
+              "Value": "LTE="
+            }
+          ],
+          "WriterData": null,
+          "Time": "2026-09-08T04:42:18.9Z"
+        }
+      ],
+      "runId": "phase3.3c8b8eca-f523-46fe-bcbd-7fceeb567ccd",
+      "scenario": "Metadata",
+      "source": {
+        "Topic": "phase3.3c8b8eca-f523-46fe-bcbd-7fceeb567ccd.retry",
+        "Partition": 0,
+        "Offset": 0,
+        "HighWaterMark": 1,
+        "Key": "NmEzMWM1NDgtNTg3NC00MDI1LWEzYTMtZGZiNmFiMmI3OWMz",
+        "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiM2M4YjhlY2EtZjUyMy00NmZlLWJjYmQtN2ZjZWViNTY3Y2NkIiwib3JkZXJJZCI6IjZhMzFjNTQ4LTU4NzQtNDAyNS1hM2EzLWRmYjZhYjJiNzljMyIsInByb2R1Y3RJZCI6MTc4ODg0MjUzODY1MDAxMDQwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDI6MTguNjUwMDEwNFoifQ==",
+        "Headers": [
+          {
+            "Key": "retry-count",
+            "Value": "LTE="
+          }
+        ],
+        "WriterData": null,
+        "Time": "2026-09-08T04:42:18.9Z"
+      },
+      "startedAt": "2026-09-08T04:42:18.8825586Z",
+      "status": "PASS",
+      "topics": [
+        "phase3.3c8b8eca-f523-46fe-bcbd-7fceeb567ccd.main",
+        "phase3.3c8b8eca-f523-46fe-bcbd-7fceeb567ccd.retry",
+        "phase3.3c8b8eca-f523-46fe-bcbd-7fceeb567ccd.dlq"
+      ],
+      "workers": [
+        {
+          "exitCode": 0,
+          "log": "{\"time\":\"2026-09-08T13:42:20.3891608+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":30440,\"groupId\":\"phase3.3c8b8eca-f523-46fe-bcbd-7fceeb567ccd-1\",\"topic\":\"phase3.3c8b8eca-f523-46fe-bcbd-7fceeb567ccd.retry\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:42:20.4184867+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":30440,\"topic\":\"phase3.3c8b8eca-f523-46fe-bcbd-7fceeb567ccd.retry\",\"partition\":0,\"offset\":0,\"key\":\"6a31c548-5874-4025-a3a3-dfb6ab2b79c3\",\"valueSHA256\":\"d3361bb114b2817af6e7dad22f35aa6f6e8a944e14a269207b4febe65e947832\"}\n{\"time\":\"2026-09-08T13:42:20.4354193+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":30440,\"topic\":\"phase3.3c8b8eca-f523-46fe-bcbd-7fceeb567ccd.retry\",\"partition\":0,\"offset\":0,\"destination\":\"phase3.3c8b8eca-f523-46fe-bcbd-7fceeb567ccd.dlq\",\"errorCode\":\"INVALID_RETRY_METADATA\",\"retryCount\":0}\n{\"time\":\"2026-09-08T13:42:20.4375098+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":30440,\"topic\":\"phase3.3c8b8eca-f523-46fe-bcbd-7fceeb567ccd.retry\",\"partition\":0,\"offset\":0,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:42:20.4810056+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":30440,\"reason\":\"context canceled\"}\n",
+          "pid": 30440
+        }
+      ]
+    },
+    {
+      "after": [
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "before": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "deadLetters": [],
+      "delaySeconds": 2,
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "f23a785d-18cb-4eb8-87ac-5171a98a5c77",
+        "orderId": "565f84ee-23c1-4de3-886a-aba8e589964e",
+        "productId": 1788842541285343500,
+        "quantity": 2,
+        "createdAt": "2026-09-08T04:42:21.2853435Z"
+      },
+      "finalInventory": 100,
+      "finishedAt": "2026-09-08T04:42:34.6730665Z",
+      "historicalInventoryUnchanged": true,
+      "initialInventory": 100,
+      "mainGroup": "phase3.f23a785d-18cb-4eb8-87ac-5171a98a5c77-0",
+      "maxRetries": 3,
+      "retryGroup": "phase3.f23a785d-18cb-4eb8-87ac-5171a98a5c77-1",
+      "retryRecords": [],
+      "runId": "phase3.f23a785d-18cb-4eb8-87ac-5171a98a5c77",
+      "scenario": "RetryPublishFailure",
+      "source": {
+        "Topic": "phase3.f23a785d-18cb-4eb8-87ac-5171a98a5c77.main",
+        "Partition": 0,
+        "Offset": 0,
+        "HighWaterMark": 1,
+        "Key": "NTY1Zjg0ZWUtMjNjMS00ZGUzLTg4NmEtYWJhOGU1ODk5NjRl",
+        "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiZjIzYTc4NWQtMThjYi00ZWI4LTg3YWMtNTE3MWE5OGE1Yzc3Iiwib3JkZXJJZCI6IjU2NWY4NGVlLTIzYzEtNGRlMy04ODZhLWFiYThlNTg5OTY0ZSIsInByb2R1Y3RJZCI6MTc4ODg0MjU0MTI4NTM0MzUwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDI6MjEuMjg1MzQzNVoifQ==",
+        "Headers": null,
+        "WriterData": null,
+        "Time": "2026-09-08T04:42:21.68Z"
+      },
+      "startedAt": "2026-09-08T04:42:21.6421684Z",
+      "status": "PASS",
+      "topics": [
+        "phase3.f23a785d-18cb-4eb8-87ac-5171a98a5c77.main",
+        "phase3.f23a785d-18cb-4eb8-87ac-5171a98a5c77.retry",
+        "phase3.f23a785d-18cb-4eb8-87ac-5171a98a5c77.dlq"
+      ],
+      "workers": [
+        {
+          "exitCode": 1,
+          "log": "{\"time\":\"2026-09-08T13:42:23.4702126+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":27760,\"groupId\":\"phase3.f23a785d-18cb-4eb8-87ac-5171a98a5c77-0\",\"topic\":\"phase3.f23a785d-18cb-4eb8-87ac-5171a98a5c77.main\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:42:23.541918+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":27760,\"topic\":\"phase3.f23a785d-18cb-4eb8-87ac-5171a98a5c77.main\",\"partition\":0,\"offset\":0,\"key\":\"565f84ee-23c1-4de3-886a-aba8e589964e\",\"valueSHA256\":\"2fa869642363270741f91b98ba1e00ed7bebe9078710ede44bbfb0993e3ad214\"}\n{\"time\":\"2026-09-08T13:42:23.5424333+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":27760,\"topic\":\"phase3.f23a785d-18cb-4eb8-87ac-5171a98a5c77.main\",\"partition\":0,\"offset\":0,\"eventId\":\"f23a785d-18cb-4eb8-87ac-5171a98a5c77\",\"orderId\":\"565f84ee-23c1-4de3-886a-aba8e589964e\",\"productId\":1788842541285343500,\"quantity\":2}\n{\"time\":\"2026-09-08T13:42:23.5424333+09:00\",\"level\":\"INFO\",\"msg\":\"fault_reached\",\"pid\":27760,\"point\":\"before-db\",\"eventId\":\"f23a785d-18cb-4eb8-87ac-5171a98a5c77\",\"orderId\":\"565f84ee-23c1-4de3-886a-aba8e589964e\",\"productId\":1788842541285343500}\n{\"time\":\"2026-09-08T13:42:27.4489025+09:00\",\"level\":\"ERROR\",\"msg\":\"inventory_failed\",\"pid\":27760,\"topic\":\"phase3.f23a785d-18cb-4eb8-87ac-5171a98a5c77.main\",\"partition\":0,\"offset\":0,\"eventId\":\"f23a785d-18cb-4eb8-87ac-5171a98a5c77\",\"orderId\":\"565f84ee-23c1-4de3-886a-aba8e589964e\",\"productId\":1788842541285343500,\"quantity\":2,\"error\":\"dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.\"}\n{\"time\":\"2026-09-08T13:42:27.6012893+09:00\",\"level\":\"ERROR\",\"msg\":\"worker_stopped\",\"pid\":27760,\"error\":\"publish failure destination=phase3.f23a785d-18cb-4eb8-87ac-5171a98a5c77.missing: [3] Unknown Topic Or Partition: the request is for a topic or partition that does not exist on this broker\"}\n",
+          "pid": 27760
+        }
+      ]
+    },
+    {
+      "after": [
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": 1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "before": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "deadLetters": [],
+      "delaySeconds": 2,
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "380dc483-973f-4192-bf66-0d9be174651c",
+        "orderId": "f4942db3-5bcf-4694-91df-80ece164acde",
+        "productId": 1788842761118150200,
+        "quantity": 2,
+        "createdAt": "2026-09-08T04:46:01.1181502Z"
+      },
+      "finalInventory": 98,
+      "finishedAt": "2026-09-08T04:46:03.5484499Z",
+      "historicalInventoryUnchanged": true,
+      "initialInventory": 100,
+      "mainGroup": "phase3.380dc483-973f-4192-bf66-0d9be174651c-0",
+      "maxRetries": 3,
+      "retryGroup": "phase3.380dc483-973f-4192-bf66-0d9be174651c-1",
+      "retryRecords": [],
+      "runId": "phase3.380dc483-973f-4192-bf66-0d9be174651c",
+      "scenario": "Normal",
+      "source": {
+        "Topic": "phase3.380dc483-973f-4192-bf66-0d9be174651c.main",
+        "Partition": 0,
+        "Offset": 0,
+        "HighWaterMark": 1,
+        "Key": "ZjQ5NDJkYjMtNWJjZi00Njk0LTkxZGYtODBlY2UxNjRhY2Rl",
+        "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiMzgwZGM0ODMtOTczZi00MTkyLWJmNjYtMGQ5YmUxNzQ2NTFjIiwib3JkZXJJZCI6ImY0OTQyZGIzLTViY2YtNDY5NC05MWRmLTgwZWNlMTY0YWNkZSIsInByb2R1Y3RJZCI6MTc4ODg0Mjc2MTExODE1MDIwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDY6MDEuMTE4MTUwMloifQ==",
+        "Headers": null,
+        "WriterData": null,
+        "Time": "2026-09-08T04:46:01.491Z"
+      },
+      "stage": "complete",
+      "startedAt": "2026-09-08T04:46:01.1205185Z",
+      "status": "PASS",
+      "topics": [
+        "phase3.380dc483-973f-4192-bf66-0d9be174651c.main",
+        "phase3.380dc483-973f-4192-bf66-0d9be174651c.retry",
+        "phase3.380dc483-973f-4192-bf66-0d9be174651c.dlq"
+      ],
+      "workers": [
+        {
+          "exitCode": 0,
+          "log": "{\"time\":\"2026-09-08T13:46:03.3481334+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":28328,\"groupId\":\"phase3.380dc483-973f-4192-bf66-0d9be174651c-0\",\"topic\":\"phase3.380dc483-973f-4192-bf66-0d9be174651c.main\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:46:03.3864501+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":28328,\"topic\":\"phase3.380dc483-973f-4192-bf66-0d9be174651c.main\",\"partition\":0,\"offset\":0,\"key\":\"f4942db3-5bcf-4694-91df-80ece164acde\",\"valueSHA256\":\"b1a0bb2f829ddbb73e57efa8ca2153964179d762e2b713a5191fd2eee382f572\"}\n{\"time\":\"2026-09-08T13:46:03.3864501+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":28328,\"topic\":\"phase3.380dc483-973f-4192-bf66-0d9be174651c.main\",\"partition\":0,\"offset\":0,\"eventId\":\"380dc483-973f-4192-bf66-0d9be174651c\",\"orderId\":\"f4942db3-5bcf-4694-91df-80ece164acde\",\"productId\":1788842761118150200,\"quantity\":2}\n{\"time\":\"2026-09-08T13:46:03.3944519+09:00\",\"level\":\"INFO\",\"msg\":\"inventory_committed\",\"pid\":28328,\"topic\":\"phase3.380dc483-973f-4192-bf66-0d9be174651c.main\",\"partition\":0,\"offset\":0,\"eventId\":\"380dc483-973f-4192-bf66-0d9be174651c\",\"orderId\":\"f4942db3-5bcf-4694-91df-80ece164acde\",\"productId\":1788842761118150200,\"quantity\":2}\n{\"time\":\"2026-09-08T13:46:03.3964512+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":28328,\"topic\":\"phase3.380dc483-973f-4192-bf66-0d9be174651c.main\",\"partition\":0,\"offset\":0,\"eventId\":\"380dc483-973f-4192-bf66-0d9be174651c\",\"orderId\":\"f4942db3-5bcf-4694-91df-80ece164acde\",\"productId\":1788842761118150200,\"quantity\":2,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:46:03.4414515+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":28328,\"reason\":\"context canceled\"}\n",
+          "pid": 28328
+        }
+      ]
+    },
+    {
+      "after": [
+        {
+          "end": {
+            "0": 2
+          },
+          "committed": {
+            "0": 2
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "before": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "deadLetters": [
+        {
+          "dlqId": "11602a16860956ab4c393de640d1d46e",
+          "originalKey": "MTBhZGFkOGQtMjA2ZC00MzJhLTllZjctYmFhMzNiYzVmZWMw",
+          "originalRawValue": "e2ludmFsaWQtanNvbg==",
+          "sourceHeaders": null,
+          "originalTopic": "phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a.main",
+          "originalPartition": 0,
+          "originalOffset": 0,
+          "retryCount": 0,
+          "errorCode": "MALFORMED_JSON",
+          "errorMessage": "MALFORMED_JSON",
+          "failedAt": "2026-09-08T04:46:05.6398456Z"
+        }
+      ],
+      "delaySeconds": 2,
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "5533dcb6-d3ce-4600-af2d-4f5f67c57f2a",
+        "orderId": "10adad8d-206d-432a-9ef7-baa33bc5fec0",
+        "productId": 1788842763558450800,
+        "quantity": 2,
+        "createdAt": "2026-09-08T04:46:03.5584508Z"
+      },
+      "finalInventory": 98,
+      "finishedAt": "2026-09-08T04:46:06.6101085Z",
+      "historicalInventoryUnchanged": true,
+      "initialInventory": 100,
+      "mainGroup": "phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a-0",
+      "maxRetries": 3,
+      "retryGroup": "phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a-1",
+      "retryRecords": [],
+      "runId": "phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a",
+      "scenario": "Poison",
+      "source": {
+        "Topic": "phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a.main",
+        "Partition": 0,
+        "Offset": 0,
+        "HighWaterMark": 2,
+        "Key": "MTBhZGFkOGQtMjA2ZC00MzJhLTllZjctYmFhMzNiYzVmZWMw",
+        "Value": "e2ludmFsaWQtanNvbg==",
+        "Headers": null,
+        "WriterData": null,
+        "Time": "2026-09-08T04:46:03.917Z"
+      },
+      "stage": "complete",
+      "startedAt": "2026-09-08T04:46:03.5624541Z",
+      "status": "PASS",
+      "topics": [
+        "phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a.main",
+        "phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a.retry",
+        "phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a.dlq"
+      ],
+      "workers": [
+        {
+          "exitCode": 0,
+          "log": "{\"time\":\"2026-09-08T13:46:05.601633+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":10572,\"groupId\":\"phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a-0\",\"topic\":\"phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a.main\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:46:05.6398456+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":10572,\"topic\":\"phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a.main\",\"partition\":0,\"offset\":0,\"key\":\"10adad8d-206d-432a-9ef7-baa33bc5fec0\",\"valueSHA256\":\"9b60fca5ee82ffb9afc0d382b727815b0b0e70a096b08a1ccb82cc2ec8909066\"}\n{\"time\":\"2026-09-08T13:46:05.6943833+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":10572,\"topic\":\"phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a.main\",\"partition\":0,\"offset\":0,\"destination\":\"phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a.dlq\",\"errorCode\":\"MALFORMED_JSON\",\"retryCount\":0}\n{\"time\":\"2026-09-08T13:46:05.6959477+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":10572,\"topic\":\"phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a.main\",\"partition\":0,\"offset\":0,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:46:05.6959477+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":10572,\"topic\":\"phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a.main\",\"partition\":0,\"offset\":1,\"key\":\"10adad8d-206d-432a-9ef7-baa33bc5fec0\",\"valueSHA256\":\"10f32f834da52e250e13d3dc9d6f46113f095bcaeb90d77710235502b0d4d9f3\"}\n{\"time\":\"2026-09-08T13:46:05.6959477+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":10572,\"topic\":\"phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a.main\",\"partition\":0,\"offset\":1,\"eventId\":\"5533dcb6-d3ce-4600-af2d-4f5f67c57f2a\",\"orderId\":\"10adad8d-206d-432a-9ef7-baa33bc5fec0\",\"productId\":1788842763558450800,\"quantity\":2}\n{\"time\":\"2026-09-08T13:46:05.7028882+09:00\",\"level\":\"INFO\",\"msg\":\"inventory_committed\",\"pid\":10572,\"topic\":\"phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a.main\",\"partition\":0,\"offset\":1,\"eventId\":\"5533dcb6-d3ce-4600-af2d-4f5f67c57f2a\",\"orderId\":\"10adad8d-206d-432a-9ef7-baa33bc5fec0\",\"productId\":1788842763558450800,\"quantity\":2}\n{\"time\":\"2026-09-08T13:46:05.7049954+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":10572,\"topic\":\"phase3.5533dcb6-d3ce-4600-af2d-4f5f67c57f2a.main\",\"partition\":0,\"offset\":1,\"eventId\":\"5533dcb6-d3ce-4600-af2d-4f5f67c57f2a\",\"orderId\":\"10adad8d-206d-432a-9ef7-baa33bc5fec0\",\"productId\":1788842763558450800,\"quantity\":2,\"committedOffset\":2}\n{\"time\":\"2026-09-08T13:46:05.8052897+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":10572,\"reason\":\"context canceled\"}\n",
+          "pid": 10572
+        }
+      ]
+    },
+    {
+      "after": [
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": 1
+          }
+        },
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": 1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "afterMainFailure": [
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": 1
+          }
+        },
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "before": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "deadLetters": [],
+      "delaySeconds": 12,
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d",
+        "orderId": "ccf2a0aa-fbd5-4ed3-a5c1-fbac39385917",
+        "productId": 1788842766620790500,
+        "quantity": 2,
+        "createdAt": "2026-09-08T04:46:06.6207905Z"
+      },
+      "finalInventory": 98,
+      "finishedAt": "2026-09-08T04:46:25.9086236Z",
+      "historicalInventoryUnchanged": true,
+      "initialInventory": 100,
+      "inventoryBeforeRetry": 100,
+      "mainGroup": "phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d-0",
+      "maxRetries": 3,
+      "nextAttemptAt": "2026-09-08T04:46:24.3521858Z",
+      "retryGroup": "phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d-1",
+      "retryProcessedAt": "2026-09-08T13:46:24.3522792+09:00",
+      "retryRecords": [
+        {
+          "Topic": "phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.retry",
+          "Partition": 0,
+          "Offset": 0,
+          "HighWaterMark": 1,
+          "Key": "Y2NmMmEwYWEtZmJkNS00ZWQzLWE1YzEtZmJhYzM5Mzg1OTE3",
+          "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiZTAzZDA3MjctNGE1Zi00M2IxLWI4NTItMGUzZWYyZTdhYzhkIiwib3JkZXJJZCI6ImNjZjJhMGFhLWZiZDUtNGVkMy1hNWMxLWZiYWMzOTM4NTkxNyIsInByb2R1Y3RJZCI6MTc4ODg0Mjc2NjYyMDc5MDUwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDY6MDYuNjIwNzkwNVoifQ==",
+          "Headers": [
+            {
+              "Key": "retry-count",
+              "Value": "MQ=="
+            },
+            {
+              "Key": "next-attempt-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0NjoyNC4zNTIxODU4Wg=="
+            },
+            {
+              "Key": "first-failed-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0NjoxMi4zNTIxODU4Wg=="
+            },
+            {
+              "Key": "last-error-code",
+              "Value": "REJfQ09OTkVDVElPTg=="
+            },
+            {
+              "Key": "original-topic",
+              "Value": "cGhhc2UzLmUwM2QwNzI3LTRhNWYtNDNiMS1iODUyLTBlM2VmMmU3YWM4ZC5tYWlu"
+            },
+            {
+              "Key": "original-partition",
+              "Value": "MA=="
+            },
+            {
+              "Key": "original-offset",
+              "Value": "MA=="
+            }
+          ],
+          "WriterData": null,
+          "Time": "2026-09-08T04:46:12.402Z"
+        }
+      ],
+      "runId": "phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d",
+      "scenario": "Recovery",
+      "source": {
+        "Topic": "phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.main",
+        "Partition": 0,
+        "Offset": 0,
+        "HighWaterMark": 1,
+        "Key": "Y2NmMmEwYWEtZmJkNS00ZWQzLWE1YzEtZmJhYzM5Mzg1OTE3",
+        "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiZTAzZDA3MjctNGE1Zi00M2IxLWI4NTItMGUzZWYyZTdhYzhkIiwib3JkZXJJZCI6ImNjZjJhMGFhLWZiZDUtNGVkMy1hNWMxLWZiYWMzOTM4NTkxNyIsInByb2R1Y3RJZCI6MTc4ODg0Mjc2NjYyMDc5MDUwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDY6MDYuNjIwNzkwNVoifQ==",
+        "Headers": null,
+        "WriterData": null,
+        "Time": "2026-09-08T04:46:07.002Z"
+      },
+      "stage": "complete",
+      "startedAt": "2026-09-08T04:46:06.6251145Z",
+      "status": "PASS",
+      "topics": [
+        "phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.main",
+        "phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.retry",
+        "phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.dlq"
+      ],
+      "workers": [
+        {
+          "exitCode": 0,
+          "log": "{\"time\":\"2026-09-08T13:46:08.8087537+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":11948,\"groupId\":\"phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d-0\",\"topic\":\"phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.main\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:46:08.8427558+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":11948,\"topic\":\"phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.main\",\"partition\":0,\"offset\":0,\"key\":\"ccf2a0aa-fbd5-4ed3-a5c1-fbac39385917\",\"valueSHA256\":\"c1a1b738323a6ea2fbe7c00670ceb8b226c31615e335e130bfe7a122fe46c486\"}\n{\"time\":\"2026-09-08T13:46:08.8427558+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":11948,\"topic\":\"phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.main\",\"partition\":0,\"offset\":0,\"eventId\":\"e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d\",\"orderId\":\"ccf2a0aa-fbd5-4ed3-a5c1-fbac39385917\",\"productId\":1788842766620790500,\"quantity\":2}\n{\"time\":\"2026-09-08T13:46:08.8427558+09:00\",\"level\":\"INFO\",\"msg\":\"fault_reached\",\"pid\":11948,\"point\":\"before-db\",\"eventId\":\"e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d\",\"orderId\":\"ccf2a0aa-fbd5-4ed3-a5c1-fbac39385917\",\"productId\":1788842766620790500}\n{\"time\":\"2026-09-08T13:46:12.3521858+09:00\",\"level\":\"ERROR\",\"msg\":\"inventory_failed\",\"pid\":11948,\"topic\":\"phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.main\",\"partition\":0,\"offset\":0,\"eventId\":\"e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d\",\"orderId\":\"ccf2a0aa-fbd5-4ed3-a5c1-fbac39385917\",\"productId\":1788842766620790500,\"quantity\":2,\"error\":\"dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.\"}\n{\"time\":\"2026-09-08T13:46:12.4054519+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":11948,\"topic\":\"phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.main\",\"partition\":0,\"offset\":0,\"eventId\":\"e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d\",\"orderId\":\"ccf2a0aa-fbd5-4ed3-a5c1-fbac39385917\",\"productId\":1788842766620790500,\"quantity\":2,\"destination\":\"phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.retry\",\"errorCode\":\"DB_CONNECTION\",\"retryCount\":0}\n{\"time\":\"2026-09-08T13:46:12.4160732+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":11948,\"topic\":\"phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.main\",\"partition\":0,\"offset\":0,\"eventId\":\"e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d\",\"orderId\":\"ccf2a0aa-fbd5-4ed3-a5c1-fbac39385917\",\"productId\":1788842766620790500,\"quantity\":2,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:46:12.4564608+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":11948,\"reason\":\"context canceled\"}\n",
+          "pid": 11948
+        },
+        {
+          "exitCode": 0,
+          "log": "{\"time\":\"2026-09-08T13:46:18.5144265+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":1824,\"groupId\":\"phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d-1\",\"topic\":\"phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.retry\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:46:18.5639962+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":1824,\"topic\":\"phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.retry\",\"partition\":0,\"offset\":0,\"key\":\"ccf2a0aa-fbd5-4ed3-a5c1-fbac39385917\",\"valueSHA256\":\"c1a1b738323a6ea2fbe7c00670ceb8b226c31615e335e130bfe7a122fe46c486\"}\n{\"time\":\"2026-09-08T13:46:18.5639962+09:00\",\"level\":\"INFO\",\"msg\":\"retry_wait\",\"pid\":1824,\"topic\":\"phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.retry\",\"partition\":0,\"offset\":0,\"retryCount\":1,\"nextAttemptAt\":\"2026-09-08T04:46:24.3521858Z\"}\n{\"time\":\"2026-09-08T13:46:24.3522792+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":1824,\"topic\":\"phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.retry\",\"partition\":0,\"offset\":0,\"eventId\":\"e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d\",\"orderId\":\"ccf2a0aa-fbd5-4ed3-a5c1-fbac39385917\",\"productId\":1788842766620790500,\"quantity\":2}\n{\"time\":\"2026-09-08T13:46:24.358991+09:00\",\"level\":\"INFO\",\"msg\":\"inventory_committed\",\"pid\":1824,\"topic\":\"phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.retry\",\"partition\":0,\"offset\":0,\"eventId\":\"e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d\",\"orderId\":\"ccf2a0aa-fbd5-4ed3-a5c1-fbac39385917\",\"productId\":1788842766620790500,\"quantity\":2}\n{\"time\":\"2026-09-08T13:46:24.3657343+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":1824,\"topic\":\"phase3.e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d.retry\",\"partition\":0,\"offset\":0,\"eventId\":\"e03d0727-4a5f-43b1-b852-0e3ef2e7ac8d\",\"orderId\":\"ccf2a0aa-fbd5-4ed3-a5c1-fbac39385917\",\"productId\":1788842766620790500,\"quantity\":2,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:46:24.4182402+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":1824,\"reason\":\"context canceled\"}\n",
+          "pid": 1824
+        }
+      ]
+    },
+    {
+      "after": [
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": 1
+          }
+        },
+        {
+          "end": {
+            "0": 3
+          },
+          "committed": {
+            "0": 3
+          }
+        },
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "afterMainFailure": [
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": 1
+          }
+        },
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "before": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "deadLetters": [
+        {
+          "dlqId": "ae62fbbbf6e66b51842c13c034afae98",
+          "originalKey": "OTQzMmM1ZDEtNjNmMi00MGQ1LTljNDctZDRiNTY4Y2NlMjJi",
+          "originalRawValue": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiMDc4ZjY2NzQtNWRhOS00MTQ1LTg4N2YtNWQyYWRiYTcyNDJiIiwib3JkZXJJZCI6Ijk0MzJjNWQxLTYzZjItNDBkNS05YzQ3LWQ0YjU2OGNjZTIyYiIsInByb2R1Y3RJZCI6MTc4ODg0Mjc4NTkxODM0MjAwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDY6MjUuOTE4MzQyWiJ9",
+          "sourceHeaders": [
+            {
+              "Key": "retry-count",
+              "Value": "Mw=="
+            },
+            {
+              "Key": "next-attempt-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0NjozNi45OTA5MzA0Wg=="
+            },
+            {
+              "Key": "first-failed-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0NjozMC45ODg4NjUzWg=="
+            },
+            {
+              "Key": "last-error-code",
+              "Value": "REJfQ09OTkVDVElPTg=="
+            },
+            {
+              "Key": "original-topic",
+              "Value": "cGhhc2UzLjA3OGY2Njc0LTVkYTktNDE0NS04ODdmLTVkMmFkYmE3MjQyYi5tYWlu"
+            },
+            {
+              "Key": "original-partition",
+              "Value": "MA=="
+            },
+            {
+              "Key": "original-offset",
+              "Value": "MA=="
+            }
+          ],
+          "originalTopic": "phase3.078f6674-5da9-4145-887f-5d2adba7242b.main",
+          "originalPartition": 0,
+          "originalOffset": 0,
+          "retryCount": 3,
+          "errorCode": "DB_CONNECTION",
+          "errorMessage": "retry limit reached: DB_CONNECTION",
+          "failedAt": "2026-09-08T04:46:36.9915715Z"
+        }
+      ],
+      "delaySeconds": 2,
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "078f6674-5da9-4145-887f-5d2adba7242b",
+        "orderId": "9432c5d1-63f2-40d5-9c47-d4b568cce22b",
+        "productId": 1788842785918342000,
+        "quantity": 2,
+        "createdAt": "2026-09-08T04:46:25.918342Z"
+      },
+      "finalInventory": 100,
+      "finishedAt": "2026-09-08T04:46:45.0631618Z",
+      "historicalInventoryUnchanged": true,
+      "initialInventory": 100,
+      "mainGroup": "phase3.078f6674-5da9-4145-887f-5d2adba7242b-0",
+      "maxRetries": 3,
+      "retryGroup": "phase3.078f6674-5da9-4145-887f-5d2adba7242b-1",
+      "retryRecords": [
+        {
+          "Topic": "phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry",
+          "Partition": 0,
+          "Offset": 0,
+          "HighWaterMark": 3,
+          "Key": "OTQzMmM1ZDEtNjNmMi00MGQ1LTljNDctZDRiNTY4Y2NlMjJi",
+          "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiMDc4ZjY2NzQtNWRhOS00MTQ1LTg4N2YtNWQyYWRiYTcyNDJiIiwib3JkZXJJZCI6Ijk0MzJjNWQxLTYzZjItNDBkNS05YzQ3LWQ0YjU2OGNjZTIyYiIsInByb2R1Y3RJZCI6MTc4ODg0Mjc4NTkxODM0MjAwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDY6MjUuOTE4MzQyWiJ9",
+          "Headers": [
+            {
+              "Key": "retry-count",
+              "Value": "MQ=="
+            },
+            {
+              "Key": "next-attempt-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0NjozMi45ODg4NjUzWg=="
+            },
+            {
+              "Key": "first-failed-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0NjozMC45ODg4NjUzWg=="
+            },
+            {
+              "Key": "last-error-code",
+              "Value": "REJfQ09OTkVDVElPTg=="
+            },
+            {
+              "Key": "original-topic",
+              "Value": "cGhhc2UzLjA3OGY2Njc0LTVkYTktNDE0NS04ODdmLTVkMmFkYmE3MjQyYi5tYWlu"
+            },
+            {
+              "Key": "original-partition",
+              "Value": "MA=="
+            },
+            {
+              "Key": "original-offset",
+              "Value": "MA=="
+            }
+          ],
+          "WriterData": null,
+          "Time": "2026-09-08T04:46:31.035Z"
+        },
+        {
+          "Topic": "phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry",
+          "Partition": 0,
+          "Offset": 1,
+          "HighWaterMark": 3,
+          "Key": "OTQzMmM1ZDEtNjNmMi00MGQ1LTljNDctZDRiNTY4Y2NlMjJi",
+          "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiMDc4ZjY2NzQtNWRhOS00MTQ1LTg4N2YtNWQyYWRiYTcyNDJiIiwib3JkZXJJZCI6Ijk0MzJjNWQxLTYzZjItNDBkNS05YzQ3LWQ0YjU2OGNjZTIyYiIsInByb2R1Y3RJZCI6MTc4ODg0Mjc4NTkxODM0MjAwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDY6MjUuOTE4MzQyWiJ9",
+          "Headers": [
+            {
+              "Key": "retry-count",
+              "Value": "Mg=="
+            },
+            {
+              "Key": "next-attempt-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0NjozNC45ODk5MDk5Wg=="
+            },
+            {
+              "Key": "first-failed-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0NjozMC45ODg4NjUzWg=="
+            },
+            {
+              "Key": "last-error-code",
+              "Value": "REJfQ09OTkVDVElPTg=="
+            },
+            {
+              "Key": "original-topic",
+              "Value": "cGhhc2UzLjA3OGY2Njc0LTVkYTktNDE0NS04ODdmLTVkMmFkYmE3MjQyYi5tYWlu"
+            },
+            {
+              "Key": "original-partition",
+              "Value": "MA=="
+            },
+            {
+              "Key": "original-offset",
+              "Value": "MA=="
+            }
+          ],
+          "WriterData": null,
+          "Time": "2026-09-08T04:46:33.04Z"
+        },
+        {
+          "Topic": "phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry",
+          "Partition": 0,
+          "Offset": 2,
+          "HighWaterMark": 3,
+          "Key": "OTQzMmM1ZDEtNjNmMi00MGQ1LTljNDctZDRiNTY4Y2NlMjJi",
+          "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiMDc4ZjY2NzQtNWRhOS00MTQ1LTg4N2YtNWQyYWRiYTcyNDJiIiwib3JkZXJJZCI6Ijk0MzJjNWQxLTYzZjItNDBkNS05YzQ3LWQ0YjU2OGNjZTIyYiIsInByb2R1Y3RJZCI6MTc4ODg0Mjc4NTkxODM0MjAwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDY6MjUuOTE4MzQyWiJ9",
+          "Headers": [
+            {
+              "Key": "retry-count",
+              "Value": "Mw=="
+            },
+            {
+              "Key": "next-attempt-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0NjozNi45OTA5MzA0Wg=="
+            },
+            {
+              "Key": "first-failed-at",
+              "Value": "MjAyNi0wOS0wOFQwNDo0NjozMC45ODg4NjUzWg=="
+            },
+            {
+              "Key": "last-error-code",
+              "Value": "REJfQ09OTkVDVElPTg=="
+            },
+            {
+              "Key": "original-topic",
+              "Value": "cGhhc2UzLjA3OGY2Njc0LTVkYTktNDE0NS04ODdmLTVkMmFkYmE3MjQyYi5tYWlu"
+            },
+            {
+              "Key": "original-partition",
+              "Value": "MA=="
+            },
+            {
+              "Key": "original-offset",
+              "Value": "MA=="
+            }
+          ],
+          "WriterData": null,
+          "Time": "2026-09-08T04:46:35.001Z"
+        }
+      ],
+      "runId": "phase3.078f6674-5da9-4145-887f-5d2adba7242b",
+      "scenario": "Exhaustion",
+      "source": {
+        "Topic": "phase3.078f6674-5da9-4145-887f-5d2adba7242b.main",
+        "Partition": 0,
+        "Offset": 0,
+        "HighWaterMark": 1,
+        "Key": "OTQzMmM1ZDEtNjNmMi00MGQ1LTljNDctZDRiNTY4Y2NlMjJi",
+        "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiMDc4ZjY2NzQtNWRhOS00MTQ1LTg4N2YtNWQyYWRiYTcyNDJiIiwib3JkZXJJZCI6Ijk0MzJjNWQxLTYzZjItNDBkNS05YzQ3LWQ0YjU2OGNjZTIyYiIsInByb2R1Y3RJZCI6MTc4ODg0Mjc4NTkxODM0MjAwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDY6MjUuOTE4MzQyWiJ9",
+        "Headers": null,
+        "WriterData": null,
+        "Time": "2026-09-08T04:46:26.182Z"
+      },
+      "stage": "complete",
+      "startedAt": "2026-09-08T04:46:25.9218924Z",
+      "status": "PASS",
+      "topics": [
+        "phase3.078f6674-5da9-4145-887f-5d2adba7242b.main",
+        "phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry",
+        "phase3.078f6674-5da9-4145-887f-5d2adba7242b.dlq"
+      ],
+      "workers": [
+        {
+          "exitCode": 0,
+          "log": "{\"time\":\"2026-09-08T13:46:27.7993656+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":22708,\"groupId\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b-0\",\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.main\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:46:27.8280643+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":22708,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.main\",\"partition\":0,\"offset\":0,\"key\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"valueSHA256\":\"6f1aec48d31b56794fb5dd13ab3896dd92821b3eae6c9fbee7b93756f80a21c5\"}\n{\"time\":\"2026-09-08T13:46:27.8280643+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":22708,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.main\",\"partition\":0,\"offset\":0,\"eventId\":\"078f6674-5da9-4145-887f-5d2adba7242b\",\"orderId\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"productId\":1788842785918342000,\"quantity\":2}\n{\"time\":\"2026-09-08T13:46:27.8280643+09:00\",\"level\":\"INFO\",\"msg\":\"fault_reached\",\"pid\":22708,\"point\":\"before-db\",\"eventId\":\"078f6674-5da9-4145-887f-5d2adba7242b\",\"orderId\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"productId\":1788842785918342000}\n{\"time\":\"2026-09-08T13:46:30.9883364+09:00\",\"level\":\"ERROR\",\"msg\":\"inventory_failed\",\"pid\":22708,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.main\",\"partition\":0,\"offset\":0,\"eventId\":\"078f6674-5da9-4145-887f-5d2adba7242b\",\"orderId\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"productId\":1788842785918342000,\"quantity\":2,\"error\":\"dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.\"}\n{\"time\":\"2026-09-08T13:46:31.0608107+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":22708,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.main\",\"partition\":0,\"offset\":0,\"eventId\":\"078f6674-5da9-4145-887f-5d2adba7242b\",\"orderId\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"productId\":1788842785918342000,\"quantity\":2,\"destination\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"errorCode\":\"DB_CONNECTION\",\"retryCount\":0}\n{\"time\":\"2026-09-08T13:46:31.0623816+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":22708,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.main\",\"partition\":0,\"offset\":0,\"eventId\":\"078f6674-5da9-4145-887f-5d2adba7242b\",\"orderId\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"productId\":1788842785918342000,\"quantity\":2,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:46:31.0934605+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":22708,\"reason\":\"context canceled\"}\n",
+          "pid": 22708
+        },
+        {
+          "exitCode": 0,
+          "log": "{\"time\":\"2026-09-08T13:46:31.2074757+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":26784,\"groupId\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b-1\",\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:46:31.2421917+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":0,\"key\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"valueSHA256\":\"6f1aec48d31b56794fb5dd13ab3896dd92821b3eae6c9fbee7b93756f80a21c5\"}\n{\"time\":\"2026-09-08T13:46:31.2421917+09:00\",\"level\":\"INFO\",\"msg\":\"retry_wait\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":0,\"retryCount\":1,\"nextAttemptAt\":\"2026-09-08T04:46:32.9888653Z\"}\n{\"time\":\"2026-09-08T13:46:32.9892629+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":0,\"eventId\":\"078f6674-5da9-4145-887f-5d2adba7242b\",\"orderId\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"productId\":1788842785918342000,\"quantity\":2}\n{\"time\":\"2026-09-08T13:46:32.9892629+09:00\",\"level\":\"ERROR\",\"msg\":\"inventory_failed\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":0,\"eventId\":\"078f6674-5da9-4145-887f-5d2adba7242b\",\"orderId\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"productId\":1788842785918342000,\"quantity\":2,\"error\":\"dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.\"}\n{\"time\":\"2026-09-08T13:46:33.042454+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":0,\"eventId\":\"078f6674-5da9-4145-887f-5d2adba7242b\",\"orderId\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"productId\":1788842785918342000,\"quantity\":2,\"destination\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"errorCode\":\"DB_CONNECTION\",\"retryCount\":1}\n{\"time\":\"2026-09-08T13:46:33.0443618+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":0,\"eventId\":\"078f6674-5da9-4145-887f-5d2adba7242b\",\"orderId\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"productId\":1788842785918342000,\"quantity\":2,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:46:33.0553244+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":1,\"key\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"valueSHA256\":\"6f1aec48d31b56794fb5dd13ab3896dd92821b3eae6c9fbee7b93756f80a21c5\"}\n{\"time\":\"2026-09-08T13:46:33.0553244+09:00\",\"level\":\"INFO\",\"msg\":\"retry_wait\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":1,\"retryCount\":2,\"nextAttemptAt\":\"2026-09-08T04:46:34.9899099Z\"}\n{\"time\":\"2026-09-08T13:46:34.9907717+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":1,\"eventId\":\"078f6674-5da9-4145-887f-5d2adba7242b\",\"orderId\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"productId\":1788842785918342000,\"quantity\":2}\n{\"time\":\"2026-09-08T13:46:34.9909304+09:00\",\"level\":\"ERROR\",\"msg\":\"inventory_failed\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":1,\"eventId\":\"078f6674-5da9-4145-887f-5d2adba7242b\",\"orderId\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"productId\":1788842785918342000,\"quantity\":2,\"error\":\"dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.\"}\n{\"time\":\"2026-09-08T13:46:35.0026199+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":1,\"eventId\":\"078f6674-5da9-4145-887f-5d2adba7242b\",\"orderId\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"productId\":1788842785918342000,\"quantity\":2,\"destination\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"errorCode\":\"DB_CONNECTION\",\"retryCount\":2}\n{\"time\":\"2026-09-08T13:46:35.0106146+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":1,\"eventId\":\"078f6674-5da9-4145-887f-5d2adba7242b\",\"orderId\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"productId\":1788842785918342000,\"quantity\":2,\"committedOffset\":2}\n{\"time\":\"2026-09-08T13:46:35.0106146+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":2,\"key\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"valueSHA256\":\"6f1aec48d31b56794fb5dd13ab3896dd92821b3eae6c9fbee7b93756f80a21c5\"}\n{\"time\":\"2026-09-08T13:46:35.0106146+09:00\",\"level\":\"INFO\",\"msg\":\"retry_wait\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":2,\"retryCount\":3,\"nextAttemptAt\":\"2026-09-08T04:46:36.9909304Z\"}\n{\"time\":\"2026-09-08T13:46:36.9915715+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":2,\"eventId\":\"078f6674-5da9-4145-887f-5d2adba7242b\",\"orderId\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"productId\":1788842785918342000,\"quantity\":2}\n{\"time\":\"2026-09-08T13:46:36.9915715+09:00\",\"level\":\"ERROR\",\"msg\":\"inventory_failed\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":2,\"eventId\":\"078f6674-5da9-4145-887f-5d2adba7242b\",\"orderId\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"productId\":1788842785918342000,\"quantity\":2,\"error\":\"dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.\"}\n{\"time\":\"2026-09-08T13:46:37.0049707+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":2,\"eventId\":\"078f6674-5da9-4145-887f-5d2adba7242b\",\"orderId\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"productId\":1788842785918342000,\"quantity\":2,\"destination\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.dlq\",\"errorCode\":\"DB_CONNECTION\",\"retryCount\":3}\n{\"time\":\"2026-09-08T13:46:37.0189858+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":26784,\"topic\":\"phase3.078f6674-5da9-4145-887f-5d2adba7242b.retry\",\"partition\":0,\"offset\":2,\"eventId\":\"078f6674-5da9-4145-887f-5d2adba7242b\",\"orderId\":\"9432c5d1-63f2-40d5-9c47-d4b568cce22b\",\"productId\":1788842785918342000,\"quantity\":2,\"committedOffset\":3}\n{\"time\":\"2026-09-08T13:46:37.1039753+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":26784,\"reason\":\"context canceled\"}\n",
+          "pid": 26784
+        }
+      ]
+    },
+    {
+      "after": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": 1
+          }
+        },
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "before": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "deadLetters": [
+        {
+          "dlqId": "a88002f670ddb34ddd9b2285b506132d",
+          "originalKey": "NTQ5YjZlZGEtZGNhNC00NTBmLTk5MTEtYjYyNzhiY2JhYzZm",
+          "originalRawValue": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiNmJkMDZjYjItMTBiYS00MWZiLWIwNzEtZmE1MWY0Y2NkZGM4Iiwib3JkZXJJZCI6IjU0OWI2ZWRhLWRjYTQtNDUwZi05OTExLWI2Mjc4YmNiYWM2ZiIsInByb2R1Y3RJZCI6MTc4ODg0MjgwNTA3MjYzMDgwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDY6NDUuMDcyNjMwOFoifQ==",
+          "sourceHeaders": [
+            {
+              "Key": "retry-count",
+              "Value": "LTE="
+            }
+          ],
+          "originalTopic": "phase3.6bd06cb2-10ba-41fb-b071-fa51f4ccddc8.retry",
+          "originalPartition": 0,
+          "originalOffset": 0,
+          "retryCount": null,
+          "errorCode": "INVALID_RETRY_METADATA",
+          "errorMessage": "INVALID_RETRY_METADATA",
+          "failedAt": "2026-09-08T04:46:46.733476Z"
+        }
+      ],
+      "delaySeconds": 2,
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "6bd06cb2-10ba-41fb-b071-fa51f4ccddc8",
+        "orderId": "549b6eda-dca4-450f-9911-b6278bcbac6f",
+        "productId": 1788842805072630800,
+        "quantity": 2,
+        "createdAt": "2026-09-08T04:46:45.0726308Z"
+      },
+      "finalInventory": 100,
+      "finishedAt": "2026-09-08T04:46:46.8958989Z",
+      "historicalInventoryUnchanged": true,
+      "initialInventory": 100,
+      "mainGroup": "phase3.6bd06cb2-10ba-41fb-b071-fa51f4ccddc8-0",
+      "maxRetries": 3,
+      "retryGroup": "phase3.6bd06cb2-10ba-41fb-b071-fa51f4ccddc8-1",
+      "retryRecords": [
+        {
+          "Topic": "phase3.6bd06cb2-10ba-41fb-b071-fa51f4ccddc8.retry",
+          "Partition": 0,
+          "Offset": 0,
+          "HighWaterMark": 1,
+          "Key": "NTQ5YjZlZGEtZGNhNC00NTBmLTk5MTEtYjYyNzhiY2JhYzZm",
+          "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiNmJkMDZjYjItMTBiYS00MWZiLWIwNzEtZmE1MWY0Y2NkZGM4Iiwib3JkZXJJZCI6IjU0OWI2ZWRhLWRjYTQtNDUwZi05OTExLWI2Mjc4YmNiYWM2ZiIsInByb2R1Y3RJZCI6MTc4ODg0MjgwNTA3MjYzMDgwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDY6NDUuMDcyNjMwOFoifQ==",
+          "Headers": [
+            {
+              "Key": "retry-count",
+              "Value": "LTE="
+            }
+          ],
+          "WriterData": null,
+          "Time": "2026-09-08T04:46:45.254Z"
+        }
+      ],
+      "runId": "phase3.6bd06cb2-10ba-41fb-b071-fa51f4ccddc8",
+      "scenario": "Metadata",
+      "source": {
+        "Topic": "phase3.6bd06cb2-10ba-41fb-b071-fa51f4ccddc8.retry",
+        "Partition": 0,
+        "Offset": 0,
+        "HighWaterMark": 1,
+        "Key": "NTQ5YjZlZGEtZGNhNC00NTBmLTk5MTEtYjYyNzhiY2JhYzZm",
+        "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiNmJkMDZjYjItMTBiYS00MWZiLWIwNzEtZmE1MWY0Y2NkZGM4Iiwib3JkZXJJZCI6IjU0OWI2ZWRhLWRjYTQtNDUwZi05OTExLWI2Mjc4YmNiYWM2ZiIsInByb2R1Y3RJZCI6MTc4ODg0MjgwNTA3MjYzMDgwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDY6NDUuMDcyNjMwOFoifQ==",
+        "Headers": [
+          {
+            "Key": "retry-count",
+            "Value": "LTE="
+          }
+        ],
+        "WriterData": null,
+        "Time": "2026-09-08T04:46:45.254Z"
+      },
+      "stage": "complete",
+      "startedAt": "2026-09-08T04:46:45.0757586Z",
+      "status": "PASS",
+      "topics": [
+        "phase3.6bd06cb2-10ba-41fb-b071-fa51f4ccddc8.main",
+        "phase3.6bd06cb2-10ba-41fb-b071-fa51f4ccddc8.retry",
+        "phase3.6bd06cb2-10ba-41fb-b071-fa51f4ccddc8.dlq"
+      ],
+      "workers": [
+        {
+          "exitCode": 0,
+          "log": "{\"time\":\"2026-09-08T13:46:46.70573+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":23692,\"groupId\":\"phase3.6bd06cb2-10ba-41fb-b071-fa51f4ccddc8-1\",\"topic\":\"phase3.6bd06cb2-10ba-41fb-b071-fa51f4ccddc8.retry\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:46:46.733476+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":23692,\"topic\":\"phase3.6bd06cb2-10ba-41fb-b071-fa51f4ccddc8.retry\",\"partition\":0,\"offset\":0,\"key\":\"549b6eda-dca4-450f-9911-b6278bcbac6f\",\"valueSHA256\":\"7b6824c0eacaf18d8006132174e4902ed0860537b4fd9a276210fdf36d800de2\"}\n{\"time\":\"2026-09-08T13:46:46.7497215+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":23692,\"topic\":\"phase3.6bd06cb2-10ba-41fb-b071-fa51f4ccddc8.retry\",\"partition\":0,\"offset\":0,\"destination\":\"phase3.6bd06cb2-10ba-41fb-b071-fa51f4ccddc8.dlq\",\"errorCode\":\"INVALID_RETRY_METADATA\",\"retryCount\":0}\n{\"time\":\"2026-09-08T13:46:46.7507642+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":23692,\"topic\":\"phase3.6bd06cb2-10ba-41fb-b071-fa51f4ccddc8.retry\",\"partition\":0,\"offset\":0,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:46:46.7972645+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":23692,\"reason\":\"context canceled\"}\n",
+          "pid": 23692
+        }
+      ]
+    },
+    {
+      "after": [
+        {
+          "end": {
+            "0": 2
+          },
+          "committed": {
+            "0": 2
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 2
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "before": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "deadLetters": [
+        {
+          "dlqId": "9f6a54fd4eaa84ea6859272642a0a922",
+          "originalKey": "MDdlNTY0MmQtNmZlMi00NTIzLTg4MTItMjRhYzUzODA4NDJm",
+          "originalRawValue": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiZGFiYmMyMzUtNWNkNS00NmZkLTg0ZjctNGQxNzY3ZTE4NTU0Iiwib3JkZXJJZCI6IjA3ZTU2NDJkLTZmZTItNDUyMy04ODEyLTI0YWM1MzgwODQyZiIsInByb2R1Y3RJZCI6MTc4ODg0MjgwNjkwNTg5MDMwMCwicXVhbnRpdHkiOjEwMSwiY3JlYXRlZEF0IjoiMjAyNi0wOS0wOFQwNDo0Njo0Ni45MDU4OTAzWiJ9",
+          "sourceHeaders": null,
+          "originalTopic": "phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.main",
+          "originalPartition": 0,
+          "originalOffset": 0,
+          "retryCount": 0,
+          "errorCode": "INSUFFICIENT_INVENTORY",
+          "errorMessage": "INSUFFICIENT_INVENTORY",
+          "failedAt": "2026-09-08T04:46:48.6563242Z"
+        },
+        {
+          "dlqId": "4251e974d5f8fb3423f95b476f7bda54",
+          "originalKey": "ZTVkMWM0YTMtNzQ5MC00NDQ3LWIyNDItMWQ2ZTNlODY1NWJm",
+          "originalRawValue": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiMDNhZDhhNjktMmMwMy00M2E1LTljNWItMTg5YjExNGNhMTUwIiwib3JkZXJJZCI6ImU1ZDFjNGEzLTc0OTAtNDQ0Ny1iMjQyLTFkNmUzZTg2NTViZiIsInByb2R1Y3RJZCI6MTc4ODg0MjgwNjkwNTg5MDMwMSwicXVhbnRpdHkiOjEsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDY6NDcuMDgxMTk3WiJ9",
+          "sourceHeaders": null,
+          "originalTopic": "phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.main",
+          "originalPartition": 0,
+          "originalOffset": 1,
+          "retryCount": 0,
+          "errorCode": "PRODUCT_MISSING",
+          "errorMessage": "PRODUCT_MISSING",
+          "failedAt": "2026-09-08T04:46:48.676626Z"
+        }
+      ],
+      "delaySeconds": 2,
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "dabbc235-5cd5-46fd-84f7-4d1767e18554",
+        "orderId": "07e5642d-6fe2-4523-8812-24ac5380842f",
+        "productId": 1788842806905890300,
+        "quantity": 2,
+        "createdAt": "2026-09-08T04:46:46.9058903Z"
+      },
+      "finalInventory": 100,
+      "finishedAt": "2026-09-08T04:46:49.5072482Z",
+      "historicalInventoryUnchanged": true,
+      "initialInventory": 100,
+      "mainGroup": "phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554-0",
+      "maxRetries": 3,
+      "missingProductEvent": {
+        "schemaVersion": 1,
+        "eventId": "03ad8a69-2c03-43a5-9c5b-189b114ca150",
+        "orderId": "e5d1c4a3-7490-4447-b242-1d6e3e8655bf",
+        "productId": 1788842806905890301,
+        "quantity": 1,
+        "createdAt": "2026-09-08T04:46:47.081197Z"
+      },
+      "retryGroup": "phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554-1",
+      "retryRecords": [],
+      "runId": "phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554",
+      "scenario": "Domain",
+      "source": {
+        "Topic": "phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.main",
+        "Partition": 0,
+        "Offset": 0,
+        "HighWaterMark": 2,
+        "Key": "MDdlNTY0MmQtNmZlMi00NTIzLTg4MTItMjRhYzUzODA4NDJm",
+        "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiZGFiYmMyMzUtNWNkNS00NmZkLTg0ZjctNGQxNzY3ZTE4NTU0Iiwib3JkZXJJZCI6IjA3ZTU2NDJkLTZmZTItNDUyMy04ODEyLTI0YWM1MzgwODQyZiIsInByb2R1Y3RJZCI6MTc4ODg0MjgwNjkwNTg5MDMwMCwicXVhbnRpdHkiOjEwMSwiY3JlYXRlZEF0IjoiMjAyNi0wOS0wOFQwNDo0Njo0Ni45MDU4OTAzWiJ9",
+        "Headers": null,
+        "WriterData": null,
+        "Time": "2026-09-08T04:46:47.079Z"
+      },
+      "stage": "complete",
+      "startedAt": "2026-09-08T04:46:46.9090359Z",
+      "status": "PASS",
+      "topics": [
+        "phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.main",
+        "phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.retry",
+        "phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.dlq"
+      ],
+      "workers": [
+        {
+          "exitCode": 0,
+          "log": "{\"time\":\"2026-09-08T13:46:48.6224199+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":26940,\"groupId\":\"phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554-0\",\"topic\":\"phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.main\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:46:48.6510833+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":26940,\"topic\":\"phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.main\",\"partition\":0,\"offset\":0,\"key\":\"07e5642d-6fe2-4523-8812-24ac5380842f\",\"valueSHA256\":\"de9879cf59235f9aeb7b33558fed58947cf01506cdf250b35c25987b79c5857a\"}\n{\"time\":\"2026-09-08T13:46:48.6510833+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":26940,\"topic\":\"phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.main\",\"partition\":0,\"offset\":0,\"eventId\":\"dabbc235-5cd5-46fd-84f7-4d1767e18554\",\"orderId\":\"07e5642d-6fe2-4523-8812-24ac5380842f\",\"productId\":1788842806905890300,\"quantity\":101}\n{\"time\":\"2026-09-08T13:46:48.6563242+09:00\",\"level\":\"ERROR\",\"msg\":\"inventory_failed\",\"pid\":26940,\"topic\":\"phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.main\",\"partition\":0,\"offset\":0,\"eventId\":\"dabbc235-5cd5-46fd-84f7-4d1767e18554\",\"orderId\":\"07e5642d-6fe2-4523-8812-24ac5380842f\",\"productId\":1788842806905890300,\"quantity\":101,\"error\":\"insufficient inventory\"}\n{\"time\":\"2026-09-08T13:46:48.6725393+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":26940,\"topic\":\"phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.main\",\"partition\":0,\"offset\":0,\"eventId\":\"dabbc235-5cd5-46fd-84f7-4d1767e18554\",\"orderId\":\"07e5642d-6fe2-4523-8812-24ac5380842f\",\"productId\":1788842806905890300,\"quantity\":101,\"destination\":\"phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.dlq\",\"errorCode\":\"INSUFFICIENT_INVENTORY\",\"retryCount\":0}\n{\"time\":\"2026-09-08T13:46:48.6740233+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":26940,\"topic\":\"phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.main\",\"partition\":0,\"offset\":0,\"eventId\":\"dabbc235-5cd5-46fd-84f7-4d1767e18554\",\"orderId\":\"07e5642d-6fe2-4523-8812-24ac5380842f\",\"productId\":1788842806905890300,\"quantity\":101,\"committedOffset\":1}\n{\"time\":\"2026-09-08T13:46:48.6740233+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":26940,\"topic\":\"phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.main\",\"partition\":0,\"offset\":1,\"key\":\"e5d1c4a3-7490-4447-b242-1d6e3e8655bf\",\"valueSHA256\":\"edc8f9dad8d2bc0df5cbc16b68823fe2f2b177095462f2a213dca14c872bd2b6\"}\n{\"time\":\"2026-09-08T13:46:48.6740233+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":26940,\"topic\":\"phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.main\",\"partition\":0,\"offset\":1,\"eventId\":\"03ad8a69-2c03-43a5-9c5b-189b114ca150\",\"orderId\":\"e5d1c4a3-7490-4447-b242-1d6e3e8655bf\",\"productId\":1788842806905890301,\"quantity\":1}\n{\"time\":\"2026-09-08T13:46:48.676626+09:00\",\"level\":\"ERROR\",\"msg\":\"inventory_failed\",\"pid\":26940,\"topic\":\"phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.main\",\"partition\":0,\"offset\":1,\"eventId\":\"03ad8a69-2c03-43a5-9c5b-189b114ca150\",\"orderId\":\"e5d1c4a3-7490-4447-b242-1d6e3e8655bf\",\"productId\":1788842806905890301,\"quantity\":1,\"error\":\"product missing\"}\n{\"time\":\"2026-09-08T13:46:48.6886297+09:00\",\"level\":\"INFO\",\"msg\":\"failure_published\",\"pid\":26940,\"topic\":\"phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.main\",\"partition\":0,\"offset\":1,\"eventId\":\"03ad8a69-2c03-43a5-9c5b-189b114ca150\",\"orderId\":\"e5d1c4a3-7490-4447-b242-1d6e3e8655bf\",\"productId\":1788842806905890301,\"quantity\":1,\"destination\":\"phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.dlq\",\"errorCode\":\"PRODUCT_MISSING\",\"retryCount\":0}\n{\"time\":\"2026-09-08T13:46:48.6896766+09:00\",\"level\":\"INFO\",\"msg\":\"offset_committed\",\"pid\":26940,\"topic\":\"phase3.dabbc235-5cd5-46fd-84f7-4d1767e18554.main\",\"partition\":0,\"offset\":1,\"eventId\":\"03ad8a69-2c03-43a5-9c5b-189b114ca150\",\"orderId\":\"e5d1c4a3-7490-4447-b242-1d6e3e8655bf\",\"productId\":1788842806905890301,\"quantity\":1,\"committedOffset\":2}\n{\"time\":\"2026-09-08T13:46:48.7150158+09:00\",\"level\":\"INFO\",\"msg\":\"worker_stopped\",\"pid\":26940,\"reason\":\"context canceled\"}\n",
+          "pid": 26940
+        }
+      ]
+    },
+    {
+      "after": [
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "before": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "deadLetters": [],
+      "delaySeconds": 2,
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "984c853a-762e-407a-a58e-7c027a3ef9bf",
+        "orderId": "f7fcda4d-5fa6-4475-8d23-b2b1ddadf104",
+        "productId": 1788842809517754100,
+        "quantity": 2,
+        "createdAt": "2026-09-08T04:46:49.5177541Z"
+      },
+      "finalInventory": 100,
+      "finishedAt": "2026-09-08T04:47:01.9076251Z",
+      "historicalInventoryUnchanged": true,
+      "initialInventory": 100,
+      "mainGroup": "phase3.984c853a-762e-407a-a58e-7c027a3ef9bf-0",
+      "maxRetries": 3,
+      "retryGroup": "phase3.984c853a-762e-407a-a58e-7c027a3ef9bf-1",
+      "retryRecords": [],
+      "runId": "phase3.984c853a-762e-407a-a58e-7c027a3ef9bf",
+      "scenario": "RetryPublishFailure",
+      "source": {
+        "Topic": "phase3.984c853a-762e-407a-a58e-7c027a3ef9bf.main",
+        "Partition": 0,
+        "Offset": 0,
+        "HighWaterMark": 1,
+        "Key": "ZjdmY2RhNGQtNWZhNi00NDc1LThkMjMtYjJiMWRkYWRmMTA0",
+        "Value": "eyJzY2hlbWFWZXJzaW9uIjoxLCJldmVudElkIjoiOTg0Yzg1M2EtNzYyZS00MDdhLWE1OGUtN2MwMjdhM2VmOWJmIiwib3JkZXJJZCI6ImY3ZmNkYTRkLTVmYTYtNDQ3NS04ZDIzLWIyYjFkZGFkZjEwNCIsInByb2R1Y3RJZCI6MTc4ODg0MjgwOTUxNzc1NDEwMCwicXVhbnRpdHkiOjIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDhUMDQ6NDY6NDkuNTE3NzU0MVoifQ==",
+        "Headers": null,
+        "WriterData": null,
+        "Time": "2026-09-08T04:46:49.689Z"
+      },
+      "stage": "complete",
+      "startedAt": "2026-09-08T04:46:49.5217261Z",
+      "status": "PASS",
+      "topics": [
+        "phase3.984c853a-762e-407a-a58e-7c027a3ef9bf.main",
+        "phase3.984c853a-762e-407a-a58e-7c027a3ef9bf.retry",
+        "phase3.984c853a-762e-407a-a58e-7c027a3ef9bf.dlq"
+      ],
+      "workers": [
+        {
+          "exitCode": 1,
+          "log": "{\"time\":\"2026-09-08T13:46:51.2286413+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":29148,\"groupId\":\"phase3.984c853a-762e-407a-a58e-7c027a3ef9bf-0\",\"topic\":\"phase3.984c853a-762e-407a-a58e-7c027a3ef9bf.main\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:46:51.258445+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":29148,\"topic\":\"phase3.984c853a-762e-407a-a58e-7c027a3ef9bf.main\",\"partition\":0,\"offset\":0,\"key\":\"f7fcda4d-5fa6-4475-8d23-b2b1ddadf104\",\"valueSHA256\":\"480b23918ebfdc5c482294a701a7e9d6336aee4a7fa120546642235624bf00a3\"}\n{\"time\":\"2026-09-08T13:46:51.258445+09:00\",\"level\":\"INFO\",\"msg\":\"event_received\",\"pid\":29148,\"topic\":\"phase3.984c853a-762e-407a-a58e-7c027a3ef9bf.main\",\"partition\":0,\"offset\":0,\"eventId\":\"984c853a-762e-407a-a58e-7c027a3ef9bf\",\"orderId\":\"f7fcda4d-5fa6-4475-8d23-b2b1ddadf104\",\"productId\":1788842809517754100,\"quantity\":2}\n{\"time\":\"2026-09-08T13:46:51.258445+09:00\",\"level\":\"INFO\",\"msg\":\"fault_reached\",\"pid\":29148,\"point\":\"before-db\",\"eventId\":\"984c853a-762e-407a-a58e-7c027a3ef9bf\",\"orderId\":\"f7fcda4d-5fa6-4475-8d23-b2b1ddadf104\",\"productId\":1788842809517754100}\n{\"time\":\"2026-09-08T13:46:54.7728609+09:00\",\"level\":\"ERROR\",\"msg\":\"inventory_failed\",\"pid\":29148,\"topic\":\"phase3.984c853a-762e-407a-a58e-7c027a3ef9bf.main\",\"partition\":0,\"offset\":0,\"eventId\":\"984c853a-762e-407a-a58e-7c027a3ef9bf\",\"orderId\":\"f7fcda4d-5fa6-4475-8d23-b2b1ddadf104\",\"productId\":1788842809517754100,\"quantity\":2,\"error\":\"dial tcp 127.0.0.1:3306: connectex: No connection could be made because the target machine actively refused it.\"}\n{\"time\":\"2026-09-08T13:46:55.1969571+09:00\",\"level\":\"ERROR\",\"msg\":\"worker_stopped\",\"pid\":29148,\"error\":\"publish failure destination=phase3.984c853a-762e-407a-a58e-7c027a3ef9bf.missing: [3] Unknown Topic Or Partition: the request is for a topic or partition that does not exist on this broker\"}\n",
+          "pid": 29148
+        }
+      ]
+    },
+    {
+      "after": [
+        {
+          "end": {
+            "0": 1
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "before": [
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        },
+        {
+          "end": {
+            "0": 0
+          },
+          "committed": {
+            "0": -1
+          }
+        }
+      ],
+      "deadLetters": [],
+      "delaySeconds": 2,
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "1b6ee9e5-ffcb-45f6-8be1-9c234b2fc54a",
+        "orderId": "b7fcdff2-d347-469d-82a9-bfdb1d672597",
+        "productId": 1788842821936542700,
+        "quantity": 2,
+        "createdAt": "2026-09-08T04:47:01.9365427Z"
+      },
+      "finalInventory": 100,
+      "finishedAt": "2026-09-08T04:47:04.4148577Z",
+      "historicalInventoryUnchanged": true,
+      "initialInventory": 100,
+      "mainGroup": "phase3.1b6ee9e5-ffcb-45f6-8be1-9c234b2fc54a-0",
+      "maxRetries": 3,
+      "retryGroup": "phase3.1b6ee9e5-ffcb-45f6-8be1-9c234b2fc54a-1",
+      "retryRecords": [],
+      "runId": "phase3.1b6ee9e5-ffcb-45f6-8be1-9c234b2fc54a",
+      "scenario": "DLQPublishFailure",
+      "source": {
+        "Topic": "phase3.1b6ee9e5-ffcb-45f6-8be1-9c234b2fc54a.main",
+        "Partition": 0,
+        "Offset": 0,
+        "HighWaterMark": 1,
+        "Key": "YjdmY2RmZjItZDM0Ny00NjlkLTgyYTktYmZkYjFkNjcyNTk3",
+        "Value": "e2ludmFsaWQtanNvbg==",
+        "Headers": null,
+        "WriterData": null,
+        "Time": "2026-09-08T04:47:02.016Z"
+      },
+      "stage": "complete",
+      "startedAt": "2026-09-08T04:47:01.9396491Z",
+      "status": "PASS",
+      "topics": [
+        "phase3.1b6ee9e5-ffcb-45f6-8be1-9c234b2fc54a.main",
+        "phase3.1b6ee9e5-ffcb-45f6-8be1-9c234b2fc54a.retry",
+        "phase3.1b6ee9e5-ffcb-45f6-8be1-9c234b2fc54a.dlq"
+      ],
+      "workers": [
+        {
+          "exitCode": 1,
+          "log": "{\"time\":\"2026-09-08T13:47:03.5795428+09:00\",\"level\":\"INFO\",\"msg\":\"worker_started\",\"pid\":28600,\"groupId\":\"phase3.1b6ee9e5-ffcb-45f6-8be1-9c234b2fc54a-0\",\"topic\":\"phase3.1b6ee9e5-ffcb-45f6-8be1-9c234b2fc54a.main\",\"phase2Baseline\":false}\n{\"time\":\"2026-09-08T13:47:03.60846+09:00\",\"level\":\"INFO\",\"msg\":\"record_fetched\",\"pid\":28600,\"topic\":\"phase3.1b6ee9e5-ffcb-45f6-8be1-9c234b2fc54a.main\",\"partition\":0,\"offset\":0,\"key\":\"b7fcdff2-d347-469d-82a9-bfdb1d672597\",\"valueSHA256\":\"9b60fca5ee82ffb9afc0d382b727815b0b0e70a096b08a1ccb82cc2ec8909066\"}\n{\"time\":\"2026-09-08T13:47:04.3599603+09:00\",\"level\":\"ERROR\",\"msg\":\"worker_stopped\",\"pid\":28600,\"error\":\"publish failure destination=phase3.1b6ee9e5-ffcb-45f6-8be1-9c234b2fc54a.missing: [3] Unknown Topic Or Partition: the request is for a topic or partition that does not exist on this broker\"}\n",
+          "pid": 28600
+        }
+      ]
+    }
+  ]
+}

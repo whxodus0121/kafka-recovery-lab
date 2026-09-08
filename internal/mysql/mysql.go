@@ -11,6 +11,20 @@ import (
 )
 
 func Open(ctx context.Context) (*sql.DB, error) {
+	db, err := Pool()
+	if err != nil {
+		return nil, err
+	}
+	if err := db.PingContext(ctx); err != nil {
+		db.Close()
+		return nil, fmt.Errorf("MySQL ping: %w", err)
+	}
+	return db, nil
+}
+
+// Pool validates configuration without requiring a live DB at worker startup.
+// Connection failures then belong to an actual source record and its policy.
+func Pool() (*sql.DB, error) {
 	c, err := config.Database()
 	if err != nil {
 		return nil, err
@@ -27,9 +41,5 @@ func Open(ctx context.Context) (*sql.DB, error) {
 	db.SetMaxOpenConns(1)
 	db.SetMaxIdleConns(1)
 	db.SetConnMaxLifetime(time.Minute)
-	if err := db.PingContext(ctx); err != nil {
-		db.Close()
-		return nil, fmt.Errorf("MySQL ping: %w", err)
-	}
 	return db, nil
 }

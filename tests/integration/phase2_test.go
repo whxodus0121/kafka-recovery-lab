@@ -156,7 +156,7 @@ func scenario(t *testing.T, name string) {
 	evidence["valueSHA256"] = hash
 	evidence["afterPublish"] = in.snapshot()
 	binary := build(t, root, "worker")
-	args := []string{"-topic", topic}
+	args := []string{"-topic", topic, "-phase2-baseline"}
 	point := map[string]string{"A": "before-db", "B": "before-db-commit", "C": "after-db-commit"}[name]
 	if point != "" {
 		args = append(args, "-fault-point", point, "-fault-event-id", e.EventID)
@@ -226,7 +226,7 @@ func scenario(t *testing.T, name string) {
 			t.Fatal("hook not reached")
 		}
 	}
-	second = start(t, root, binary, []string{"KAFKA_CONSUMER_GROUP=" + group}, "-topic", topic)
+	second = start(t, root, binary, []string{"KAFKA_CONSUMER_GROUP=" + group}, "-topic", topic, "-phase2-baseline")
 	expected := int64(100) - e.Quantity
 	if name == "C" {
 		expected -= e.Quantity
@@ -331,7 +331,10 @@ func savePhase2(t *testing.T, root string, run map[string]any) {
 		Regression json.RawMessage   `json:"regression"`
 		Scenarios  []json.RawMessage `json:"scenarios"`
 	}
-	path := filepath.Join(root, "docs/phase-2-evidence.json")
+	path := os.Getenv("PHASE2_EVIDENCE_PATH")
+	if path == "" {
+		path = filepath.Join(root, "docs/phase-2-evidence.json")
+	}
 	existing, err := os.ReadFile(path)
 	if err == nil {
 		if err = json.Unmarshal(existing, &document); err != nil {
