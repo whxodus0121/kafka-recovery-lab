@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/segmentio/kafka-go"
+	"kafka-recovery-lab/internal/event"
 )
 
 type FailurePolicy struct {
@@ -23,6 +24,7 @@ type FailurePolicy struct {
 	Seed                        int64
 	random                      *mathrand.Rand
 	Publish                     func(context.Context, kafka.Message) error
+	BeforeApply                 func(context.Context, kafka.Message, event.OrderCreated) error
 }
 
 type retryMetadata struct {

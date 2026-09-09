@@ -19,6 +19,7 @@ import (
 	"kafka-recovery-lab/internal/inventory"
 	"kafka-recovery-lab/internal/kafka"
 	"kafka-recovery-lab/internal/mysql"
+	"kafka-recovery-lab/internal/ratelimit"
 )
 
 func main() {
@@ -39,6 +40,7 @@ func run(logger *slog.Logger) error {
 	retryTopic := flag.String("retry-topic", "inventory.retry.v1", "retry destination and retry worker source")
 	dlqTopic := flag.String("dlq-topic", "inventory.dlq.v1", "dead letter destination")
 	recoveryTopic := flag.String("recovery-topic", "inventory.recovery.v1", "recovery worker source")
+	recoveryRate := flag.Float64("recovery-rate", 0, "maximum Recovery processing starts per second; 0 is unlimited")
 	maxRetries := flag.Int("max-retries", 3, "additional attempts after the initial failure")
 	delay := flag.Duration("retry-delay", 2*time.Second, "fixed delay, or base delay for exponential/jitter")
 	strategy := flag.String("retry-strategy", "fixed", "fixed, exponential or jitter (full jitter)")
@@ -85,11 +87,34 @@ func run(logger *slog.Logger) error {
 	if *baseline && (*retryWorker || *recoveryWorker) {
 		return fmt.Errorf("phase2-baseline cannot run as retry or recovery worker")
 	}
+	if *recoveryRate < 0 || (*recoveryRate > 0 && !*recoveryWorker) {
+		return fmt.Errorf("recovery-rate must be non-negative and is valid only for recovery-worker")
+	}
 	var policy *inventory.FailurePolicy
 	if !*baseline {
 		writer := kafka.NewFailureWriter(brokers)
 		defer writer.Close()
 		policy = &inventory.FailurePolicy{RetrySource: *retryWorker, RecoverySource: *recoveryWorker, RetryTopic: *retryTopic, DLQTopic: *dlqTopic, MaxRetries: *maxRetries, Delay: *delay, Strategy: *strategy, Cap: *capDelay, Seed: *seed, Publish: func(ctx context.Context, m kafkago.Message) error { return writer.WriteMessages(ctx, m) }}
+		if *recoveryWorker {
+			var pacer *ratelimit.Pacer
+			if *recoveryRate > 0 {
+				var pacerErr error
+				pacer, pacerErr = ratelimit.New(*recoveryRate)
+				if pacerErr != nil {
+					return pacerErr
+				}
+			}
+			policy.BeforeApply = func(ctx context.Context, m kafkago.Message, e event.OrderCreated) error {
+				if pacer != nil {
+					if err := pacer.Wait(ctx); err != nil {
+						return err
+					}
+				}
+				logger.Info("recovery_processing_started", "topic", m.Topic, "partition", m.Partition, "offset", m.Offset,
+					"eventId", e.EventID, "processingStartedAt", time.Now().UTC())
+				return nil
+			}
+		}
 		if err := policy.Validate(); err != nil {
 			return err
 		}
@@ -115,7 +140,7 @@ func run(logger *slog.Logger) error {
 	reader := kafka.NewConsumer(brokers, group, *topic)
 	defer reader.Close()
 	logger.Info("worker_started", "groupId", group, "topic", *topic, "retryWorker", *retryWorker, "recoveryWorker", *recoveryWorker, "phase2Baseline", *baseline,
-		"retryStrategy", *strategy, "retryBase", delay.String(), "retryCap", capDelay.String(), "retrySeed", *seed)
+		"retryStrategy", *strategy, "retryBase", delay.String(), "retryCap", capDelay.String(), "retrySeed", *seed, "recoveryRate", *recoveryRate)
 	err = inventory.Consume(ctx, reader, (inventory.Store{DB: db, Hooks: hooks, LegacyBaseline: *baseline}).Decrement, logger, hooks, policy)
 	if ctx.Err() != nil {
 		logger.Info("worker_stopped", "reason", "context canceled")

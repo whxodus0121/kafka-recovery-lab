@@ -1,0 +1,20 @@
+{
+  "cliPID": 10136,
+  "finalInventory": 11999,
+  "finishedAt": "2026-09-09T17:18:57.8202748Z",
+  "inputCount": 1,
+  "offsetReset": false,
+  "processedEvents": 1,
+  "recoveryCommittedOffset": 1,
+  "recoveryEndOffset": 1,
+  "runId": "phase7.f0c13e96-5be3-4048-83b5-c6635b98ab9e",
+  "startedAt": "2026-09-09T17:18:56.8436872Z",
+  "status": "PASS",
+  "strategy": "single-regression",
+  "topics": {
+    "dlq": "phase7.f0c13e96-5be3-4048-83b5-c6635b98ab9e.dlq",
+    "recovery": "phase7.f0c13e96-5be3-4048-83b5-c6635b98ab9e.recovery",
+    "retry": "phase7.f0c13e96-5be3-4048-83b5-c6635b98ab9e.retry"
+  },
+  "workerPID": 22036
+}

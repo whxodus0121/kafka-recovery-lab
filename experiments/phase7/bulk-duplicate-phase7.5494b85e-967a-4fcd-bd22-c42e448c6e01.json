@@ -1,0 +1,30 @@
+{
+  "additionalInventoryChange": 0,
+  "duplicates": 24,
+  "finishedAt": "2026-09-09T17:18:56.6786651Z",
+  "firstReplay": {
+    "cliPID": 23364,
+    "inventory": 11976,
+    "processedEvents": 24,
+    "recoveryCommittedOffset": 24
+  },
+  "inputCount": 24,
+  "newEffects": 24,
+  "offsetReset": false,
+  "runId": "phase7.5494b85e-967a-4fcd-bd22-c42e448c6e01",
+  "secondReplay": {
+    "cliPID": 23288,
+    "inventory": 11976,
+    "processedEvents": 24,
+    "recoveryCommittedOffset": 48
+  },
+  "startedAt": "2026-09-09T17:18:55.5733954Z",
+  "status": "PASS",
+  "strategy": "bulk-duplicate",
+  "topics": {
+    "dlq": "phase7.5494b85e-967a-4fcd-bd22-c42e448c6e01.dlq",
+    "recovery": "phase7.5494b85e-967a-4fcd-bd22-c42e448c6e01.recovery",
+    "retry": "phase7.5494b85e-967a-4fcd-bd22-c42e448c6e01.retry"
+  },
+  "workerPID": 8640
+}

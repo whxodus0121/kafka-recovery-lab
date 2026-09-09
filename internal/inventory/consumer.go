@@ -82,6 +82,11 @@ func Consume(ctx context.Context, reader Reader, apply func(context.Context, eve
 		}
 		if err == nil {
 			log = log.With("eventId", e.EventID, "orderId", e.OrderID, "productId", e.ProductID, "quantity", e.Quantity)
+			if policy != nil && policy.BeforeApply != nil {
+				if err := policy.BeforeApply(ctx, m, e); err != nil {
+					return fmt.Errorf("before inventory processing at %s/%d/%d: %w", m.Topic, m.Partition, m.Offset, err)
+				}
+			}
 			if policy != nil && policy.RetrySource {
 				started := time.Now().UTC()
 				log.Info("retry_attempt_started", "retryCount", md.Count, "nextAttemptAt", md.Next,

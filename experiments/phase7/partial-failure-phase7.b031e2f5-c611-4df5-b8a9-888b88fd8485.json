@@ -1,0 +1,21 @@
+{
+  "cliLog": "{\"time\":\"2026-09-10T02:18:58.1430316+09:00\",\"level\":\"INFO\",\"msg\":\"replay_published\",\"batchId\":\"c210c009-adce-40d9-aa54-d95dcdbc0b28\",\"batchIndex\":0,\"publishedAt\":\"2026-09-09T17:18:58.1430316Z\",\"replayId\":\"edc49f89-45bd-4c37-8757-7141d0af371c\",\"replayCount\":1,\"dlqTopic\":\"phase7.b031e2f5-c611-4df5-b8a9-888b88fd8485.dlq\",\"dlqPartition\":0,\"dlqOffset\":0,\"recoveryTopic\":\"phase7.b031e2f5-c611-4df5-b8a9-888b88fd8485.recovery\"}\n{\"time\":\"2026-09-10T02:18:58.2000752+09:00\",\"level\":\"ERROR\",\"msg\":\"replay_failed\",\"error\":\"batch=c210c009-adce-40d9-aa54-d95dcdbc0b28 published=1 failed=phase7.b031e2f5-c611-4df5-b8a9-888b88fd8485.dlq/0/1: decode DLQ envelope: invalid character 'b' looking for beginning of object key string\"}\n",
+  "cliPID": 10508,
+  "dlqCommittedOffset": -1,
+  "dlqEndOffset": 3,
+  "failedDLQOffset": 1,
+  "finishedAt": "2026-09-09T17:18:58.2130759Z",
+  "inputCount": 3,
+  "offsetReset": false,
+  "publishedBeforeFailure": 1,
+  "recoveryEndOffset": 1,
+  "runId": "phase7.b031e2f5-c611-4df5-b8a9-888b88fd8485",
+  "startedAt": "2026-09-09T17:18:57.9968956Z",
+  "status": "PASS",
+  "strategy": "partial-failure",
+  "topics": {
+    "dlq": "phase7.b031e2f5-c611-4df5-b8a9-888b88fd8485.dlq",
+    "recovery": "phase7.b031e2f5-c611-4df5-b8a9-888b88fd8485.recovery",
+    "retry": "phase7.b031e2f5-c611-4df5-b8a9-888b88fd8485.retry"
+  }
+}

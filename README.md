@@ -2,7 +2,7 @@
 
 Kafka 메시지는 재전달될 수 있다는 전제에서, 재고 반영의 중복을 막고 재시도·복구 부하를 통제하는 과정을 단계별 실험으로 증명하는 Go 프로젝트다.
 
-기존 티켓 예매 프로젝트에서 단순 DLQ 처리 후 남았던 질문에서 출발했다. 현재 Phase 5에서 MySQL transaction 기반 Idempotent Consumer를 구현했다. Phase 2의 DB commit 후 Kafka offset commit 전 crash 결과 **100 → 98 → 96**을 같은 장애 경계에서 **100 → 98 → 98**로 바꾸고 실제 SQL·offset으로 확인했다. Retry/DLQ와 Backoff/Jitter는 유지하며 Replay는 아직 없다.
+기존 티켓 예매 프로젝트에서 단순 DLQ 처리 후 남았던 질문에서 출발했다. Phase 5에서 DB commit 후 offset commit 전 재전달의 중복 차감을 **100 → 98 → 96**에서 **100 → 98 → 98**로 바꿨고, Phase 6에서 단건 DLQ Replay를 실제 DB 복구까지 연결했다. 현재 Phase 7에서는 한 partition의 Bulk Replay와 publication/recovery 처리 rate를 독립적으로 제한하고 실제 timestamp·lag·SQL 결과로 비교한다.
 
 ## Architecture
 
@@ -98,6 +98,16 @@ flowchart LR
 
 [Phase 6 상세 문서](docs/phase-6-dlq-recovery.md) · [검증 보고서](docs/phase-6-verification.md) · [Evidence](docs/phase-6-evidence.json)
 
+### Phase 7 — Bulk Replay / Recovery Rate Limiting
+
+문제: 많은 DLQ record를 한꺼번에 Replay하면 Recovery backlog와 DB 부하가 복구 시스템의 새 장애가 될 수 있으며, Producer 발행 속도와 실제 DB 처리 속도는 같은 제어 대상이 아니다.
+
+선택·검증: 기존 단건 CLI를 유지하면서 한 partition의 연속 범위를 Bulk Replay하고, 동기 발행 전 `publish-rate`와 Recovery Store 진입 전 `recovery-rate`를 별도 timer pacer로 제한했다. 120건을 12개 product에 분산해 Unlimited, Publication Limited, 기존 Backlog + Recovery Limited를 실제 Kafka/MySQL에서 비교했다.
+
+핵심 결과: Unlimited의 발행/처리 peak는 81/81, Publication Limited는 20/23, Backlog + Recovery Limited는 81/20이었다. 마지막 전략은 CLI 2.196초와 business 완료 8.355초가 분리됐고, 세 전략 모두 120건 성공·DLQ 0·미완료 0, inventory 12,000→11,880이었다. 같은 24건을 두 번 Bulk Replay해 두 번째 24건이 모두 Duplicate이고 추가 차감 0임을 확인했다.
+
+[Phase 7 상세 문서](docs/phase-7-replay-rate-limit.md) · [검증 보고서](docs/phase-7-verification.md) · [Evidence](docs/phase-7-evidence.json) · [원시 실행](experiments/phase7/)
+
 ## Run locally
 
 프로젝트 루트 PowerShell에서 실행한다.
@@ -172,6 +182,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase5.ps1 -C
 
 # Phase 6 single-record DLQ replay and Recovery flow
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase6.ps1 -Check All
+
+# Phase 7 bulk replay and independent publication/recovery rate limits
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase7.ps1 -Check All
 ```
 
 장애 검증은 공유 로컬 MySQL 컨테이너를 실제 중지하므로 다른 애플리케이션과 병행하지 않는다. 각 시나리오는 새 product, topic, group을 사용하며 기존 offset이나 inventory를 초기화하지 않는다. Phase 2 스크립트는 `-phase2-baseline`으로 과거 실패 동작을 명시적으로 재현하며 일반 Worker에는 이 옵션을 사용하지 않는다.
@@ -188,6 +201,8 @@ Phase 5 진입점은 과거 문서를 덮어쓰지 않고 회귀 결과를 Phase
 - Retry 대기는 Worker의 다음 record 처리를 지연시키는 head-of-line blocking이 있다.
 - 단일 broker/RF=1 로컬 환경이며 broker HA를 검증하지 않았다.
 - Backoff/Jitter 비교는 단일 Worker/partition 구성과 각 비교 셀 1회 실행에 한정된다. 실제 DB 재기동 시간 편차와 HOL이 결과에 영향을 준다.
-- 다중 Worker rebalance, 운영 규모 처리량, 반복 실험의 통계적 유의성, Replay 부하는 아직 검증하지 않았다.
+- Phase 7 limiter는 단일 Recovery Worker의 최초 Store 진입만 제어하며 이후 Retry lineage 전체에 전역 quota를 적용하지 않는다.
+- Bulk Replay는 한 partition 범위만 지원하고 persistent checkpoint/resume가 없어 중간 재실행 시 Recovery duplicate와 처리 비용이 남는다.
+- 다중 Worker rebalance, 운영 규모 처리량, 반복 실험의 통계적 유의성은 아직 검증하지 않았다.
 
 앞으로 각 Phase는 코드·검증 완료, 원시 verification/evidence 보존, `docs/phase-N-*.md`의 동일한 11개 섹션 작성, Development Journey 갱신, 수치·링크 대조를 모두 마친 뒤 완료 commit을 만든다.
