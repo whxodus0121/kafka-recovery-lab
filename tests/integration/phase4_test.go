@@ -346,6 +346,9 @@ func phase4RunScenario(t *testing.T, root, binary, scenario, strategy string) {
 func savePhase4(t *testing.T, root string, r phase4Run) {
 	t.Helper()
 	dir := filepath.Join(root, "experiments/phase4")
+	if override := os.Getenv("PHASE4_RAW_DIR"); override != "" {
+		dir = override
+	}
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		t.Error(err)
 		return

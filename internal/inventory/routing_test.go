@@ -76,7 +76,10 @@ func TestRouteBeforeSourceCommitAndStopOnUnknown(t *testing.T) {
 				}
 				return tc.publishErr
 			}}
-			_ = Consume(context.Background(), r, func(context.Context, event.OrderCreated) error { trace = append(trace, "db"); return tc.dbErr }, slog.New(slog.NewTextHandler(io.Discard, nil)), Hooks{}, p)
+			_ = Consume(context.Background(), r, func(context.Context, event.OrderCreated) (Result, error) {
+				trace = append(trace, "db")
+				return Result{}, tc.dbErr
+			}, slog.New(slog.NewTextHandler(io.Discard, nil)), Hooks{}, p)
 			if !reflect.DeepEqual(trace, tc.trace) {
 				t.Fatalf("trace=%v want=%v", trace, tc.trace)
 			}

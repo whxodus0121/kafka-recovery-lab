@@ -24,7 +24,7 @@ type Hooks struct {
 	BeforeDB, BeforeCommit, AfterCommit func(context.Context, event.OrderCreated) error
 }
 
-func Consume(ctx context.Context, reader Reader, apply func(context.Context, event.OrderCreated) error, logger *slog.Logger, hooks Hooks, policies ...*FailurePolicy) error {
+func Consume(ctx context.Context, reader Reader, apply func(context.Context, event.OrderCreated) (Result, error), logger *slog.Logger, hooks Hooks, policies ...*FailurePolicy) error {
 	var policy *FailurePolicy
 	if len(policies) > 0 {
 		policy = policies[0]
@@ -90,11 +90,14 @@ func Consume(ctx context.Context, reader Reader, apply func(context.Context, eve
 				}
 			}
 			dbCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
-			err = apply(dbCtx, e)
+			var result Result
+			result, err = apply(dbCtx, e)
 			cancel()
 			if err != nil {
 				log.Error("inventory_failed", "error", err)
 				code, retryable = classifyDB(err)
+			} else if result.Duplicate {
+				log.Info("inventory_duplicate")
 			} else {
 				log.Info("inventory_committed")
 				if hooks.AfterCommit != nil {

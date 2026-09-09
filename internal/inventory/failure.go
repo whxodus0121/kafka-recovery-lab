@@ -13,12 +13,15 @@ import (
 var (
 	ErrProductMissing        = errors.New("product missing")
 	ErrInsufficientInventory = errors.New("insufficient inventory")
+	ErrEventIDConflict       = errors.New("event ID payload conflict")
 )
 
 // Only recognized transient DB errors may leave the source for retry.
 // Unrecognized SQL, authentication and programming errors stop the worker.
 func classifyDB(err error) (code string, retryable bool) {
 	switch {
+	case errors.Is(err, ErrEventIDConflict):
+		return "EVENT_ID_CONFLICT", false
 	case errors.Is(err, ErrProductMissing):
 		return "PRODUCT_MISSING", false
 	case errors.Is(err, ErrInsufficientInventory):

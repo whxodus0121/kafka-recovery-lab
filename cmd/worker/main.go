@@ -42,7 +42,7 @@ func run(logger *slog.Logger) error {
 	strategy := flag.String("retry-strategy", "fixed", "fixed, exponential or jitter (full jitter)")
 	capDelay := flag.Duration("retry-cap", 30*time.Second, "exponential/jitter upper delay cap")
 	seed := flag.Int64("retry-seed", time.Now().UnixNano(), "per-process jitter RNG seed; recorded on startup")
-	baseline := flag.Bool("phase2-baseline", false, "local regression only: stop on failures without retry/DLQ")
+	baseline := flag.Bool("phase2-baseline", false, "local Phase 2 regression only: no retry/DLQ or idempotency")
 	flag.Parse()
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -99,7 +99,7 @@ func run(logger *slog.Logger) error {
 	defer reader.Close()
 	logger.Info("worker_started", "groupId", group, "topic", *topic, "phase2Baseline", *baseline,
 		"retryStrategy", *strategy, "retryBase", delay.String(), "retryCap", capDelay.String(), "retrySeed", *seed)
-	err = inventory.Consume(ctx, reader, (inventory.Store{DB: db, Hooks: hooks}).Decrement, logger, hooks, policy)
+	err = inventory.Consume(ctx, reader, (inventory.Store{DB: db, Hooks: hooks, LegacyBaseline: *baseline}).Decrement, logger, hooks, policy)
 	if ctx.Err() != nil {
 		logger.Info("worker_stopped", "reason", "context canceled")
 		return nil

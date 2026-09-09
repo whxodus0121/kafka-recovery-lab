@@ -57,7 +57,10 @@ func TestCommitOnlyAfterSuccessfulDBProcessing(t *testing.T) {
 			if scenario.invalid {
 				r.message.Value = []byte(`{}`)
 			}
-			err := Consume(context.Background(), r, func(context.Context, event.OrderCreated) error { trace = append(trace, "db"); return scenario.dbErr }, slog.New(slog.NewTextHandler(io.Discard, nil)), Hooks{})
+			err := Consume(context.Background(), r, func(context.Context, event.OrderCreated) (Result, error) {
+				trace = append(trace, "db")
+				return Result{}, scenario.dbErr
+			}, slog.New(slog.NewTextHandler(io.Discard, nil)), Hooks{})
 			if err == nil || !reflect.DeepEqual(trace, scenario.want) {
 				t.Fatalf("trace=%v error=%v", trace, err)
 			}

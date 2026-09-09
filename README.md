@@ -2,7 +2,7 @@
 
 Kafka 메시지는 재전달될 수 있다는 전제에서, 재고 반영의 중복을 막고 재시도·복구 부하를 통제하는 과정을 단계별 실험으로 증명하는 Go 프로젝트다.
 
-기존 티켓 예매 프로젝트에서 단순 DLQ 처리 후 남았던 질문에서 출발했다. 현재 Phase 4에서 Fixed Retry, Exponential Backoff, Full Jitter의 실제 장애 중 시도 집중과 복구를 비교했다. 예약 분산이 FIFO 대기 때문에 실제 실행 분산으로 그대로 이어지지 않는 것도 측정했다. Idempotency와 Replay는 아직 없으며, Phase 2에서 확인한 DB commit 후 Kafka offset commit 전 crash의 재고 **100 → 98 → 96** 중복 차감도 해결하지 않은 상태다.
+기존 티켓 예매 프로젝트에서 단순 DLQ 처리 후 남았던 질문에서 출발했다. 현재 Phase 5에서 MySQL transaction 기반 Idempotent Consumer를 구현했다. Phase 2의 DB commit 후 Kafka offset commit 전 crash 결과 **100 → 98 → 96**을 같은 장애 경계에서 **100 → 98 → 98**로 바꾸고 실제 SQL·offset으로 확인했다. Retry/DLQ와 Backoff/Jitter는 유지하며 Replay는 아직 없다.
 
 ## Architecture
 
@@ -11,7 +11,7 @@ flowchart LR
     Client -->|POST /orders| API[Go Order API]
     API -->|OrderCreated<br/>key=orderId| Kafka[Kafka 4.2.0<br/>orders.created.v1]
     Kafka -->|FetchMessage<br/>inventory-main-v1| Worker[Go Inventory Worker]
-    Worker -->|InnoDB transaction| MySQL[(MySQL 8.4.8)]
+    Worker -->|동일 InnoDB transaction<br/>processed_events + inventory| MySQL[(MySQL 8.4.8)]
     Worker -->|DB 성공 후<br/>CommitMessages| Kafka
 ```
 
@@ -78,6 +78,16 @@ flowchart LR
 
 [Phase 4 상세 문서](docs/phase-4-backoff-jitter.md) · [검증 보고서](docs/phase-4-verification.md) · [Evidence](docs/phase-4-evidence.json) · [원시 실행](experiments/phase4/)
 
+### Phase 5 — Idempotent Consumer
+
+문제: 수동 offset commit만으로는 DB 성공 후 crash에서 재전달되는 이벤트의 중복 side effect를 막을 수 없었다.
+
+선택·검증: eventId PRIMARY KEY인 processed_events 등록과 재고 차감을 같은 transaction으로 묶었다. 동일 canonical payload는 Duplicate 성공으로 offset만 진행하고, 다른 payload는 EVENT_ID_CONFLICT로 DLQ에 격리했다. Main/Retry는 동일 함수를 사용한다.
+
+핵심 결과: 동일 record의 crash/restart에서 재고 100→98→98, 100회 전달에서 신규 반영 1회·Duplicate 99회, 실제 DB 동시 호출 16개에서 신규 반영 1회·Duplicate 15회를 확인했다. 상품 없음·재고 부족·SQL 대기 timeout과 commit 전 crash에서는 marker가 남지 않았다.
+
+[Phase 5 상세 문서](docs/phase-5-idempotency.md) · [검증 보고서](docs/phase-5-verification.md) · [Evidence](docs/phase-5-evidence.json)
+
 ## Run locally
 
 프로젝트 루트 PowerShell에서 실행한다.
@@ -134,15 +144,21 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase3.ps1 -C
 
 # Phase 4 comparison, raw evidence audit and all prior regressions
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase4.ps1 -Check All
+
+# Phase 5 idempotency and all prior regressions, preserving Phase 0-4 evidence
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase5.ps1 -Check All
 ```
 
 장애 검증은 공유 로컬 MySQL 컨테이너를 실제 중지하므로 다른 애플리케이션과 병행하지 않는다. 각 시나리오는 새 product, topic, group을 사용하며 기존 offset이나 inventory를 초기화하지 않는다. Phase 2 스크립트는 `-phase2-baseline`으로 과거 실패 동작을 명시적으로 재현하며 일반 Worker에는 이 옵션을 사용하지 않는다.
 
-Phase 4 진입점은 Phase 0~3 회귀 evidence를 별도 경로에 저장하고 최종 Phase 4 evidence에 포함한다. Phase 1~3 스크립트를 직접 실행하면 해당 Phase evidence를 갱신하므로 역사적 기록을 보존하려면 Phase 4 진입점을 사용한다. Phase 4 raw 파일은 덮어쓰지 않으며 `-Check Audit`은 저장된 결과만 다시 계산한다.
+Phase 5 진입점은 과거 문서를 덮어쓰지 않고 회귀 결과를 Phase 5 evidence에 포함한다. 이번 Phase 4 회귀 raw는 `experiments/phase5/regression/`에 별도로 보존한다. Phase 5 Regression은 전략 계산과 Phase 0~3 기능을 확인하며, Phase 4의 8~12초 성능 비교 실험은 반복하지 않는다. 이번 재실행에서는 여섯 기능 시나리오가 PASS했지만 MySQL 기동 편차로 과거 성능 비교 audit은 FAIL했고 상세 원본과 한계를 Phase 5 문서에 남겼다.
+
+기존 환경에서도 Worker 시작 전에 `scripts/init-inventory.ps1`을 Seed 없이 실행해 processed_events를 생성한다. `-phase2-baseline`은 Retry/DLQ와 Idempotency를 모두 끄는 과거 실패 재현용 옵션이며 일반 실행에 사용하지 않는다.
 
 ## Current limits
 
-- DB commit과 Kafka offset commit 사이의 중복 처리는 아직 해결하지 않았다.
+- 같은 eventId의 재고 중복 반영은 marker가 유지되는 범위에서 차단한다. marker 도입 전의 처리 이력은 소급 등록하지 않았다.
+- processed_events의 보존·삭제 정책과 schema 변경 시 canonical hash 호환성은 이후 설계가 필요하다. 다른 eventId의 동일 주문까지 중복 제거하지 않는다.
 - Retry/DLQ 발행 성공과 source commit 사이 crash는 목적지 중복 발행을 만들 수 있다.
 - Retry 대기는 Worker의 다음 record 처리를 지연시키는 head-of-line blocking이 있다.
 - 단일 broker/RF=1 로컬 환경이며 broker HA를 검증하지 않았다.

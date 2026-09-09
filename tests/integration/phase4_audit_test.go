@@ -53,7 +53,11 @@ func TestPhase4Audit(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	paths, err := filepath.Glob(filepath.Join(root, "experiments/phase4/*.json"))
+	rawDir := filepath.Join(root, "experiments/phase4")
+	if override := os.Getenv("PHASE4_RAW_DIR"); override != "" {
+		rawDir = override
+	}
+	paths, err := filepath.Glob(filepath.Join(rawDir, "*.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -81,6 +85,11 @@ func TestPhase4Audit(t *testing.T) {
 	controls := map[string]phase4Controls{}
 	coverage := map[string]int{}
 	for _, path := range paths {
+		relative, err := filepath.Rel(root, path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		relative = filepath.ToSlash(relative)
 		b, err := os.ReadFile(path)
 		if err != nil {
 			t.Fatal(err)
@@ -94,7 +103,7 @@ func TestPhase4Audit(t *testing.T) {
 			continue
 		}
 		if outage := r.FaultEnd.Sub(r.FaultStart); outage < 8*time.Second || outage > 12*time.Second {
-			summary.ExcludedRuns = append(summary.ExcludedRuns, map[string]string{"file": "experiments/phase4/" + filepath.Base(path), "sha256": fmt.Sprintf("%x", sha256.Sum256(b)), "reason": fmt.Sprintf("actual outage %.3fs outside 8..12s comparison control; execution status %s", outage.Seconds(), r.Status)})
+			summary.ExcludedRuns = append(summary.ExcludedRuns, map[string]string{"file": relative, "sha256": fmt.Sprintf("%x", sha256.Sum256(b)), "reason": fmt.Sprintf("actual outage %.3fs outside 8..12s comparison control; execution status %s", outage.Seconds(), r.Status)})
 			continue
 		}
 		if prior, ok := controls[r.Scenario]; ok && !reflect.DeepEqual(prior, r.Controls) {
@@ -106,7 +115,7 @@ func TestPhase4Audit(t *testing.T) {
 		if !t.Run(r.Scenario+"/"+r.Strategy, func(t *testing.T) { m = auditPhase4(t, r) }) {
 			continue
 		}
-		m.File = "experiments/phase4/" + filepath.Base(path)
+		m.File = relative
 		m.SHA256 = fmt.Sprintf("%x", sha256.Sum256(b))
 		summary.Metrics = append(summary.Metrics, m)
 		t.Logf("%s/%s peak=%d total=%d success=%d dlq=%d unfinished=%d overdueP95=%.1fms HOL=%d", r.Scenario, r.Strategy, m.PeakRPS, m.Total, m.Success, m.DLQ, m.Unfinished, m.OverdueP95MS, m.HOLDelayedAttempts)
@@ -130,7 +139,11 @@ func TestPhase4Audit(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(root, "docs/phase-4-evidence.json"), append(b, '\n'), 0644); err != nil {
+	output := filepath.Join(root, "docs/phase-4-evidence.json")
+	if override := os.Getenv("PHASE4_EVIDENCE_PATH"); override != "" {
+		output = override
+	}
+	if err := os.WriteFile(output, append(b, '\n'), 0644); err != nil {
 		t.Fatal(err)
 	}
 }
