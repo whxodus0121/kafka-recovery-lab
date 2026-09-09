@@ -140,3 +140,40 @@ func TestMetadataBoundedRetriesAndDelay(t *testing.T) {
 		t.Fatal("wait cannot cancel")
 	}
 }
+
+func TestRecoveryStartsNewRetryChainAndCarriesReplayLineage(t *testing.T) {
+	d := DeadLetter{ID: "dlq", Key: []byte("order"), Value: []byte("value"), Topic: "orders.created.v1", Partition: 0, Offset: 8, ErrorCode: "PRODUCT_MISSING", ErrorMessage: "PRODUCT_MISSING", FailedAt: time.Now().UTC()}
+	payload, _ := json.Marshal(d)
+	recovery, _, err := BuildReplayMessage(kafka.Message{Topic: "dlq", Partition: 0, Offset: 4, Value: payload}, "recovery", testReplayID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	mainPolicy := &FailurePolicy{RetryTopic: "retry", DLQTopic: "dlq", MaxRetries: 3, Delay: time.Second, Publish: func(context.Context, kafka.Message) error { return nil }}
+	if _, err := mainPolicy.metadata(recovery); err == nil {
+		t.Fatal("main source accepted recovery metadata")
+	}
+	var out kafka.Message
+	p := &FailurePolicy{RecoverySource: true, RetryTopic: "retry", DLQTopic: "dlq", MaxRetries: 3, Delay: time.Second, Publish: func(_ context.Context, m kafka.Message) error { out = m; return nil }}
+	md, err := p.metadata(recovery)
+	if err != nil || md.Count != 0 || md.Topic != "orders.created.v1" || md.Offset != 8 {
+		t.Fatal("recovery metadata", md, err)
+	}
+	if _, err := p.route(context.Background(), recovery, md, "DB_CONNECTION", true, true); err != nil {
+		t.Fatal(err)
+	}
+	if out.Topic != "retry" || headerValue(out.Headers, "retry-count") != "1" || headerValue(out.Headers, "replay-id") != testReplayID || headerValue(out.Headers, "original-offset") != "8" {
+		t.Fatal("recovery retry did not reset/preserve metadata")
+	}
+	p.RecoverySource, p.RetrySource = false, true
+	md, err = p.metadata(out)
+	if err != nil || md.Count != 1 {
+		t.Fatal("recovery retry metadata unreadable", md, err)
+	}
+	if _, err := p.route(context.Background(), out, md, "PRODUCT_MISSING", false, true); err != nil {
+		t.Fatal(err)
+	}
+	letter, err := DecodeDeadLetter(out.Value)
+	if err != nil || letter.ReplayID != testReplayID || letter.ReplayCount == nil || *letter.ReplayCount != 1 || letter.Topic != "orders.created.v1" || letter.Offset != 8 {
+		t.Fatal("replay lineage lost in DLQ", letter, err)
+	}
+}

@@ -53,7 +53,11 @@ func Consume(ctx context.Context, reader Reader, apply func(context.Context, eve
 			md, err = policy.metadata(m)
 			if err != nil {
 				validMetadata = false
-				code = "INVALID_RETRY_METADATA"
+				if policy.RecoverySource {
+					code = "INVALID_REPLAY_METADATA"
+				} else {
+					code = "INVALID_RETRY_METADATA"
+				}
 			} else if policy.RetrySource {
 				log.Info("retry_wait", "retryCount", md.Count, "nextAttemptAt", md.Next)
 				if err = waitAttempt(ctx, md.Next); err != nil {

@@ -35,8 +35,10 @@ func run(logger *slog.Logger) error {
 	faultPoint := flag.String("fault-point", "", "local only: before-db, before-db-commit, after-db-commit")
 	faultEvent := flag.String("fault-event-id", "", "the sole event targeted by the local fault")
 	retryWorker := flag.Bool("retry-worker", false, "consume the retry topic with inventory logic")
+	recoveryWorker := flag.Bool("recovery-worker", false, "consume the recovery topic with inventory logic")
 	retryTopic := flag.String("retry-topic", "inventory.retry.v1", "retry destination and retry worker source")
 	dlqTopic := flag.String("dlq-topic", "inventory.dlq.v1", "dead letter destination")
+	recoveryTopic := flag.String("recovery-topic", "inventory.recovery.v1", "recovery worker source")
 	maxRetries := flag.Int("max-retries", 3, "additional attempts after the initial failure")
 	delay := flag.Duration("retry-delay", 2*time.Second, "fixed delay, or base delay for exponential/jitter")
 	strategy := flag.String("retry-strategy", "fixed", "fixed, exponential or jitter (full jitter)")
@@ -74,15 +76,27 @@ func run(logger *slog.Logger) error {
 	if *retryWorker {
 		*topic = *retryTopic
 	}
+	if *recoveryWorker {
+		*topic = *recoveryTopic
+	}
+	if *retryWorker && *recoveryWorker {
+		return fmt.Errorf("retry-worker and recovery-worker are mutually exclusive")
+	}
+	if *baseline && (*retryWorker || *recoveryWorker) {
+		return fmt.Errorf("phase2-baseline cannot run as retry or recovery worker")
+	}
 	var policy *inventory.FailurePolicy
 	if !*baseline {
 		writer := kafka.NewFailureWriter(brokers)
 		defer writer.Close()
-		policy = &inventory.FailurePolicy{RetrySource: *retryWorker, RetryTopic: *retryTopic, DLQTopic: *dlqTopic, MaxRetries: *maxRetries, Delay: *delay, Strategy: *strategy, Cap: *capDelay, Seed: *seed, Publish: func(ctx context.Context, m kafkago.Message) error { return writer.WriteMessages(ctx, m) }}
+		policy = &inventory.FailurePolicy{RetrySource: *retryWorker, RecoverySource: *recoveryWorker, RetryTopic: *retryTopic, DLQTopic: *dlqTopic, MaxRetries: *maxRetries, Delay: *delay, Strategy: *strategy, Cap: *capDelay, Seed: *seed, Publish: func(ctx context.Context, m kafkago.Message) error { return writer.WriteMessages(ctx, m) }}
 		if err := policy.Validate(); err != nil {
 			return err
 		}
-		if *topic == *dlqTopic || (!*retryWorker && *topic == *retryTopic) {
+		if *recoveryTopic == *retryTopic || *recoveryTopic == *dlqTopic || *topic == *dlqTopic {
+			return fmt.Errorf("source and destination topics conflict")
+		}
+		if !*retryWorker && !*recoveryWorker && (*topic == *retryTopic || *topic == *recoveryTopic) {
 			return fmt.Errorf("source and destination topics conflict")
 		}
 	}
@@ -95,9 +109,12 @@ func run(logger *slog.Logger) error {
 	if *retryWorker && os.Getenv("KAFKA_CONSUMER_GROUP") == "" {
 		group = "inventory-retry-v1"
 	}
+	if *recoveryWorker && os.Getenv("KAFKA_CONSUMER_GROUP") == "" {
+		group = "inventory-recovery-v1"
+	}
 	reader := kafka.NewConsumer(brokers, group, *topic)
 	defer reader.Close()
-	logger.Info("worker_started", "groupId", group, "topic", *topic, "phase2Baseline", *baseline,
+	logger.Info("worker_started", "groupId", group, "topic", *topic, "retryWorker", *retryWorker, "recoveryWorker", *recoveryWorker, "phase2Baseline", *baseline,
 		"retryStrategy", *strategy, "retryBase", delay.String(), "retryCap", capDelay.String(), "retrySeed", *seed)
 	err = inventory.Consume(ctx, reader, (inventory.Store{DB: db, Hooks: hooks, LegacyBaseline: *baseline}).Decrement, logger, hooks, policy)
 	if ctx.Err() != nil {

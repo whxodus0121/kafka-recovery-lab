@@ -14,15 +14,15 @@ import (
 )
 
 type FailurePolicy struct {
-	RetrySource          bool
-	RetryTopic, DLQTopic string
-	MaxRetries           int
-	Delay                time.Duration
-	Strategy             string
-	Cap                  time.Duration
-	Seed                 int64
-	random               *mathrand.Rand
-	Publish              func(context.Context, kafka.Message) error
+	RetrySource, RecoverySource bool
+	RetryTopic, DLQTopic        string
+	MaxRetries                  int
+	Delay                       time.Duration
+	Strategy                    string
+	Cap                         time.Duration
+	Seed                        int64
+	random                      *mathrand.Rand
+	Publish                     func(context.Context, kafka.Message) error
 }
 
 type retryMetadata struct {
@@ -33,9 +33,14 @@ type retryMetadata struct {
 	Offset      int64
 }
 
-var metadataKeys = []string{"retry-count", "next-attempt-at", "first-failed-at", "last-error-code", "original-topic", "original-partition", "original-offset"}
+var retryControlKeys = []string{"retry-count", "next-attempt-at", "first-failed-at", "last-error-code"}
+var originKeys = []string{"original-topic", "original-partition", "original-offset"}
+var metadataKeys = append(append([]string{}, retryControlKeys...), originKeys...)
 
 func (p *FailurePolicy) Validate() error {
+	if p.RetrySource && p.RecoverySource {
+		return fmt.Errorf("retry and recovery source modes are mutually exclusive")
+	}
 	if p.MaxRetries < 0 || p.MaxRetries > 100 || p.Delay <= 0 || p.Delay > time.Hour || p.RetryTopic == "" || p.DLQTopic == "" || p.RetryTopic == p.DLQTopic || p.Publish == nil {
 		return fmt.Errorf("invalid retry policy: retries 0..100, delay (0,1h], distinct topics and publisher required")
 	}
@@ -56,9 +61,31 @@ func (p *FailurePolicy) metadata(m kafka.Message) (retryMetadata, error) {
 			values[key] = string(h.Value)
 		}
 	}
+	if p.RecoverySource {
+		for _, key := range retryControlKeys {
+			if _, exists := values[key]; exists {
+				return md, fmt.Errorf("retry scheduling headers on recovery source")
+			}
+		}
+		origin, err := parseOrigin(values)
+		if err != nil {
+			return md, err
+		}
+		if _, err := parseReplayHeaders(m.Headers, true); err != nil {
+			return md, err
+		}
+		return origin, nil
+	}
 	if !p.RetrySource {
 		if len(values) != 0 {
 			return md, fmt.Errorf("retry headers on main source")
+		}
+		replay, err := parseReplayHeaders(m.Headers, false)
+		if err != nil {
+			return md, err
+		}
+		if replay.Present {
+			return md, fmt.Errorf("replay headers on main source")
 		}
 		return md, nil
 	}
@@ -69,13 +96,9 @@ func (p *FailurePolicy) metadata(m kafka.Message) (retryMetadata, error) {
 	if err != nil || count < 1 || count > p.MaxRetries || strconv.Itoa(count) != values["retry-count"] {
 		return md, fmt.Errorf("invalid retry count")
 	}
-	part, err := strconv.Atoi(values["original-partition"])
-	if err != nil || part < 0 || strconv.Itoa(part) != values["original-partition"] {
-		return md, fmt.Errorf("invalid original partition")
-	}
-	off, err := strconv.ParseInt(values["original-offset"], 10, 64)
-	if err != nil || off < 0 || strconv.FormatInt(off, 10) != values["original-offset"] {
-		return md, fmt.Errorf("invalid original offset")
+	origin, err := parseOrigin(values)
+	if err != nil {
+		return md, err
 	}
 	first, err := time.Parse(time.RFC3339Nano, values["first-failed-at"])
 	if err != nil {
@@ -85,15 +108,31 @@ func (p *FailurePolicy) metadata(m kafka.Message) (retryMetadata, error) {
 	if err != nil || first.IsZero() || next.Before(first) || next.After(time.Now().Add(time.Hour)) {
 		return md, fmt.Errorf("invalid next attempt time")
 	}
-	if values["original-topic"] == "" || len(values["original-topic"]) > 249 {
-		return md, fmt.Errorf("invalid original topic")
-	}
 	switch values["last-error-code"] {
 	case "DB_CONNECTION", "DB_TIMEOUT", "DB_DEADLOCK", "DB_LOCK_TIMEOUT":
 	default:
 		return md, fmt.Errorf("invalid last error code")
 	}
-	return retryMetadata{count, next, first, values["last-error-code"], values["original-topic"], part, off}, nil
+	if _, err := parseReplayHeaders(m.Headers, false); err != nil {
+		return md, err
+	}
+	return retryMetadata{count, next, first, values["last-error-code"], origin.Topic, origin.Partition, origin.Offset}, nil
+}
+
+func parseOrigin(values map[string]string) (retryMetadata, error) {
+	md := retryMetadata{}
+	if values["original-topic"] == "" || len(values["original-topic"]) > 249 {
+		return md, fmt.Errorf("invalid original topic")
+	}
+	part, err := strconv.Atoi(values["original-partition"])
+	if err != nil || part < 0 || strconv.Itoa(part) != values["original-partition"] {
+		return md, fmt.Errorf("invalid original partition")
+	}
+	off, err := strconv.ParseInt(values["original-offset"], 10, 64)
+	if err != nil || off < 0 || strconv.FormatInt(off, 10) != values["original-offset"] {
+		return md, fmt.Errorf("invalid original offset")
+	}
+	return retryMetadata{Topic: values["original-topic"], Partition: part, Offset: off}, nil
 }
 
 func waitAttempt(ctx context.Context, at time.Time) error {
@@ -109,17 +148,22 @@ func waitAttempt(ctx context.Context, at time.Time) error {
 
 // []byte JSON encoding preserves arbitrary original key/value bytes as Base64.
 type DeadLetter struct {
-	ID           string         `json:"dlqId"`
-	Key          []byte         `json:"originalKey"`
-	Value        []byte         `json:"originalRawValue"`
-	Headers      []kafka.Header `json:"sourceHeaders"`
-	Topic        string         `json:"originalTopic"`
-	Partition    int            `json:"originalPartition"`
-	Offset       int64          `json:"originalOffset"`
-	RetryCount   *int           `json:"retryCount"`
-	ErrorCode    string         `json:"errorCode"`
-	ErrorMessage string         `json:"errorMessage"`
-	FailedAt     time.Time      `json:"failedAt"`
+	ID                       string         `json:"dlqId"`
+	Key                      []byte         `json:"originalKey"`
+	Value                    []byte         `json:"originalRawValue"`
+	Headers                  []kafka.Header `json:"sourceHeaders"`
+	Topic                    string         `json:"originalTopic"`
+	Partition                int            `json:"originalPartition"`
+	Offset                   int64          `json:"originalOffset"`
+	RetryCount               *int           `json:"retryCount"`
+	ErrorCode                string         `json:"errorCode"`
+	ErrorMessage             string         `json:"errorMessage"`
+	FailedAt                 time.Time      `json:"failedAt"`
+	ReplayID                 string         `json:"replayId,omitempty"`
+	ReplayCount              *int           `json:"replayCount,omitempty"`
+	ReplayedFromDLQTopic     string         `json:"replayedFromDlqTopic,omitempty"`
+	ReplayedFromDLQPartition *int           `json:"replayedFromDlqPartition,omitempty"`
+	ReplayedFromDLQOffset    *int64         `json:"replayedFromDlqOffset,omitempty"`
 }
 
 func (p *FailurePolicy) route(ctx context.Context, m kafka.Message, md retryMetadata, code string, retryable, validMetadata bool) (string, error) {
@@ -162,7 +206,14 @@ func (p *FailurePolicy) route(ctx context.Context, m kafka.Message, md retryMeta
 			message = "retry limit reached: " + code
 		}
 		// Error messages are bounded, policy-owned text; no raw DSN/SQL/driver data.
-		dlq := DeadLetter{hex.EncodeToString(id[:]), m.Key, m.Value, m.Headers, md.Topic, md.Partition, md.Offset, count, code, message, now}
+		dlq := DeadLetter{ID: hex.EncodeToString(id[:]), Key: m.Key, Value: m.Value, Headers: m.Headers, Topic: md.Topic, Partition: md.Partition, Offset: md.Offset, RetryCount: count, ErrorCode: code, ErrorMessage: message, FailedAt: now}
+		if replay, replayErr := parseReplayHeaders(m.Headers, false); replayErr == nil && replay.Present {
+			dlq.ReplayID = replay.ID
+			dlq.ReplayCount = &replay.Count
+			dlq.ReplayedFromDLQTopic = replay.Topic
+			dlq.ReplayedFromDLQPartition = &replay.Partition
+			dlq.ReplayedFromDLQOffset = &replay.Offset
+		}
 		payload, err := json.Marshal(dlq)
 		if err != nil {
 			return "", err

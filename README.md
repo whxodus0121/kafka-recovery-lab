@@ -88,6 +88,16 @@ flowchart LR
 
 [Phase 5 상세 문서](docs/phase-5-idempotency.md) · [검증 보고서](docs/phase-5-verification.md) · [Evidence](docs/phase-5-evidence.json)
 
+### Phase 6 — DLQ Replay / Recovery
+
+문제: DLQ 격리만으로는 실제 비즈니스 처리가 복구되지 않으며, Replay 발행 성공과 MySQL 반영 완료도 같은 상태가 아니다.
+
+선택·검증: Replay CLI가 운영자가 지정한 DLQ topic/partition/offset 한 건을 group 없이 읽고 원본 eventId·key·raw value를 `inventory.recovery.v1`에 동기 발행한다. Recovery Worker는 기존 Retry/DLQ 정책과 Idempotent Store를 그대로 사용한다.
+
+핵심 결과: Retry Exhaustion 뒤 CLI 발행 시점에는 inventory 100·marker 0·Recovery committed -1이었고, Worker 처리 후 98·marker 1·committed 1이었다. 같은 DLQ를 다시 Replay해도 98·marker 1을 유지하며 committed만 2로 진행했다. Recovery 실패 DLQ를 다시 Replay한 lineage는 `replay-count` 1→2로 보존됐다.
+
+[Phase 6 상세 문서](docs/phase-6-dlq-recovery.md) · [검증 보고서](docs/phase-6-verification.md) · [Evidence](docs/phase-6-evidence.json)
+
 ## Run locally
 
 프로젝트 루트 PowerShell에서 실행한다.
@@ -115,6 +125,11 @@ go run ./cmd/worker
 go run ./cmd/worker -retry-worker
 ```
 
+```powershell
+. ./scripts/env.ps1
+go run ./cmd/worker -recovery-worker
+```
+
 기본 group은 main `inventory-main-v1`, retry `inventory-retry-v1`이다. 환경 변수 `KAFKA_CONSUMER_GROUP`을 사용하면 각 프로세스에 서로 다른 group을 지정한다. 기본 추가 Retry는 3회, Fixed Delay는 2초다.
 
 ```powershell
@@ -125,6 +140,13 @@ go run ./cmd/api
 ```powershell
 Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8080/orders `
   -ContentType application/json -Body '{"productId":1,"quantity":1}'
+```
+
+DLQ 한 건은 consumer group offset을 변경하지 않고 좌표로 Replay한다.
+
+```powershell
+. ./scripts/env.ps1
+go run ./cmd/replay -dlq-topic inventory.dlq.v1 -partition 0 -offset 10
 ```
 
 ## Verification
@@ -147,6 +169,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase4.ps1 -C
 
 # Phase 5 idempotency and all prior regressions, preserving Phase 0-4 evidence
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase5.ps1 -Check All
+
+# Phase 6 single-record DLQ replay and Recovery flow
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase6.ps1 -Check All
 ```
 
 장애 검증은 공유 로컬 MySQL 컨테이너를 실제 중지하므로 다른 애플리케이션과 병행하지 않는다. 각 시나리오는 새 product, topic, group을 사용하며 기존 offset이나 inventory를 초기화하지 않는다. Phase 2 스크립트는 `-phase2-baseline`으로 과거 실패 동작을 명시적으로 재현하며 일반 Worker에는 이 옵션을 사용하지 않는다.
