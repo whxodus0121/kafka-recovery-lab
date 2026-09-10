@@ -32,7 +32,7 @@ Main, Retry, Recovery Worker는 같은 Consumer, FailurePolicy와 Store를 사�
 
 ## 5. 구현 과정
 
-`cmd/replay`는 `-dlq-topic`, `-partition`, `-offset`으로 group 없는 Kafka Reader를 열어 정확히 한 record를 읽는다. DLQ envelope를 검증한 뒤 동기 writer로 `inventory.recovery.v1`에 발행한다. writer는 acks=all, MaxAttempts=1, 자동 Topic 생성 금지를 그대로 사용한다.
+`cmd/replay`는 `-dlq-topic`, `-partition`, `-offset`으로 group 없는 Kafka Reader를 열어 정확히 한 record를 읽는다. DLQ envelope를 검증한 뒤 동기 writer로 Recovery Topic에 발행한다. Phase 6 검증에서는 CLI의 `-recovery-topic inventory.recovery.v1`을 명시했다. 현재 CLI와 Recovery Worker의 기본 recovery topic 이름은 서로 다르므로 함께 실행할 때 이 옵션이 필요하다. writer는 acks=all, MaxAttempts=1, 자동 Topic 생성 금지를 그대로 사용한다.
 
 Recovery Worker는 기존 `cmd/worker -recovery-worker` 모드다. 기본 group은 `inventory-recovery-v1`이다. 기존 Store가 신규 event를 transaction으로 반영하고 Duplicate는 UPDATE 없이 공통 offset commit으로 보낸다.
 

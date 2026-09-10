@@ -15,12 +15,12 @@ Scope: Preserve Phase 3 fixed default and Phase 2 duplicate effects. Add exponen
 - [x] S: Six isolated real outage runs preserve raw records, timing, lag and reconciled outcomes
   CHECK: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase4.ps1 -Check Scenarios
   EXPECT: PHASE4_SCENARIOS_PASS
-  EVIDENCE: exit=0; shell=C:\Windows\system32\cmd.exe; cwd=project root; EXPECT=matched; output-sha256=34144d3f8a958d48d498ca04e89103c8134f18e9b5e5685ad78f133ada66fda8; output-bytes=6953; A/fixed repeated in fresh topics after startup outlier, selected test exit=0 (dfb0a1), actual outage=9.883s; 7 immutable raw files retained, qualification decided by gate A.
+  EVIDENCE: exit=0; shell=cmd.exe; cwd=project root; EXPECT=matched; output-sha256=34144d3f8a958d48d498ca04e89103c8134f18e9b5e5685ad78f133ada66fda8; output-bytes=6953; A/fixed repeated in fresh topics after startup outlier, selected test exit=0 (dfb0a1), actual outage=9.883s; 7 immutable raw files retained, qualification decided by gate A.
 
 - [x] A: Offline evidence audit verifies headers, timing, counts, identical planned controls and HOL metrics
   CHECK: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase4.ps1 -Check Audit
   EXPECT: PHASE4_AUDIT_PASS
-  EVIDENCE: exit=0; shell=C:\Windows\system32\cmd.exe; cwd=C:\Users\조태연\Desktop\kafka-recovery-lab; path=900acd22c11c/45 entries; EXPECT=matched; output-sha256=b64dfb9a75c530aba49368c48da585fc2a5b735342bc1053de73cd306d75bff1; output-bytes=1483
+  EVIDENCE: exit=0; shell=cmd.exe; cwd=project root; path=900acd22c11c/45 entries; EXPECT=matched; output-sha256=b64dfb9a75c530aba49368c48da585fc2a5b735342bc1053de73cd306d75bff1; output-bytes=1483
 
 - [x] D: Eleven-section document, verification and README accurately interpret measured data and actual outage variation
   EVIDENCE: All three measured tables matched evidence fields; 15 required rows and 11 detail sections checked; local links and all 7 raw SHA-256 values checked; 6 qualified cells plus 1 startup outlier retained; common 8s comparison, actual outage variation, HOL, initial regression/audit failures and unverified extensions explicitly documented.

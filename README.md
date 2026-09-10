@@ -1,138 +1,194 @@
-# kafka-recovery-lab
+# Kafka Recovery Lab
 
-Kafka 메시지는 재전달될 수 있다는 전제에서, 재고 반영의 중복을 막고 재시도·복구 부하를 통제하는 과정을 단계별 실험으로 증명하는 Go 프로젝트다.
+Kafka의 at-least-once delivery에서 발생하는 Consumer 실패, 재전달, Retry 집중, DLQ 복구와 대량 Replay 부하를 실제 Kafka·MySQL 장애 실험으로 검증한 Go 프로젝트다. 정상 주문 서비스의 기능 확장보다 실패 경계와 복구 정책을 작은 환경에서 분리해 측정하는 데 초점을 맞췄다.
 
-기존 티켓 예매 프로젝트에서 단순 DLQ 처리 후 남았던 질문에서 출발했다. Phase 5에서 DB commit 후 offset commit 전 재전달의 중복 차감을 **100 → 98 → 96**에서 **100 → 98 → 98**로 바꿨고, Phase 6~7에서 DLQ 복구와 Bulk Replay 부하를 통제했다. Phase 8에서는 Worker 상태를 저 cardinality metric으로 관측했고, Phase 9에서는 Retry와 Recovery 핵심 비교를 각각 3회 반복해 유지되는 경향과 환경 편차를 분리했다.
+## Why This Project
+
+기존 티켓 예매 프로젝트에서는 Consumer 실패 메시지를 DLQ로 격리했지만, DLQ 발행만으로 비즈니스 복구가 끝나는지와 DB commit 이후 Kafka offset commit 전에 장애가 나면 어떤 상태가 남는지는 충분히 검증하지 못했다.
+
+이 프로젝트에서는 그 경계를 직접 중단해 중복 side effect를 재현하고, Retryable/Non-Retryable 분류, Backoff와 Jitter, MySQL idempotency, DLQ Replay, Recovery rate control 순서로 해결 범위를 확장했다. 각 결론은 application log만이 아니라 Kafka offset, MySQL 상태와 보존된 raw evidence를 교차 확인했다.
+
+## Core Goal
+
+> **메시지는 재전달될 수 있지만, 재고 반영은 중복되지 않고, 재시도와 복구 부하는 통제된다.**
+
+Kafka와 MySQL을 하나의 exactly-once transaction으로 묶지 않는다. Kafka는 at-least-once로 처리하고, MySQL에서는 `eventId` 기반 `processed_events` 등록과 `inventory` 변경을 같은 InnoDB transaction에 넣어 재전달의 비즈니스 side effect를 멱등하게 만든다.
 
 ## Architecture
 
 ```mermaid
-flowchart LR
-    Client -->|POST /orders| API[Go Order API]
-    API -->|OrderCreated<br/>key=orderId| Kafka[Kafka 4.2.0<br/>orders.created.v1]
-    Kafka -->|FetchMessage<br/>inventory-main-v1| Worker[Go Inventory Worker]
-    Worker -->|동일 InnoDB transaction<br/>processed_events + inventory| MySQL[(MySQL 8.4.8)]
-    Worker -->|DB 성공 후<br/>CommitMessages| Kafka
-    Worker -->|bounded /metrics| Prometheus
-    Prometheus --> Grafana
+flowchart TD
+    Client[Client] -->|POST /orders| API[Order API]
+    API --> Orders[orders.created.v1]
+    Orders --> Main[Main Worker]
+
+    Main -->|Success or Duplicate| Store[Idempotent Inventory Store]
+    Main -->|Retryable| RetryTopic[inventory.retry.v1]
+    Main -->|Non-Retryable or Domain rejection| DLQ[inventory.dlq.v1]
+
+    RetryTopic --> Retry[Retry Worker]
+    Retry -->|Success or Duplicate| Store
+    Retry -->|Retryable and attempts remain| RetryTopic
+    Retry -->|Non-Retryable or exhausted| DLQ
+
+    DLQ -->|selected coordinate or range| Replay[Replay CLI]
+    Replay --> RecoveryTopic[inventory.recovery.v1]
+    RecoveryTopic --> Recovery[Recovery Worker]
+    Recovery -->|Success or Duplicate| Store
+    Recovery -->|Retryable| RetryTopic
+    Recovery -->|Non-Retryable| DLQ
+
+    Store --> Inventory[(inventory)]
+    Store --> Processed[(processed_events)]
+
+    Main --> Metrics[metrics endpoint]
+    Retry --> Metrics
+    Recovery --> Metrics
+    Metrics --> Prometheus[Prometheus]
+    Prometheus --> Grafana[Grafana]
 ```
 
-| 구성 | 선택 |
+Retry/DLQ/Recovery destination 발행이 성공한 뒤 source offset을 commit한다. 이 두 Kafka 작업도 원자적이지 않으므로 commit 경계에서 destination duplicate가 생길 수 있으며, 최종 DB side effect는 idempotency로 보호한다.
+
+## Tech Stack
+
+| 기술 | 이 프로젝트에서의 역할 |
 | --- | --- |
-| Go | 1.26.5, 표준 `net/http`, `database/sql`, `log/slog` |
-| Kafka client | `github.com/segmentio/kafka-go` v0.4.51 |
-| MySQL driver | `github.com/go-sql-driver/mysql` v1.10.0 |
-| Local infrastructure | Docker Compose, 단일 KRaft Kafka, InnoDB MySQL |
+| Go 1.26.5 | 표준 `net/http`, `database/sql`, `log/slog` 기반 API·Worker·CLI |
+| Kafka 4.2.0 | 주문, Retry, DLQ와 Recovery record 저장; 단일 노드 KRaft 실험 환경 |
+| `segmentio/kafka-go` v0.4.51 | 수동 fetch/commit, record/header 처리와 좌표 기반 Replay |
+| MySQL 8.4.8 | InnoDB 재고 변경과 `processed_events`의 transactional idempotency |
+| Docker Compose | Kafka, MySQL, Prometheus와 Grafana의 재현 가능한 로컬 실행 |
+| Prometheus / Grafana | bounded-label Worker metric 수집과 9-panel dashboard |
+
+## Key Results
+
+### Commit boundary and idempotency
+
+| 상태 | 첫 처리 | DB commit 후 offset commit 전 crash | 동일 record 재전달 |
+| --- | ---: | --- | ---: |
+| Phase 2 — idempotency 없음 | 100 → 98 | Kafka offset 미commit | **98 → 96** |
+| Phase 5 — idempotency 적용 | 100 → 98 | Kafka offset 미commit | **98 → 98** |
+
+Phase 2에서는 같은 topic/partition/offset과 eventId가 다시 전달되어 재고가 두 번 감소했다. Phase 5에서는 동일 eventId의 canonical payload를 Duplicate로 판정해 offset은 진행하되 추가 inventory update는 실행하지 않았다.
+
+### Repeated Retry comparison
+
+Phase 9에서 Phase 4 Scenario A의 60-event burst를 전략별 3회 반복했다.
+
+| 전략 | Common 8s Retry median | Success | DLQ | 해석 |
+| --- | ---: | ---: | ---: | --- |
+| Fixed | 300 | 0 | 60 | 짧은 간격으로 Retry를 소진했다. |
+| Exponential | 180 | 60 | 0 | Retry 수를 줄이고 전부 복구했다. |
+| Full Jitter | 172 | 60 | 0 | Retry 분산은 있었지만 FIFO Worker의 HOL과 수초 overdue가 반복됐다. |
+
+낮은 peak만으로 전략을 평가하지 않는다. Retry 횟수, 성공/DLQ, DB healthy 이후 recovery, overdue와 head-of-line blocking을 함께 비교했다.
+
+### Bulk Recovery rate control
+
+120건 backlog를 먼저 만든 뒤 Recovery Worker를 20/s로 제한한 Phase 9 반복 결과다.
+
+| 항목 | Median |
+| --- | ---: |
+| Replay publication | 약 84.32 records/s |
+| Recovery processing | 약 19.75 records/s |
+| Processing peak | 20 records/s |
+| Peak lag | 120 records |
+| Replay CLI completion | 약 1.9초 |
+| Business recovery completion | 약 8.0초 |
+
+Replay publication 완료와 DB business recovery 완료는 다른 상태다. Publication limiter는 Recovery Topic 유입을, Recovery limiter는 backlog가 이미 있어도 최초 Store 진입 속도를 각각 통제한다.
+
+### Observability
+
+Main, Retry와 Recovery Worker의 Prometheus target이 모두 UP인 상태에서 Retry, DLQ, Duplicate, Recovery와 limiter wait metric의 실제 증가를 Kafka/MySQL 결과와 대조했다. Grafana는 Compose에서 datasource와 9개 panel을 자동 provision하며 10개 PromQL query를 검증했다. 정확한 committed consumer-group lag collector는 구현하지 않았다.
 
 ## Development Journey
 
 ### Phase 0 — Reproducible Environment
 
-문제: 장애 실험 전에 Kafka·MySQL의 실행과 데이터 영속성을 같은 조건으로 반복할 기준선이 필요했다.
+단일 KRaft Kafka와 InnoDB MySQL을 Compose로 구성하고 healthcheck, volume, 명시적 topic 생성, 실제 produce/consume와 DB 재시작 후 데이터 보존을 검증했다.
 
-구현·검증: 단일 KRaft broker와 InnoDB MySQL을 Compose로 구성하고 healthcheck, named volume, 명시적 topic 생성, Kafka 실제 produce/consume, SQL, MySQL 재시작 검사를 자동화했다.
-
-핵심 결과: 사용자 검증 14개가 모두 PASS했고, Kafka 4.2.0과 MySQL 8.4.8 환경에서 메시지 왕복과 재시작 후 probe row 보존을 확인했다.
-
-[Phase 0 상세 문서](docs/phase-0-environment.md) · [원시 검증 보고서](docs/phase-0-verification.md)
+→ [Phase 0 상세 문서](docs/phase-0-environment.md)
 
 ### Phase 1 — Normal Order-to-Inventory Flow
 
-문제: 장애 경계를 판단하려면 DB transaction과 Kafka offset commit 순서가 분명한 정상 흐름이 먼저 필요했다.
+`POST /orders → orders.created.v1 → Inventory Worker → MySQL → offset commit` 정상 경로를 만들었다. Worker는 `FetchMessage`로 읽고 DB 성공 이후에만 `CommitMessages`를 호출한다.
 
-구현·검증: `POST /orders → OrderCreated → orders.created.v1 → Inventory Worker → MySQL → CommitMessages`를 구현했다. `FetchMessage`로 읽고 DB commit 성공 후에만 offset을 수동 commit한다.
-
-핵심 결과: 정상 요청 7건의 quantity 합계 19가 재고 100→81로 반영됐다. 잘못된 요청 5건은 Kafka에 발행되지 않았고, 정상 Worker 재시작 후 추가 처리는 0건이었다.
-
-[Phase 1 상세 문서](docs/phase-1-normal-flow.md) · [원시 검증 보고서](docs/phase-1-verification.md) · [Evidence](docs/phase-1-evidence.json)
+→ [Phase 1 상세 문서](docs/phase-1-normal-flow.md)
 
 ### Phase 2 — Kafka/MySQL Failure Boundaries
 
-문제: MySQL commit과 Kafka offset commit은 원자적이지 않으며, 영구 실패 record를 격리할 정책도 없었다.
+DB 작업 전 실패, commit 전 crash, DB commit 후 offset commit 전 crash와 poison message를 결정적으로 재현했다. 이 단계에서 idempotency가 없는 재전달은 재고를 `100 → 98 → 96`으로 중복 감소시켰다.
 
-구현·검증: 특정 eventId에서만 동작하는 최소 fault hook으로 MySQL 장애, DB commit 전 crash, DB commit 후 crash, poison message를 실제 Worker 프로세스에서 재현했다. DB와 broker 상태는 Worker 밖에서 교차 확인했다.
+→ [Phase 2 상세 문서](docs/phase-2-failure-boundaries.md)
 
-핵심 결과:
+### Phase 3 — Error Classification, Fixed Retry and DLQ
 
-- DB commit 전 crash: transaction rollback, offset 미commit, 동일 record 재전달
-- DB commit 후 offset commit 전 crash: 동일 eventId 재전달과 재고 100→98→96 중복 반영
-- Poison message: 두 번의 Worker 실행에서 같은 record가 실패하고 같은 partition의 정상 후속 record가 처리되지 않음
+일시 DB 오류만 Retry하고 계약 위반과 Domain rejection은 DLQ로 격리했다. destination 발행 실패 시 source offset을 남기며, poison message 뒤의 정상 record가 진행되는 것을 확인했다.
 
-[Phase 2 상세 문서](docs/phase-2-failure-boundaries.md) · [원시 검증 보고서](docs/phase-2-verification.md) · [Evidence](docs/phase-2-evidence.json)
+→ [Phase 3 상세 문서](docs/phase-3-retry-dlq.md)
 
-### Phase 3 — Fixed Retry / DLQ
+### Phase 4 — Retry Storm, Backoff and Full Jitter
 
-문제: 일시 DB 장애와 영구 오류가 모두 Worker를 중단해 같은 partition의 정상 record까지 막았다.
+실제 MySQL 중단 중 Fixed, Exponential과 Full Jitter를 burst·지속 유입에서 비교했다. Retry RPS, lag, recovery, overdue와 FIFO Retry Worker의 HOL을 raw timestamp로 측정했다.
 
-선택·검증: 알려진 일시 DB 오류만 최대 3회 추가 Retry하고, 계약 위반과 Domain rejection은 DLQ로 격리했다. 알 수 없는 오류와 목적지 발행 실패는 source offset을 남긴다. Retry Worker는 동일 재고 함수를 사용하고 Header의 next-attempt-at까지 기다린다.
-
-핵심 결과: Poison O0를 DLQ로 옮긴 뒤 Normal O1이 처리됐다. 복구 시 Retry 1회로 재고 100→98, 지속 장애 시 추가 Retry 1→2→3 후 DLQ, Retry/DLQ 발행 실패 시 source 미commit을 확인했다.
-
-[Phase 3 상세 문서](docs/phase-3-retry-dlq.md) · [검증 보고서](docs/phase-3-verification.md) · [Evidence](docs/phase-3-evidence.json)
-
-### Phase 4 — Retry Storm / Backoff / Full Jitter
-
-문제: 실패 record를 Retry로 넘기는 것만으로 재시도 집중과 복구 부하가 통제되는지는 알 수 없었다.
-
-선택·검증: 기존 Worker와 재고 함수를 유지하고 지연 전략만 확장했다. 실제 MySQL을 중단하며 동시 60건과 5건/초 지속 유입을 각각 비교했다. Header 예약 시각, 실제 시도, 초당 횟수, lag, SQL 재고, DLQ를 원시 기록으로 대조했다.
-
-핵심 결과: 지속 유입의 전체 peak는 Jitter 39회/초, Exponential 35회/초로 Jitter가 항상 더 낮지는 않았다. 최초 8초 공통 장애 구간에서는 둘 다 15회/초였다. 예약 초과 지연과 HOL을 함께 측정했으며, DB 재기동 시간이 긴 첫 실행은 원본을 보존하고 비교 셀을 다시 실행했다. 전체 복구 수치는 실제 장애 길이 편차를 포함한 단일 실행 관측이다.
-
-[Phase 4 상세 문서](docs/phase-4-backoff-jitter.md) · [검증 보고서](docs/phase-4-verification.md) · [Evidence](docs/phase-4-evidence.json) · [원시 실행](experiments/phase4/)
+→ [Phase 4 상세 문서](docs/phase-4-backoff-jitter.md)
 
 ### Phase 5 — Idempotent Consumer
 
-문제: 수동 offset commit만으로는 DB 성공 후 crash에서 재전달되는 이벤트의 중복 side effect를 막을 수 없었다.
+`processed_events` 등록과 `inventory` 차감을 같은 transaction으로 묶었다. DB commit 뒤 crash와 재전달에서도 재고가 `100 → 98 → 98`을 유지했고, 같은 eventId의 다른 payload는 conflict로 격리했다.
 
-선택·검증: eventId PRIMARY KEY인 processed_events 등록과 재고 차감을 같은 transaction으로 묶었다. 동일 canonical payload는 Duplicate 성공으로 offset만 진행하고, 다른 payload는 EVENT_ID_CONFLICT로 DLQ에 격리했다. Main/Retry는 동일 함수를 사용한다.
+→ [Phase 5 상세 문서](docs/phase-5-idempotency.md)
 
-핵심 결과: 동일 record의 crash/restart에서 재고 100→98→98, 100회 전달에서 신규 반영 1회·Duplicate 99회, 실제 DB 동시 호출 16개에서 신규 반영 1회·Duplicate 15회를 확인했다. 상품 없음·재고 부족·SQL 대기 timeout과 commit 전 crash에서는 marker가 남지 않았다.
+### Phase 6 — DLQ Replay and Recovery
 
-[Phase 5 상세 문서](docs/phase-5-idempotency.md) · [검증 보고서](docs/phase-5-verification.md) · [Evidence](docs/phase-5-evidence.json)
+운영자가 지정한 DLQ record 한 건을 group offset 변경 없이 Recovery Topic으로 발행하는 CLI를 추가했다. Recovery Worker가 기존 Store와 Retry/DLQ 정책으로 실제 DB 상태를 복구하고 반복 Replay는 Duplicate로 처리했다.
 
-### Phase 6 — DLQ Replay / Recovery
+→ [Phase 6 상세 문서](docs/phase-6-dlq-recovery.md)
 
-문제: DLQ 격리만으로는 실제 비즈니스 처리가 복구되지 않으며, Replay 발행 성공과 MySQL 반영 완료도 같은 상태가 아니다.
+### Phase 7 — Bulk Replay and Recovery Rate Limiting
 
-선택·검증: Replay CLI가 운영자가 지정한 DLQ topic/partition/offset 한 건을 group 없이 읽고 원본 eventId·key·raw value를 `inventory.recovery.v1`에 동기 발행한다. Recovery Worker는 기존 Retry/DLQ 정책과 Idempotent Store를 그대로 사용한다.
+한 partition의 DLQ 범위를 Bulk Replay하고 publication pacing과 Recovery Store 진입 pacing을 분리했다. Unlimited, Publication Limited와 기존 backlog의 Recovery Limited를 120건으로 비교했다.
 
-핵심 결과: Retry Exhaustion 뒤 CLI 발행 시점에는 inventory 100·marker 0·Recovery committed -1이었고, Worker 처리 후 98·marker 1·committed 1이었다. 같은 DLQ를 다시 Replay해도 98·marker 1을 유지하며 committed만 2로 진행했다. Recovery 실패 DLQ를 다시 Replay한 lineage는 `replay-count` 1→2로 보존됐다.
+→ [Phase 7 상세 문서](docs/phase-7-replay-rate-limit.md)
 
-[Phase 6 상세 문서](docs/phase-6-dlq-recovery.md) · [검증 보고서](docs/phase-6-verification.md) · [Evidence](docs/phase-6-evidence.json)
+### Phase 8 — Prometheus and Grafana Observability
 
-### Phase 7 — Bulk Replay / Recovery Rate Limiting
+고카디널리티 event 식별자를 제외한 Worker metric을 노출했다. 세 Worker target, 실제 metric 변화, Grafana provisioning과 panel query를 Kafka/MySQL 상태와 함께 검증했다.
 
-문제: 많은 DLQ record를 한꺼번에 Replay하면 Recovery backlog와 DB 부하가 복구 시스템의 새 장애가 될 수 있으며, Producer 발행 속도와 실제 DB 처리 속도는 같은 제어 대상이 아니다.
-
-선택·검증: 기존 단건 CLI를 유지하면서 한 partition의 연속 범위를 Bulk Replay하고, 동기 발행 전 `publish-rate`와 Recovery Store 진입 전 `recovery-rate`를 별도 timer pacer로 제한했다. 120건을 12개 product에 분산해 Unlimited, Publication Limited, 기존 Backlog + Recovery Limited를 실제 Kafka/MySQL에서 비교했다.
-
-핵심 결과: Unlimited의 발행/처리 peak는 81/81, Publication Limited는 20/23, Backlog + Recovery Limited는 81/20이었다. 마지막 전략은 CLI 2.196초와 business 완료 8.355초가 분리됐고, 세 전략 모두 120건 성공·DLQ 0·미완료 0, inventory 12,000→11,880이었다. 같은 24건을 두 번 Bulk Replay해 두 번째 24건이 모두 Duplicate이고 추가 차감 0임을 확인했다.
-
-[Phase 7 상세 문서](docs/phase-7-replay-rate-limit.md) · [검증 보고서](docs/phase-7-verification.md) · [Evidence](docs/phase-7-evidence.json) · [원시 실행](experiments/phase7/)
-
-### Phase 8 — Prometheus / Grafana Observability
-
-문제: Retry, DLQ, Duplicate와 Recovery 상태를 확인하려면 structured log와 evidence를 직접 읽어야 했고, event 식별자를 metric label로 옮기면 cardinality가 메시지 수에 비례해 증가한다.
-
-선택·검증: Main/Retry/Recovery Worker에 독립 `/metrics` endpoint를 두고 worker, outcome, strategy와 bounded error_code만 label로 사용했다. Prometheus는 Windows host process를 scrape하고 Grafana datasource와 9개 panel은 Compose 시작 시 자동 provision한다.
-
-핵심 결과: Normal, processing latency, Duplicate, DLQ, Retry, overdue와 단건 Recovery metric이 실제 시나리오에서 각각 0→1로 증가했다. Recovery 10건/5s에서는 실제 limiter wait가 0→9였고, 세 target UP과 Kafka offset·MySQL 상태를 교차 확인했다. Grafana의 10개 PromQL target도 모두 성공했다.
-
-[Phase 8 상세 문서](docs/phase-8-observability.md) · [검증 보고서](docs/phase-8-verification.md) · [Evidence](docs/phase-8-evidence.json) · [원시 실행](experiments/phase8/)
+→ [Phase 8 상세 문서](docs/phase-8-observability.md)
 
 ### Phase 9 — Repeated Experiment Validation
 
-문제: Phase 4와 Phase 7의 전략별 단일 로컬 실행은 container startup, scheduler와 random seed 편차를 전략 효과로 오인할 수 있었다.
+Phase 4의 6개 cell과 Phase 7의 3개 cell을 각각 3회 반복하고 median/min/max를 집계했다. 반복된 경향과 scheduler, container startup, Jitter seed에 민감한 수치를 구분해 단일 run의 일반화 범위를 제한했다.
 
-선택·검증: Phase 4의 6개 cell과 Phase 7의 3개 cell을 독립된 새 환경 식별자로 각각 3회 실행했다. Phase 4는 세 deterministic seed pair와 실제 outage를 기록하고 공통 초기 8초와 DB healthy 이후 recovery를 분리했으며, Phase 7은 기존 sliding-window peak와 DB/Kafka reconciliation을 유지했다.
+→ [Phase 9 상세 문서](docs/phase-9-repeated-experiments.md)
 
-핵심 결과: Fixed의 Retry 소진/DLQ와 Jitter의 HOL·수초 overdue는 반복됐다. 그러나 지속 유입 Fixed overdue는 기존 단일 run 2.089초와 달리 반복 run 14.8~15.5ms였고, Unlimited 처리량도 기존 약 72~74/s에서 반복 median 약 85/s로 달라졌다. Backlog Recovery limiter는 세 번 모두 processing peak 20/s와 peak lag 120을 보였다. n=3 로컬 관측이므로 통계적 우위나 운영 SLA로 일반화하지 않는다.
+## Repository Structure
 
-[Phase 9 상세 문서](docs/phase-9-repeated-experiments.md) · [검증 보고서](docs/phase-9-verification.md) · [Evidence](docs/phase-9-evidence.json) · [원시 실행](experiments/phase9/)
+```text
+.
+├── cmd/          # API, Worker, Replay와 smoke 실행 진입점
+├── internal/     # event, inventory, retry, rate limit와 observability 구현
+├── migrations/   # inventory와 processed_events schema
+├── monitoring/   # Prometheus/Grafana provisioning
+├── scripts/      # 환경 준비와 Phase별 검증
+├── tests/        # 실제 Kafka/MySQL integration harness
+├── experiments/  # 보존된 raw experiment evidence
+├── docs/         # 상세 설계, verification과 evidence index
+└── compose.yaml
+```
 
-## Run locally
+## How to Run
 
-프로젝트 루트 PowerShell에서 실행한다.
+### Prerequisites
+
+- Go 1.26.5
+- Docker Desktop와 Docker Compose
+- PowerShell 7 또는 Windows PowerShell
+
+프로젝트 루트에서 로컬 전용 `.env`를 만들고 infrastructure, topic과 schema를 준비한다. 생성된 `.env`는 Git에서 제외되며 password는 출력하지 않는다.
 
 ```powershell
 . ./scripts/env.ps1 -Init
@@ -140,12 +196,11 @@ go mod download
 docker compose up -d --wait
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1 -Check Topics
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase3.ps1 -Check Topics
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase6.ps1 -Check Topics
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/init-inventory.ps1 -Seed
 ```
 
-`-Seed`는 product 1을 100으로 되돌린다. 기존 검증 데이터가 있는 환경에서는 생략하고, 활성 Worker나 미처리 record가 없는 초기 로컬 환경에서만 사용한다.
-
-별도 터미널에서 Main Worker, Retry Worker, Recovery Worker와 API를 실행한다. Phase 8 대시보드에서 각 역할을 관측하려면 아래 metrics address를 유지한다.
+별도 터미널에서 Main Worker와 API를 실행한다.
 
 ```powershell
 . ./scripts/env.ps1
@@ -154,86 +209,51 @@ go run ./cmd/worker -metrics-address :22112
 
 ```powershell
 . ./scripts/env.ps1
-go run ./cmd/worker -retry-worker -metrics-address :22113
-```
-
-```powershell
-. ./scripts/env.ps1
-go run ./cmd/worker -recovery-worker -metrics-address :22114
-```
-
-기본 group은 main `inventory-main-v1`, retry `inventory-retry-v1`이다. 환경 변수 `KAFKA_CONSUMER_GROUP`을 사용하면 각 프로세스에 서로 다른 group을 지정한다. 기본 추가 Retry는 3회, Fixed Delay는 2초다.
-
-```powershell
-. ./scripts/env.ps1
 go run ./cmd/api
 ```
+
+정상 주문을 발행한다.
 
 ```powershell
 Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8080/orders `
   -ContentType application/json -Body '{"productId":1,"quantity":1}'
 ```
 
-DLQ 한 건은 consumer group offset을 변경하지 않고 좌표로 Replay한다.
+MySQL에서 재고와 idempotency marker를 확인한다.
 
 ```powershell
-. ./scripts/env.ps1
-go run ./cmd/replay -dlq-topic inventory.dlq.v1 -partition 0 -offset 10
+docker compose exec -T mysql sh -c 'MYSQL_PWD="$MYSQL_PASSWORD" mysql --protocol=TCP --host=127.0.0.1 --user="$MYSQL_USER" --database="$MYSQL_DATABASE" -e "SELECT * FROM inventory WHERE product_id=1; SELECT event_id, processed_at FROM processed_events ORDER BY processed_at DESC LIMIT 5;"'
 ```
+
+Retry와 Recovery process, 단건 Replay, 관측 UI는 필요할 때 추가한다.
+
+```powershell
+go run ./cmd/worker -retry-worker -metrics-address :22113
+go run ./cmd/worker -recovery-worker -metrics-address :22114
+go run ./cmd/replay -dlq-topic inventory.dlq.v1 -partition 0 -offset 0 -recovery-topic inventory.recovery.v1
+```
+
+- Prometheus: <http://127.0.0.1:9090>
+- Grafana: <http://127.0.0.1:3000>
+
+장애 실험은 실제 MySQL 컨테이너를 중단한다. 실행 절차와 격리 조건은 각 Phase verification 문서를 따른다.
 
 ## Verification
 
-```powershell
-# Phase 0 environment
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1 -Check All
+검증은 mock 결과가 아니라 실제 Kafka/MySQL integration scenario를 사용한다. SQL 상태, Kafka topic/partition/offset, consumer group commit과 application 결과를 교차 확인하고 Retry, DLQ, idempotency, Replay/Recovery 및 rate control의 raw JSON을 보존했다. Phase 9에서는 핵심 Phase 4/7 cell을 각각 3회 반복해 median/min/max와 환경 편차를 기록했다.
 
-# Phase 1 normal flow and earlier regression
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase1.ps1 -Check All
+문서별 재현 명령과 판정은 [Documentation Index](docs/README.md)에서 확인할 수 있다.
 
-# Phase 2 failure scenarios and earlier regressions
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase2.ps1 -Check All
+## Known Limitations
 
-# Phase 3 plus all prior regressions
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase3.ps1 -Check All
+- Kafka와 MySQL을 하나의 exactly-once transaction으로 묶지 않는다.
+- destination Kafka publish와 source offset commit은 원자적이지 않아 destination duplicate와 처리 비용이 남을 수 있다.
+- 단일 FIFO Retry Worker가 미래 예약 record를 기다려 뒤의 due record를 막는 HOL이 있다.
+- Bulk Replay는 persistent checkpoint/resume와 multi-partition scheduling을 지원하지 않는다.
+- Replay CLI와 Recovery Worker의 기본 recovery topic 이름이 달라 함께 실행할 때 CLI에 `-recovery-topic inventory.recovery.v1`을 명시해야 한다.
+- Recovery limiter는 Recovery Topic에서 최초 Store 진입만 제한하며 이후 Retry lineage 전체 quota를 통제하지 않는다.
+- exact committed consumer-group lag metric은 구현하지 않았다.
+- 실험은 단일 broker, 단일 partition/Worker 중심의 Windows 로컬 Docker 환경에서 수행했다.
+- Phase 9의 n=3은 편차 관측이며 production benchmark, 통계적 유의성이나 SLA 근거가 아니다.
 
-# Phase 4 comparison, raw evidence audit and all prior regressions
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase4.ps1 -Check All
-
-# Phase 5 idempotency and all prior regressions, preserving Phase 0-4 evidence
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase5.ps1 -Check All
-
-# Phase 6 single-record DLQ replay and Recovery flow
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase6.ps1 -Check All
-
-# Phase 7 bulk replay and independent publication/recovery rate limits
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase7.ps1 -Check All
-
-# Phase 8 Worker metrics, Prometheus and Grafana
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase8.ps1 -Check All
-
-# Phase 9 preserved repeated-experiment evidence audit and build verification
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase9.ps1 -Check All
-```
-
-장애 검증은 공유 로컬 MySQL 컨테이너를 실제 중지하므로 다른 애플리케이션과 병행하지 않는다. 각 시나리오는 새 product, topic, group을 사용하며 기존 offset이나 inventory를 초기화하지 않는다. Phase 2 스크립트는 `-phase2-baseline`으로 과거 실패 동작을 명시적으로 재현하며 일반 Worker에는 이 옵션을 사용하지 않는다.
-
-Phase 5 진입점은 과거 문서를 덮어쓰지 않고 회귀 결과를 Phase 5 evidence에 포함한다. 이번 Phase 4 회귀 raw는 `experiments/phase5/regression/`에 별도로 보존한다. Phase 5 Regression은 전략 계산과 Phase 0~3 기능을 확인하며, Phase 4의 8~12초 성능 비교 실험은 반복하지 않는다. 이번 재실행에서는 여섯 기능 시나리오가 PASS했지만 MySQL 기동 편차로 과거 성능 비교 audit은 FAIL했고 상세 원본과 한계를 Phase 5 문서에 남겼다.
-
-기존 환경에서도 Worker 시작 전에 `scripts/init-inventory.ps1`을 Seed 없이 실행해 processed_events를 생성한다. `-phase2-baseline`은 Retry/DLQ와 Idempotency를 모두 끄는 과거 실패 재현용 옵션이며 일반 실행에 사용하지 않는다.
-
-## Current limits
-
-- 같은 eventId의 재고 중복 반영은 marker가 유지되는 범위에서 차단한다. marker 도입 전의 처리 이력은 소급 등록하지 않았다.
-- processed_events의 보존·삭제 정책과 schema 변경 시 canonical hash 호환성은 이후 설계가 필요하다. 다른 eventId의 동일 주문까지 중복 제거하지 않는다.
-- Retry/DLQ 발행 성공과 source commit 사이 crash는 목적지 중복 발행을 만들 수 있다.
-- Retry 대기는 Worker의 다음 record 처리를 지연시키는 head-of-line blocking이 있다.
-- 단일 broker/RF=1 로컬 환경이며 broker HA를 검증하지 않았다.
-- Backoff/Jitter 비교는 단일 Worker/partition 구성이다. Phase 9에서 각 비교 cell을 3회 반복했지만 실제 DB 기동, scheduler와 seed 편차가 남는다.
-- Phase 7 limiter는 단일 Recovery Worker의 최초 Store 진입만 제어하며 이후 Retry lineage 전체에 전역 quota를 적용하지 않는다.
-- Bulk Replay는 한 partition 범위만 지원하고 persistent checkpoint/resume가 없어 중간 재실행 시 Recovery duplicate와 처리 비용이 남는다.
-- 정확한 committed consumer-group lag metric은 구현하지 않았다. last-observed high-water mark를 committed lag로 표현하지 않는다.
-- Replay CLI는 short-lived process라 Prometheus scrape 대상이 아니며 publication 수치는 Phase 7 log/evidence에 남는다.
-- Worker metrics endpoint는 로컬 Docker scrape를 위해 host interface에 bind하므로 운영 환경에는 별도 network/auth 정책이 필요하다.
-- 다중 Worker rebalance, 운영 규모 처리량과 반복 실험의 통계적 유의성은 검증하지 않았다. Phase 9 median/min/max는 Windows 로컬 Docker의 n=3 관측 범위다.
-
-앞으로 각 Phase는 코드·검증 완료, 원시 verification/evidence 보존, `docs/phase-N-*.md`의 동일한 11개 섹션 작성, Development Journey 갱신, 수치·링크 대조를 모두 마친 뒤 완료 commit을 만든다.
+더 세부적인 실패 조건, 측정 정의와 해석 한계는 [문서 인덱스](docs/README.md)에 연결된 Phase별 문서에 기록되어 있다.

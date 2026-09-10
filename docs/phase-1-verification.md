@@ -1,6 +1,6 @@
 # Phase 1 실행 보고
 
-정상 흐름 검증 시각: 2026-09-07 10:24:29 KST (증거 JSON의 UTC 01:24:29). 루트: `C:\Users\조태연\Desktop\kafka-recovery-lab`.
+정상 흐름 검증 시각: 2026-09-07 10:24:29 KST (증거 JSON의 UTC 01:24:29). 루트: `project root`.
 
 ## 1. Phase 0 commit 결과
 

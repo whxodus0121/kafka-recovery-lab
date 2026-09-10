@@ -1,6 +1,6 @@
 # Phase 0 실행 및 완료 보고
 
-검증일: 2026-09-07 KST. 작업 루트: `C:\Users\조태연\Desktop\kafka-recovery-lab`.
+검증일: 2026-09-07 KST. 작업 루트: `project root`.
 
 ## 1. Phase 0 결과 요약
 
