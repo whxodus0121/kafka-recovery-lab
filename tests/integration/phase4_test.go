@@ -42,6 +42,7 @@ type phase4Process struct {
 }
 type phase4Run struct {
 	RunID, Scenario, Strategy, Status                                           string
+	Repetition                                                                  int
 	Controls                                                                    phase4Controls
 	Topics, Groups                                                              []string
 	Events                                                                      []event.OrderCreated
@@ -55,6 +56,13 @@ type phase4Run struct {
 	MainRecords, RetryRecords, DLQRecords                                       []kafka.Message
 	Workers                                                                     []phase4Process
 	HistoricalInventoryUnchanged                                                bool
+	RawDirectory                                                                string `json:"-"`
+}
+
+type phase4RunOptions struct {
+	Repetition          int
+	MainSeed, RetrySeed int64
+	RawDirectory        string
 }
 
 func TestPhase4Runs(t *testing.T) {
@@ -71,10 +79,14 @@ func TestPhase4Runs(t *testing.T) {
 }
 
 func phase4RunScenario(t *testing.T, root, binary, scenario, strategy string) {
+	phase4RunScenarioWithOptions(t, root, binary, scenario, strategy, phase4RunOptions{MainSeed: 4101, RetrySeed: 4102})
+}
+
+func phase4RunScenarioWithOptions(t *testing.T, root, binary, scenario, strategy string, options phase4RunOptions) {
 	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer cancel()
 	c := phase4Controls{Events: 60, Products: 6, InitialStock: 100, Quantity: 1, Partitions: 1, MainWorkers: 1, RetryWorkers: 1, Pool: 1, MaxRetries: 5,
-		Base: time.Second, Cap: 8 * time.Second, RestoreAfter: 8 * time.Second, ObserveFor: 35 * time.Second, SampleInterval: 500 * time.Millisecond, MainSeed: 4101, RetrySeed: 4102, DBTimeout: 10 * time.Second}
+		Base: time.Second, Cap: 8 * time.Second, RestoreAfter: 8 * time.Second, ObserveFor: 35 * time.Second, SampleInterval: 500 * time.Millisecond, MainSeed: options.MainSeed, RetrySeed: options.RetrySeed, DBTimeout: 10 * time.Second}
 	if scenario == "B" {
 		c.PublishInterval = 200 * time.Millisecond
 	}
@@ -82,8 +94,8 @@ func phase4RunScenario(t *testing.T, root, binary, scenario, strategy string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	r := phase4Run{RunID: "phase4." + first.EventID, Scenario: scenario, Strategy: strategy, Status: "FAIL", Controls: c,
-		InitialInventory: map[int64]int64{}, FinalInventory: map[int64]int64{}, FaultEndDefinition: "first successful external SQL SELECT 1 after restart (100ms polling; query duration recorded by timestamp)"}
+	r := phase4Run{RunID: "phase4." + first.EventID, Scenario: scenario, Strategy: strategy, Status: "FAIL", Repetition: options.Repetition, Controls: c,
+		InitialInventory: map[int64]int64{}, FinalInventory: map[int64]int64{}, FaultEndDefinition: "first successful external SQL SELECT 1 after restart (100ms polling; query duration recorded by timestamp)", RawDirectory: options.RawDirectory}
 	workers := []*child{}
 	defer func() {
 		for _, w := range workers {
@@ -346,7 +358,9 @@ func phase4RunScenario(t *testing.T, root, binary, scenario, strategy string) {
 func savePhase4(t *testing.T, root string, r phase4Run) {
 	t.Helper()
 	dir := filepath.Join(root, "experiments/phase4")
-	if override := os.Getenv("PHASE4_RAW_DIR"); override != "" {
+	if r.RawDirectory != "" {
+		dir = r.RawDirectory
+	} else if override := os.Getenv("PHASE4_RAW_DIR"); override != "" {
 		dir = override
 	}
 	if err := os.MkdirAll(dir, 0755); err != nil {

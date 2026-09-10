@@ -1,0 +1,1422 @@
+{
+  "claims": {
+    "confidenceInterval": false,
+    "productionSLA": false,
+    "sampleSizePerCell": 3,
+    "statisticalSignificance": false
+  },
+  "definitions": {
+    "invalidRun": "process crash, infrastructure initialization failure, Docker daemon interruption, harness defect, or evidence write failure; an unexpected performance result is valid",
+    "phase4CommonWindow": "first 8 seconds after FaultStart, before the restore request",
+    "phase4Recovery": "seconds from the first successful external SQL probe after restart until all events reach successful DB commit and both source groups drain; null when any event is DLQ or unfinished",
+    "phase7PeakRPS": "maximum records in any sliding interval shorter than one second; unchanged from Phase 7"
+  },
+  "environment": {
+    "sha256": "f1c13c7bf00d7cc41a485751885be6cb0c1306933403ae3ed247416091a80259",
+    "sourceFile": "experiments/phase9/environment.json",
+    "values": {
+      "capturedAt": "2026-09-10T09:21:54.5429201Z",
+      "cpuLogicalCount": 12,
+      "dockerVersion": "29.2.0",
+      "goArch": "amd64",
+      "goOS": "windows",
+      "goVersion": "go1.26.5",
+      "kafkaVersion": "4.2.0",
+      "mysqlVersion": "8.4.8",
+      "phase4": {
+        "base": "1s",
+        "cap": "8s",
+        "events": 60,
+        "maxRetries": 5,
+        "observation": "35s",
+        "products": 6,
+        "restoreAfter": "8s",
+        "seedSets": [
+          [
+            4101,
+            4102
+          ],
+          [
+            7301,
+            7302
+          ],
+          [
+            9201,
+            9202
+          ]
+        ]
+      },
+      "phase7": {
+        "peakDefinition": "maximum records in any sliding interval shorter than one second",
+        "products": 12,
+        "publicationRate": 20,
+        "records": 120,
+        "recoveryRate": 20
+      }
+    }
+  },
+  "generatedAt": "2026-09-10T09:36:31.6812823Z",
+  "invalidRuns": [],
+  "phase10Implemented": false,
+  "phase4": {
+    "aggregates": [
+      {
+        "actualOutageSeconds": {
+          "median": 9.8604518,
+          "min": 9.7232088,
+          "max": 10.0356339
+        },
+        "common8sPeakRetryRPS": {
+          "median": 60,
+          "min": 60,
+          "max": 60
+        },
+        "common8sRetryAttempts": {
+          "median": 300,
+          "min": 300,
+          "max": 300
+        },
+        "dlq": {
+          "median": 60,
+          "min": 60,
+          "max": 60
+        },
+        "holAttempts": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "overallPeakRetryRPS": {
+          "median": 60,
+          "min": 60,
+          "max": 60
+        },
+        "recoverySecondsAfterHealthy": null,
+        "reservationInversions": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "retryOverdueP95Ms": {
+          "median": 19.8991,
+          "min": 7.2156,
+          "max": 32.7414
+        },
+        "runs": 3,
+        "scenario": "A",
+        "strategy": "fixed",
+        "success": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "totalRetryAttempts": {
+          "median": 300,
+          "min": 300,
+          "max": 300
+        },
+        "unfinished": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        }
+      },
+      {
+        "actualOutageSeconds": {
+          "median": 9.7093602,
+          "min": 9.7047206,
+          "max": 9.8303025
+        },
+        "common8sPeakRetryRPS": {
+          "median": 60,
+          "min": 60,
+          "max": 60
+        },
+        "common8sRetryAttempts": {
+          "median": 180,
+          "min": 180,
+          "max": 180
+        },
+        "dlq": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "holAttempts": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "overallPeakRetryRPS": {
+          "median": 60,
+          "min": 60,
+          "max": 60
+        },
+        "recoverySecondsAfterHealthy": {
+          "median": 6.3350954999999995,
+          "min": 6.2381722,
+          "max": 6.3462803
+        },
+        "reservationInversions": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "retryOverdueP95Ms": {
+          "median": 7.1881,
+          "min": 4.7674,
+          "max": 15.6974
+        },
+        "runs": 3,
+        "scenario": "A",
+        "strategy": "exponential",
+        "success": {
+          "median": 60,
+          "min": 60,
+          "max": 60
+        },
+        "totalRetryAttempts": {
+          "median": 240,
+          "min": 240,
+          "max": 240
+        },
+        "unfinished": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        }
+      },
+      {
+        "actualOutageSeconds": {
+          "median": 9.8989235,
+          "min": 9.7886843,
+          "max": 10.4059585
+        },
+        "common8sPeakRetryRPS": {
+          "median": 52,
+          "min": 40,
+          "max": 54
+        },
+        "common8sRetryAttempts": {
+          "median": 172,
+          "min": 170,
+          "max": 181
+        },
+        "dlq": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "holAttempts": {
+          "median": 196,
+          "min": 193,
+          "max": 204
+        },
+        "overallPeakRetryRPS": {
+          "median": 52,
+          "min": 40,
+          "max": 54
+        },
+        "recoverySecondsAfterHealthy": {
+          "median": 5.825106,
+          "min": 4.6893437,
+          "max": 6.1407064
+        },
+        "reservationInversions": {
+          "median": 117,
+          "min": 112,
+          "max": 117
+        },
+        "retryOverdueP95Ms": {
+          "median": 5284.749743,
+          "min": 5148.169388,
+          "max": 5955.983241
+        },
+        "runs": 3,
+        "scenario": "A",
+        "strategy": "jitter",
+        "success": {
+          "median": 60,
+          "min": 60,
+          "max": 60
+        },
+        "totalRetryAttempts": {
+          "median": 241,
+          "min": 230,
+          "max": 242
+        },
+        "unfinished": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        }
+      },
+      {
+        "actualOutageSeconds": {
+          "median": 9.8802023,
+          "min": 9.7968987,
+          "max": 10.0088463
+        },
+        "common8sPeakRetryRPS": {
+          "median": 25,
+          "min": 25,
+          "max": 25
+        },
+        "common8sRetryAttempts": {
+          "median": 125,
+          "min": 125,
+          "max": 125
+        },
+        "dlq": {
+          "median": 24,
+          "min": 24,
+          "max": 25
+        },
+        "holAttempts": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "overallPeakRetryRPS": {
+          "median": 25,
+          "min": 25,
+          "max": 25
+        },
+        "recoverySecondsAfterHealthy": null,
+        "reservationInversions": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "retryOverdueP95Ms": {
+          "median": 15.3327,
+          "min": 14.785,
+          "max": 15.5121
+        },
+        "runs": 3,
+        "scenario": "B",
+        "strategy": "fixed",
+        "success": {
+          "median": 36,
+          "min": 35,
+          "max": 36
+        },
+        "totalRetryAttempts": {
+          "median": 195,
+          "min": 195,
+          "max": 200
+        },
+        "unfinished": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        }
+      },
+      {
+        "actualOutageSeconds": {
+          "median": 9.8233002,
+          "min": 9.7009435,
+          "max": 11.1655601
+        },
+        "common8sPeakRetryRPS": {
+          "median": 15,
+          "min": 15,
+          "max": 15
+        },
+        "common8sRetryAttempts": {
+          "median": 37,
+          "min": 37,
+          "max": 37
+        },
+        "dlq": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "holAttempts": {
+          "median": 82,
+          "min": 82,
+          "max": 90
+        },
+        "overallPeakRetryRPS": {
+          "median": 29,
+          "min": 28,
+          "max": 36
+        },
+        "recoverySecondsAfterHealthy": {
+          "median": 6.7541415,
+          "min": 5.3948117,
+          "max": 6.8597913
+        },
+        "reservationInversions": {
+          "median": 37,
+          "min": 37,
+          "max": 37
+        },
+        "retryOverdueP95Ms": {
+          "median": 6822.298,
+          "min": 6821.2198,
+          "max": 6822.961
+        },
+        "runs": 3,
+        "scenario": "B",
+        "strategy": "exponential",
+        "success": {
+          "median": 60,
+          "min": 60,
+          "max": 60
+        },
+        "totalRetryAttempts": {
+          "median": 107,
+          "min": 106,
+          "max": 114
+        },
+        "unfinished": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        }
+      },
+      {
+        "actualOutageSeconds": {
+          "median": 9.8152658,
+          "min": 9.7137992,
+          "max": 9.9054089
+        },
+        "common8sPeakRetryRPS": {
+          "median": 17,
+          "min": 15,
+          "max": 18
+        },
+        "common8sRetryAttempts": {
+          "median": 38,
+          "min": 33,
+          "max": 39
+        },
+        "dlq": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "holAttempts": {
+          "median": 87,
+          "min": 77,
+          "max": 107
+        },
+        "overallPeakRetryRPS": {
+          "median": 42,
+          "min": 39,
+          "max": 46
+        },
+        "recoverySecondsAfterHealthy": {
+          "median": 5.307374,
+          "min": 3.2233254000000002,
+          "max": 6.1369419
+        },
+        "reservationInversions": {
+          "median": 41,
+          "min": 40,
+          "max": 52
+        },
+        "retryOverdueP95Ms": {
+          "median": 5585.692319,
+          "min": 5496.81356,
+          "max": 6806.031362
+        },
+        "runs": 3,
+        "scenario": "B",
+        "strategy": "jitter",
+        "success": {
+          "median": 60,
+          "min": 60,
+          "max": 60
+        },
+        "totalRetryAttempts": {
+          "median": 97,
+          "min": 88,
+          "max": 124
+        },
+        "unfinished": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        }
+      }
+    ],
+    "runs": [
+      {
+        "SourceFile": "experiments/phase9/phase4/exponential-A-phase4.70e1d2e5-752e-4a82-9833-8a32b09105b3.json",
+        "SHA256": "f0a6ffe7a53025af94d66da012336fe891b572b8168ecae581dab371f8626950",
+        "RunID": "phase4.70e1d2e5-752e-4a82-9833-8a32b09105b3",
+        "Scenario": "A",
+        "Strategy": "exponential",
+        "Repetition": 1,
+        "MainSeed": 4101,
+        "RetrySeed": 4102,
+        "ActualOutageSeconds": 9.7047206,
+        "TotalRetryAttempts": 240,
+        "Common8sRetryAttempts": 180,
+        "OverallPeakRetryRPS": 60,
+        "Common8sPeakRetryRPS": 60,
+        "RecoverySecondsAfterHealthy": 6.3462803,
+        "RetryOverdueP95MS": 7.1881,
+        "HOLAttempts": 0,
+        "ReservationInversions": 0,
+        "Success": 60,
+        "DLQ": 0,
+        "Unfinished": 0
+      },
+      {
+        "SourceFile": "experiments/phase9/phase4/exponential-A-phase4.fbd9fdda-9c19-49eb-9f2e-79e267b40dd1.json",
+        "SHA256": "c2a713760a27fb263661321c8e2a21bed2423c620e0a0e2693aaf24613250c64",
+        "RunID": "phase4.fbd9fdda-9c19-49eb-9f2e-79e267b40dd1",
+        "Scenario": "A",
+        "Strategy": "exponential",
+        "Repetition": 2,
+        "MainSeed": 7301,
+        "RetrySeed": 7302,
+        "ActualOutageSeconds": 9.8303025,
+        "TotalRetryAttempts": 240,
+        "Common8sRetryAttempts": 180,
+        "OverallPeakRetryRPS": 60,
+        "Common8sPeakRetryRPS": 60,
+        "RecoverySecondsAfterHealthy": 6.2381722,
+        "RetryOverdueP95MS": 4.7674,
+        "HOLAttempts": 0,
+        "ReservationInversions": 0,
+        "Success": 60,
+        "DLQ": 0,
+        "Unfinished": 0
+      },
+      {
+        "SourceFile": "experiments/phase9/phase4/exponential-A-phase4.ccaf05d7-480f-4270-b783-834ed6b161af.json",
+        "SHA256": "3357d275d41f09bf92926e0c7c785e8da92382ff9d3b25a4440792a8d40d31fb",
+        "RunID": "phase4.ccaf05d7-480f-4270-b783-834ed6b161af",
+        "Scenario": "A",
+        "Strategy": "exponential",
+        "Repetition": 3,
+        "MainSeed": 9201,
+        "RetrySeed": 9202,
+        "ActualOutageSeconds": 9.7093602,
+        "TotalRetryAttempts": 240,
+        "Common8sRetryAttempts": 180,
+        "OverallPeakRetryRPS": 60,
+        "Common8sPeakRetryRPS": 60,
+        "RecoverySecondsAfterHealthy": 6.3350954999999995,
+        "RetryOverdueP95MS": 15.6974,
+        "HOLAttempts": 0,
+        "ReservationInversions": 0,
+        "Success": 60,
+        "DLQ": 0,
+        "Unfinished": 0
+      },
+      {
+        "SourceFile": "experiments/phase9/phase4/fixed-A-phase4.50cfb823-64d8-4e40-9d2c-a765f0a45016.json",
+        "SHA256": "9ae29490d78d40497e9392711c367a02f3c3072bf7bed9170657a0c1569bc356",
+        "RunID": "phase4.50cfb823-64d8-4e40-9d2c-a765f0a45016",
+        "Scenario": "A",
+        "Strategy": "fixed",
+        "Repetition": 1,
+        "MainSeed": 4101,
+        "RetrySeed": 4102,
+        "ActualOutageSeconds": 9.8604518,
+        "TotalRetryAttempts": 300,
+        "Common8sRetryAttempts": 300,
+        "OverallPeakRetryRPS": 60,
+        "Common8sPeakRetryRPS": 60,
+        "RecoverySecondsAfterHealthy": null,
+        "RetryOverdueP95MS": 32.7414,
+        "HOLAttempts": 0,
+        "ReservationInversions": 0,
+        "Success": 0,
+        "DLQ": 60,
+        "Unfinished": 0
+      },
+      {
+        "SourceFile": "experiments/phase9/phase4/fixed-A-phase4.c1d4a23f-873c-4bd7-bb41-ed902efd6381.json",
+        "SHA256": "b81aaf867dff4cae22d2b513e3e4418a1c2d9c9407f5275fb82d0c2288cd96b7",
+        "RunID": "phase4.c1d4a23f-873c-4bd7-bb41-ed902efd6381",
+        "Scenario": "A",
+        "Strategy": "fixed",
+        "Repetition": 2,
+        "MainSeed": 7301,
+        "RetrySeed": 7302,
+        "ActualOutageSeconds": 9.7232088,
+        "TotalRetryAttempts": 300,
+        "Common8sRetryAttempts": 300,
+        "OverallPeakRetryRPS": 60,
+        "Common8sPeakRetryRPS": 60,
+        "RecoverySecondsAfterHealthy": null,
+        "RetryOverdueP95MS": 7.2156,
+        "HOLAttempts": 0,
+        "ReservationInversions": 0,
+        "Success": 0,
+        "DLQ": 60,
+        "Unfinished": 0
+      },
+      {
+        "SourceFile": "experiments/phase9/phase4/fixed-A-phase4.0c618118-5e94-468d-b128-22f32ddb8c09.json",
+        "SHA256": "3bb9e4ef049bd4f6e07f16d8a1c80521f4cb58d8d1ba0308d34c050b8903074e",
+        "RunID": "phase4.0c618118-5e94-468d-b128-22f32ddb8c09",
+        "Scenario": "A",
+        "Strategy": "fixed",
+        "Repetition": 3,
+        "MainSeed": 9201,
+        "RetrySeed": 9202,
+        "ActualOutageSeconds": 10.0356339,
+        "TotalRetryAttempts": 300,
+        "Common8sRetryAttempts": 300,
+        "OverallPeakRetryRPS": 60,
+        "Common8sPeakRetryRPS": 60,
+        "RecoverySecondsAfterHealthy": null,
+        "RetryOverdueP95MS": 19.8991,
+        "HOLAttempts": 0,
+        "ReservationInversions": 0,
+        "Success": 0,
+        "DLQ": 60,
+        "Unfinished": 0
+      },
+      {
+        "SourceFile": "experiments/phase9/phase4/jitter-A-phase4.bc420ba8-c0a8-49cb-bcf1-0938b81745a3.json",
+        "SHA256": "5945596a425203cdf77544a28885b8c0a93294732d484703b71cf6335d342b58",
+        "RunID": "phase4.bc420ba8-c0a8-49cb-bcf1-0938b81745a3",
+        "Scenario": "A",
+        "Strategy": "jitter",
+        "Repetition": 1,
+        "MainSeed": 4101,
+        "RetrySeed": 4102,
+        "ActualOutageSeconds": 10.4059585,
+        "TotalRetryAttempts": 230,
+        "Common8sRetryAttempts": 170,
+        "OverallPeakRetryRPS": 52,
+        "Common8sPeakRetryRPS": 52,
+        "RecoverySecondsAfterHealthy": 4.6893437,
+        "RetryOverdueP95MS": 5284.749743,
+        "HOLAttempts": 196,
+        "ReservationInversions": 117,
+        "Success": 60,
+        "DLQ": 0,
+        "Unfinished": 0
+      },
+      {
+        "SourceFile": "experiments/phase9/phase4/jitter-A-phase4.d1f565df-af9e-4e6c-afaf-ea41bb7fdbc3.json",
+        "SHA256": "e1182d879e6695e5f48f79b9a5087b5019d0d0533eb72906f6b5750f0260b852",
+        "RunID": "phase4.d1f565df-af9e-4e6c-afaf-ea41bb7fdbc3",
+        "Scenario": "A",
+        "Strategy": "jitter",
+        "Repetition": 2,
+        "MainSeed": 7301,
+        "RetrySeed": 7302,
+        "ActualOutageSeconds": 9.7886843,
+        "TotalRetryAttempts": 241,
+        "Common8sRetryAttempts": 181,
+        "OverallPeakRetryRPS": 54,
+        "Common8sPeakRetryRPS": 54,
+        "RecoverySecondsAfterHealthy": 5.825106,
+        "RetryOverdueP95MS": 5148.169388,
+        "HOLAttempts": 193,
+        "ReservationInversions": 112,
+        "Success": 60,
+        "DLQ": 0,
+        "Unfinished": 0
+      },
+      {
+        "SourceFile": "experiments/phase9/phase4/jitter-A-phase4.08fe85dd-6be1-4289-a74a-2baa7956c3a9.json",
+        "SHA256": "55e681ca3bb73bca9d73b208cef9a8e4c09ce6aa1d01406d23913f38bb08d851",
+        "RunID": "phase4.08fe85dd-6be1-4289-a74a-2baa7956c3a9",
+        "Scenario": "A",
+        "Strategy": "jitter",
+        "Repetition": 3,
+        "MainSeed": 9201,
+        "RetrySeed": 9202,
+        "ActualOutageSeconds": 9.8989235,
+        "TotalRetryAttempts": 242,
+        "Common8sRetryAttempts": 172,
+        "OverallPeakRetryRPS": 40,
+        "Common8sPeakRetryRPS": 40,
+        "RecoverySecondsAfterHealthy": 6.1407064,
+        "RetryOverdueP95MS": 5955.983241,
+        "HOLAttempts": 204,
+        "ReservationInversions": 117,
+        "Success": 60,
+        "DLQ": 0,
+        "Unfinished": 0
+      },
+      {
+        "SourceFile": "experiments/phase9/phase4/exponential-B-phase4.b646048b-daab-4058-b62e-23b0704811ce.json",
+        "SHA256": "f307a7d08f4a34645cc385aec9a61e63e5344e9e4b0ec5040be71cfa471b93d8",
+        "RunID": "phase4.b646048b-daab-4058-b62e-23b0704811ce",
+        "Scenario": "B",
+        "Strategy": "exponential",
+        "Repetition": 1,
+        "MainSeed": 4101,
+        "RetrySeed": 4102,
+        "ActualOutageSeconds": 9.7009435,
+        "TotalRetryAttempts": 106,
+        "Common8sRetryAttempts": 37,
+        "OverallPeakRetryRPS": 28,
+        "Common8sPeakRetryRPS": 15,
+        "RecoverySecondsAfterHealthy": 6.8597913,
+        "RetryOverdueP95MS": 6822.961,
+        "HOLAttempts": 82,
+        "ReservationInversions": 37,
+        "Success": 60,
+        "DLQ": 0,
+        "Unfinished": 0
+      },
+      {
+        "SourceFile": "experiments/phase9/phase4/exponential-B-phase4.576ebbdc-5c67-45aa-b2d8-38106e74d93e.json",
+        "SHA256": "413dd0bfc662e9d9f4b56dcfc1e1cf742ca1be696cab3bd97fea4300b352b854",
+        "RunID": "phase4.576ebbdc-5c67-45aa-b2d8-38106e74d93e",
+        "Scenario": "B",
+        "Strategy": "exponential",
+        "Repetition": 2,
+        "MainSeed": 7301,
+        "RetrySeed": 7302,
+        "ActualOutageSeconds": 11.1655601,
+        "TotalRetryAttempts": 114,
+        "Common8sRetryAttempts": 37,
+        "OverallPeakRetryRPS": 36,
+        "Common8sPeakRetryRPS": 15,
+        "RecoverySecondsAfterHealthy": 5.3948117,
+        "RetryOverdueP95MS": 6821.2198,
+        "HOLAttempts": 90,
+        "ReservationInversions": 37,
+        "Success": 60,
+        "DLQ": 0,
+        "Unfinished": 0
+      },
+      {
+        "SourceFile": "experiments/phase9/phase4/exponential-B-phase4.555e5313-0d60-48a4-ae14-fef2e7746dfb.json",
+        "SHA256": "815ac9289f6b22d702d84de24879cb61b8002cb3552a7aa91151307a1d219c0f",
+        "RunID": "phase4.555e5313-0d60-48a4-ae14-fef2e7746dfb",
+        "Scenario": "B",
+        "Strategy": "exponential",
+        "Repetition": 3,
+        "MainSeed": 9201,
+        "RetrySeed": 9202,
+        "ActualOutageSeconds": 9.8233002,
+        "TotalRetryAttempts": 107,
+        "Common8sRetryAttempts": 37,
+        "OverallPeakRetryRPS": 29,
+        "Common8sPeakRetryRPS": 15,
+        "RecoverySecondsAfterHealthy": 6.7541415,
+        "RetryOverdueP95MS": 6822.298,
+        "HOLAttempts": 82,
+        "ReservationInversions": 37,
+        "Success": 60,
+        "DLQ": 0,
+        "Unfinished": 0
+      },
+      {
+        "SourceFile": "experiments/phase9/phase4/fixed-B-phase4.d7176edd-f93a-4feb-ab4a-d262ff5f4084.json",
+        "SHA256": "968139b7993bd930c13e5c62711a13f726f5f30ef5bcd08a8f2f4f152f712256",
+        "RunID": "phase4.d7176edd-f93a-4feb-ab4a-d262ff5f4084",
+        "Scenario": "B",
+        "Strategy": "fixed",
+        "Repetition": 1,
+        "MainSeed": 4101,
+        "RetrySeed": 4102,
+        "ActualOutageSeconds": 9.7968987,
+        "TotalRetryAttempts": 195,
+        "Common8sRetryAttempts": 125,
+        "OverallPeakRetryRPS": 25,
+        "Common8sPeakRetryRPS": 25,
+        "RecoverySecondsAfterHealthy": null,
+        "RetryOverdueP95MS": 15.5121,
+        "HOLAttempts": 0,
+        "ReservationInversions": 0,
+        "Success": 36,
+        "DLQ": 24,
+        "Unfinished": 0
+      },
+      {
+        "SourceFile": "experiments/phase9/phase4/fixed-B-phase4.09df82a1-fedb-4bc2-8f42-c1e961fadf34.json",
+        "SHA256": "d3c5ccd682adecea4092fc98290ef67dd8b691daf365d7eb7fc6e5124452d161",
+        "RunID": "phase4.09df82a1-fedb-4bc2-8f42-c1e961fadf34",
+        "Scenario": "B",
+        "Strategy": "fixed",
+        "Repetition": 2,
+        "MainSeed": 7301,
+        "RetrySeed": 7302,
+        "ActualOutageSeconds": 9.8802023,
+        "TotalRetryAttempts": 195,
+        "Common8sRetryAttempts": 125,
+        "OverallPeakRetryRPS": 25,
+        "Common8sPeakRetryRPS": 25,
+        "RecoverySecondsAfterHealthy": null,
+        "RetryOverdueP95MS": 15.3327,
+        "HOLAttempts": 0,
+        "ReservationInversions": 0,
+        "Success": 36,
+        "DLQ": 24,
+        "Unfinished": 0
+      },
+      {
+        "SourceFile": "experiments/phase9/phase4/fixed-B-phase4.827a8f59-7404-4fdd-8b16-67ca434b0cca.json",
+        "SHA256": "d51c7043cdaf5235adb4e86bcbdcc39f8f048732c21f15d7e51de6da2b45de58",
+        "RunID": "phase4.827a8f59-7404-4fdd-8b16-67ca434b0cca",
+        "Scenario": "B",
+        "Strategy": "fixed",
+        "Repetition": 3,
+        "MainSeed": 9201,
+        "RetrySeed": 9202,
+        "ActualOutageSeconds": 10.0088463,
+        "TotalRetryAttempts": 200,
+        "Common8sRetryAttempts": 125,
+        "OverallPeakRetryRPS": 25,
+        "Common8sPeakRetryRPS": 25,
+        "RecoverySecondsAfterHealthy": null,
+        "RetryOverdueP95MS": 14.785,
+        "HOLAttempts": 0,
+        "ReservationInversions": 0,
+        "Success": 35,
+        "DLQ": 25,
+        "Unfinished": 0
+      },
+      {
+        "SourceFile": "experiments/phase9/phase4/jitter-B-phase4.53239187-95cb-4ae3-839b-788cbea9bb75.json",
+        "SHA256": "c8763b89d115b00f3cf6ada29b4f12db24c1873c90ce29fc28fb3df8dd050a93",
+        "RunID": "phase4.53239187-95cb-4ae3-839b-788cbea9bb75",
+        "Scenario": "B",
+        "Strategy": "jitter",
+        "Repetition": 1,
+        "MainSeed": 4101,
+        "RetrySeed": 4102,
+        "ActualOutageSeconds": 9.7137992,
+        "TotalRetryAttempts": 88,
+        "Common8sRetryAttempts": 38,
+        "OverallPeakRetryRPS": 39,
+        "Common8sPeakRetryRPS": 15,
+        "RecoverySecondsAfterHealthy": 5.307374,
+        "RetryOverdueP95MS": 5585.692319,
+        "HOLAttempts": 77,
+        "ReservationInversions": 40,
+        "Success": 60,
+        "DLQ": 0,
+        "Unfinished": 0
+      },
+      {
+        "SourceFile": "experiments/phase9/phase4/jitter-B-phase4.0c05b3f0-64bd-4c71-a8ce-9a1eda8fe7fe.json",
+        "SHA256": "fd5247ef3900b2e0070b3b92e32ead18846bedb839340c73f9d6db58031e00ce",
+        "RunID": "phase4.0c05b3f0-64bd-4c71-a8ce-9a1eda8fe7fe",
+        "Scenario": "B",
+        "Strategy": "jitter",
+        "Repetition": 2,
+        "MainSeed": 7301,
+        "RetrySeed": 7302,
+        "ActualOutageSeconds": 9.8152658,
+        "TotalRetryAttempts": 97,
+        "Common8sRetryAttempts": 39,
+        "OverallPeakRetryRPS": 42,
+        "Common8sPeakRetryRPS": 18,
+        "RecoverySecondsAfterHealthy": 3.2233254000000002,
+        "RetryOverdueP95MS": 5496.81356,
+        "HOLAttempts": 87,
+        "ReservationInversions": 41,
+        "Success": 60,
+        "DLQ": 0,
+        "Unfinished": 0
+      },
+      {
+        "SourceFile": "experiments/phase9/phase4/jitter-B-phase4.989a2327-f126-475d-b3bc-158a05da9594.json",
+        "SHA256": "9ae8191f496e0c9211c64de17575bcd61088b788c35985f574fd63068ecd8acf",
+        "RunID": "phase4.989a2327-f126-475d-b3bc-158a05da9594",
+        "Scenario": "B",
+        "Strategy": "jitter",
+        "Repetition": 3,
+        "MainSeed": 9201,
+        "RetrySeed": 9202,
+        "ActualOutageSeconds": 9.9054089,
+        "TotalRetryAttempts": 124,
+        "Common8sRetryAttempts": 33,
+        "OverallPeakRetryRPS": 46,
+        "Common8sPeakRetryRPS": 17,
+        "RecoverySecondsAfterHealthy": 6.1369419,
+        "RetryOverdueP95MS": 6806.031362,
+        "HOLAttempts": 107,
+        "ReservationInversions": 52,
+        "Success": 60,
+        "DLQ": 0,
+        "Unfinished": 0
+      }
+    ]
+  },
+  "phase7": {
+    "aggregates": [
+      {
+        "businessRecoveryCompletionMs": {
+          "median": 2020,
+          "min": 1952,
+          "max": 2177
+        },
+        "cliCompletionMs": {
+          "median": 2020,
+          "min": 1952,
+          "max": 2177
+        },
+        "dlq": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "peakLag": {
+          "median": 2,
+          "min": 1,
+          "max": 4
+        },
+        "processingAverageRPS": {
+          "median": 84.87872043403127,
+          "min": 81.51502315026657,
+          "max": 86.17923978323387
+        },
+        "processingDurationMs": {
+          "median": 1402,
+          "min": 1380,
+          "max": 1459
+        },
+        "processingPeakRPS": {
+          "median": 88,
+          "min": 85,
+          "max": 90
+        },
+        "publicationAverageRPS": {
+          "median": 84.84830940456523,
+          "min": 81.57092159786879,
+          "max": 86.20854528078486
+        },
+        "publicationDurationMs": {
+          "median": 1402,
+          "min": 1380,
+          "max": 1458
+        },
+        "publicationPeakRPS": {
+          "median": 88,
+          "min": 85,
+          "max": 90
+        },
+        "runs": 3,
+        "strategy": "unlimited",
+        "success": {
+          "median": 120,
+          "min": 120,
+          "max": 120
+        },
+        "unfinished": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        }
+      },
+      {
+        "businessRecoveryCompletionMs": {
+          "median": 6358,
+          "min": 6091,
+          "max": 6513
+        },
+        "cliCompletionMs": {
+          "median": 6358,
+          "min": 6078,
+          "max": 6513
+        },
+        "dlq": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "peakLag": {
+          "median": 1,
+          "min": 1,
+          "max": 1
+        },
+        "processingAverageRPS": {
+          "median": 19.72359257912923,
+          "min": 19.703149371264224,
+          "max": 19.763872872724264
+        },
+        "processingDurationMs": {
+          "median": 6033,
+          "min": 6021,
+          "max": 6039
+        },
+        "processingPeakRPS": {
+          "median": 20,
+          "min": 20,
+          "max": 20
+        },
+        "publicationAverageRPS": {
+          "median": 19.725148128403355,
+          "min": 19.701460295415284,
+          "max": 19.765744042152125
+        },
+        "publicationDurationMs": {
+          "median": 6032,
+          "min": 6020,
+          "max": 6040
+        },
+        "publicationPeakRPS": {
+          "median": 20,
+          "min": 20,
+          "max": 20
+        },
+        "runs": 3,
+        "strategy": "publication-limited",
+        "success": {
+          "median": 120,
+          "min": 120,
+          "max": 120
+        },
+        "unfinished": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        }
+      },
+      {
+        "businessRecoveryCompletionMs": {
+          "median": 8014,
+          "min": 7924,
+          "max": 8132
+        },
+        "cliCompletionMs": {
+          "median": 1906,
+          "min": 1822,
+          "max": 2045
+        },
+        "dlq": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "peakLag": {
+          "median": 120,
+          "min": 120,
+          "max": 120
+        },
+        "processingAverageRPS": {
+          "median": 19.754987686168345,
+          "min": 19.72798261815528,
+          "max": 19.77031282516142
+        },
+        "processingDurationMs": {
+          "median": 6023,
+          "min": 6019,
+          "max": 6032
+        },
+        "processingPeakRPS": {
+          "median": 20,
+          "min": 20,
+          "max": 20
+        },
+        "publicationAverageRPS": {
+          "median": 84.32104095529645,
+          "min": 82.59400707601598,
+          "max": 84.46751677425509
+        },
+        "publicationDurationMs": {
+          "median": 1411,
+          "min": 1408,
+          "max": 1440
+        },
+        "publicationPeakRPS": {
+          "median": 87,
+          "min": 85,
+          "max": 87
+        },
+        "runs": 3,
+        "strategy": "recovery-limited-backlog",
+        "success": {
+          "median": 120,
+          "min": 120,
+          "max": 120
+        },
+        "unfinished": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        }
+      }
+    ],
+    "runs": [
+      {
+        "SourceFile": "experiments/phase9/phase7/publication-limited-phase7.f89f60c3-4f45-4378-bc77-2d8f46b5fc71.json",
+        "SHA256": "50bfcb42e1d35e2f71d577bc37b4809a6c8530613fcab36f5077ac62c439fa3b",
+        "RunID": "phase7.f89f60c3-4f45-4378-bc77-2d8f46b5fc71",
+        "Strategy": "publication-limited",
+        "Repetition": 1,
+        "InputCount": 120,
+        "PublishRate": 20,
+        "RecoveryRate": 0,
+        "PublicationDurationMS": 6040,
+        "CLICompletionMS": 6358,
+        "PublicationAverageRPS": 19.701460295415284,
+        "PublicationPeakRPS": 20,
+        "ProcessingDurationMS": 6039,
+        "BusinessRecoveryCompletionMS": 6358,
+        "ProcessingAverageRPS": 19.703149371264224,
+        "ProcessingPeakRPS": 20,
+        "PeakLag": 1,
+        "RecoveryEndOffset": 120,
+        "RecoveryCommittedOffset": 120,
+        "Success": 120,
+        "DLQ": 0,
+        "Unfinished": 0,
+        "InitialInventory": 12000,
+        "FinalInventory": 11880,
+        "ProcessedEvents": 120
+      },
+      {
+        "SourceFile": "experiments/phase9/phase7/publication-limited-phase7.39f5db85-b8e9-4bcb-83d7-4f00344db844.json",
+        "SHA256": "751281d0997b099ec93e66eebdcdafa362b60b46befbff819bee8b40e5536594",
+        "RunID": "phase7.39f5db85-b8e9-4bcb-83d7-4f00344db844",
+        "Strategy": "publication-limited",
+        "Repetition": 2,
+        "InputCount": 120,
+        "PublishRate": 20,
+        "RecoveryRate": 0,
+        "PublicationDurationMS": 6020,
+        "CLICompletionMS": 6513,
+        "PublicationAverageRPS": 19.765744042152125,
+        "PublicationPeakRPS": 20,
+        "ProcessingDurationMS": 6021,
+        "BusinessRecoveryCompletionMS": 6513,
+        "ProcessingAverageRPS": 19.763872872724264,
+        "ProcessingPeakRPS": 20,
+        "PeakLag": 1,
+        "RecoveryEndOffset": 120,
+        "RecoveryCommittedOffset": 120,
+        "Success": 120,
+        "DLQ": 0,
+        "Unfinished": 0,
+        "InitialInventory": 12000,
+        "FinalInventory": 11880,
+        "ProcessedEvents": 120
+      },
+      {
+        "SourceFile": "experiments/phase9/phase7/publication-limited-phase7.c8bfc2da-6a47-43b5-acb6-d840e9ce5ee9.json",
+        "SHA256": "0e0555b585bad6ebc1dc01a01b394dbad5b4671cde3d0ad039a87687449a7dda",
+        "RunID": "phase7.c8bfc2da-6a47-43b5-acb6-d840e9ce5ee9",
+        "Strategy": "publication-limited",
+        "Repetition": 3,
+        "InputCount": 120,
+        "PublishRate": 20,
+        "RecoveryRate": 0,
+        "PublicationDurationMS": 6032,
+        "CLICompletionMS": 6078,
+        "PublicationAverageRPS": 19.725148128403355,
+        "PublicationPeakRPS": 20,
+        "ProcessingDurationMS": 6033,
+        "BusinessRecoveryCompletionMS": 6091,
+        "ProcessingAverageRPS": 19.72359257912923,
+        "ProcessingPeakRPS": 20,
+        "PeakLag": 1,
+        "RecoveryEndOffset": 120,
+        "RecoveryCommittedOffset": 120,
+        "Success": 120,
+        "DLQ": 0,
+        "Unfinished": 0,
+        "InitialInventory": 12000,
+        "FinalInventory": 11880,
+        "ProcessedEvents": 120
+      },
+      {
+        "SourceFile": "experiments/phase9/phase7/recovery-limited-backlog-phase7.7b4f2dad-aeaf-473f-be24-197ed424362c.json",
+        "SHA256": "18b11c95bb2ca40a586431710644fa6c4a78846681c200109050d8639021fd2a",
+        "RunID": "phase7.7b4f2dad-aeaf-473f-be24-197ed424362c",
+        "Strategy": "recovery-limited-backlog",
+        "Repetition": 1,
+        "InputCount": 120,
+        "PublishRate": 0,
+        "RecoveryRate": 20,
+        "PublicationDurationMS": 1411,
+        "CLICompletionMS": 1906,
+        "PublicationAverageRPS": 84.32104095529645,
+        "PublicationPeakRPS": 87,
+        "ProcessingDurationMS": 6032,
+        "BusinessRecoveryCompletionMS": 8014,
+        "ProcessingAverageRPS": 19.72798261815528,
+        "ProcessingPeakRPS": 20,
+        "PeakLag": 120,
+        "RecoveryEndOffset": 120,
+        "RecoveryCommittedOffset": 120,
+        "Success": 120,
+        "DLQ": 0,
+        "Unfinished": 0,
+        "InitialInventory": 12000,
+        "FinalInventory": 11880,
+        "ProcessedEvents": 120
+      },
+      {
+        "SourceFile": "experiments/phase9/phase7/recovery-limited-backlog-phase7.e737e2d7-fe09-4c70-be14-69cceff5979f.json",
+        "SHA256": "449c79ef09f2e4457c11ba3a21300de83c69724a609ba90191c1c83f86d42186",
+        "RunID": "phase7.e737e2d7-fe09-4c70-be14-69cceff5979f",
+        "Strategy": "recovery-limited-backlog",
+        "Repetition": 2,
+        "InputCount": 120,
+        "PublishRate": 0,
+        "RecoveryRate": 20,
+        "PublicationDurationMS": 1408,
+        "CLICompletionMS": 2045,
+        "PublicationAverageRPS": 84.46751677425509,
+        "PublicationPeakRPS": 87,
+        "ProcessingDurationMS": 6023,
+        "BusinessRecoveryCompletionMS": 8132,
+        "ProcessingAverageRPS": 19.754987686168345,
+        "ProcessingPeakRPS": 20,
+        "PeakLag": 120,
+        "RecoveryEndOffset": 120,
+        "RecoveryCommittedOffset": 120,
+        "Success": 120,
+        "DLQ": 0,
+        "Unfinished": 0,
+        "InitialInventory": 12000,
+        "FinalInventory": 11880,
+        "ProcessedEvents": 120
+      },
+      {
+        "SourceFile": "experiments/phase9/phase7/recovery-limited-backlog-phase7.cb9ce8b4-fb84-42e1-bc26-c1dc77358365.json",
+        "SHA256": "a3edc4bea5b327ffe03483b912bd1bdd82ab789dc588d06132fa1a99ce294a67",
+        "RunID": "phase7.cb9ce8b4-fb84-42e1-bc26-c1dc77358365",
+        "Strategy": "recovery-limited-backlog",
+        "Repetition": 3,
+        "InputCount": 120,
+        "PublishRate": 0,
+        "RecoveryRate": 20,
+        "PublicationDurationMS": 1440,
+        "CLICompletionMS": 1822,
+        "PublicationAverageRPS": 82.59400707601598,
+        "PublicationPeakRPS": 85,
+        "ProcessingDurationMS": 6019,
+        "BusinessRecoveryCompletionMS": 7924,
+        "ProcessingAverageRPS": 19.77031282516142,
+        "ProcessingPeakRPS": 20,
+        "PeakLag": 120,
+        "RecoveryEndOffset": 120,
+        "RecoveryCommittedOffset": 120,
+        "Success": 120,
+        "DLQ": 0,
+        "Unfinished": 0,
+        "InitialInventory": 12000,
+        "FinalInventory": 11880,
+        "ProcessedEvents": 120
+      },
+      {
+        "SourceFile": "experiments/phase9/phase7/unlimited-phase7.3ac0eeea-8808-4e0c-95b4-09220aea0b17.json",
+        "SHA256": "59a7d222faf098ae1417cebc6532863d944fb9dd74776b85286d6e91cce41d48",
+        "RunID": "phase7.3ac0eeea-8808-4e0c-95b4-09220aea0b17",
+        "Strategy": "unlimited",
+        "Repetition": 1,
+        "InputCount": 120,
+        "PublishRate": 0,
+        "RecoveryRate": 0,
+        "PublicationDurationMS": 1380,
+        "CLICompletionMS": 2177,
+        "PublicationAverageRPS": 86.20854528078486,
+        "PublicationPeakRPS": 90,
+        "ProcessingDurationMS": 1380,
+        "BusinessRecoveryCompletionMS": 2177,
+        "ProcessingAverageRPS": 86.17923978323387,
+        "ProcessingPeakRPS": 90,
+        "PeakLag": 2,
+        "RecoveryEndOffset": 120,
+        "RecoveryCommittedOffset": 120,
+        "Success": 120,
+        "DLQ": 0,
+        "Unfinished": 0,
+        "InitialInventory": 12000,
+        "FinalInventory": 11880,
+        "ProcessedEvents": 120
+      },
+      {
+        "SourceFile": "experiments/phase9/phase7/unlimited-phase7.a714ccc3-e8ce-4347-a838-c35d76c347c6.json",
+        "SHA256": "9213c26b53cd2fa6a7687eaabcb6ab39c3c3960a8101f287f8e0ea9e28b2419e",
+        "RunID": "phase7.a714ccc3-e8ce-4347-a838-c35d76c347c6",
+        "Strategy": "unlimited",
+        "Repetition": 2,
+        "InputCount": 120,
+        "PublishRate": 0,
+        "RecoveryRate": 0,
+        "PublicationDurationMS": 1458,
+        "CLICompletionMS": 2020,
+        "PublicationAverageRPS": 81.57092159786879,
+        "PublicationPeakRPS": 85,
+        "ProcessingDurationMS": 1459,
+        "BusinessRecoveryCompletionMS": 2020,
+        "ProcessingAverageRPS": 81.51502315026657,
+        "ProcessingPeakRPS": 85,
+        "PeakLag": 4,
+        "RecoveryEndOffset": 120,
+        "RecoveryCommittedOffset": 120,
+        "Success": 120,
+        "DLQ": 0,
+        "Unfinished": 0,
+        "InitialInventory": 12000,
+        "FinalInventory": 11880,
+        "ProcessedEvents": 120
+      },
+      {
+        "SourceFile": "experiments/phase9/phase7/unlimited-phase7.3d45306e-89f3-4ad6-9158-dac4f1d61766.json",
+        "SHA256": "22ae6e4d6f8fc16115e1573280b97516c9d2e1af973d8a43ca89bec564e3ce37",
+        "RunID": "phase7.3d45306e-89f3-4ad6-9158-dac4f1d61766",
+        "Strategy": "unlimited",
+        "Repetition": 3,
+        "InputCount": 120,
+        "PublishRate": 0,
+        "RecoveryRate": 0,
+        "PublicationDurationMS": 1402,
+        "CLICompletionMS": 1952,
+        "PublicationAverageRPS": 84.84830940456523,
+        "PublicationPeakRPS": 88,
+        "ProcessingDurationMS": 1402,
+        "BusinessRecoveryCompletionMS": 1952,
+        "ProcessingAverageRPS": 84.87872043403127,
+        "ProcessingPeakRPS": 88,
+        "PeakLag": 1,
+        "RecoveryEndOffset": 120,
+        "RecoveryCommittedOffset": 120,
+        "Success": 120,
+        "DLQ": 0,
+        "Unfinished": 0,
+        "InitialInventory": 12000,
+        "FinalInventory": 11880,
+        "ProcessedEvents": 120
+      }
+    ]
+  },
+  "priorResults": {
+    "phase4": [
+      {
+        "common8sPeakRetryRPS": 60,
+        "common8sRetryAttempts": 180,
+        "dlq": 0,
+        "holAttempts": 0,
+        "overallPeakRetryRPS": 60,
+        "recoverySecondsAfterHealthy": 5.6514057,
+        "retryOverdueP95Ms": 26.8807,
+        "runId": "phase4.6a85262f-e140-46cd-b2ec-dc711a252f4a",
+        "scenario": "A",
+        "strategy": "exponential",
+        "success": 60,
+        "unfinished": 0
+      },
+      {
+        "common8sPeakRetryRPS": 15,
+        "common8sRetryAttempts": 37,
+        "dlq": 0,
+        "holAttempts": 89,
+        "overallPeakRetryRPS": 35,
+        "recoverySecondsAfterHealthy": 5.6541704,
+        "retryOverdueP95Ms": 6815.4334,
+        "runId": "phase4.e51c9c5a-4ad3-4d06-82b2-c66c5bce8fc4",
+        "scenario": "B",
+        "strategy": "exponential",
+        "success": 60,
+        "unfinished": 0
+      },
+      {
+        "common8sPeakRetryRPS": 60,
+        "common8sRetryAttempts": 300,
+        "dlq": 60,
+        "holAttempts": 0,
+        "overallPeakRetryRPS": 60,
+        "recoverySecondsAfterHealthy": null,
+        "retryOverdueP95Ms": 80.3519,
+        "runId": "phase4.f04af141-6e49-4c5b-a73d-04ae62d45e8f",
+        "scenario": "A",
+        "strategy": "fixed",
+        "success": 0,
+        "unfinished": 0
+      },
+      {
+        "common8sPeakRetryRPS": 25,
+        "common8sRetryAttempts": 125,
+        "dlq": 32,
+        "holAttempts": 0,
+        "overallPeakRetryRPS": 25,
+        "recoverySecondsAfterHealthy": null,
+        "retryOverdueP95Ms": 2088.6469,
+        "runId": "phase4.825a4ff1-76d3-4bd8-8986-180d1a943547",
+        "scenario": "B",
+        "strategy": "fixed",
+        "success": 28,
+        "unfinished": 0
+      },
+      {
+        "common8sPeakRetryRPS": 44,
+        "common8sRetryAttempts": 164,
+        "dlq": 0,
+        "holAttempts": 196,
+        "overallPeakRetryRPS": 44,
+        "recoverySecondsAfterHealthy": 4.6339438,
+        "retryOverdueP95Ms": 5698.634925,
+        "runId": "phase4.d1f57651-0d9a-4d31-83d9-6b5172f8722d",
+        "scenario": "A",
+        "strategy": "jitter",
+        "success": 60,
+        "unfinished": 0
+      },
+      {
+        "common8sPeakRetryRPS": 15,
+        "common8sRetryAttempts": 38,
+        "dlq": 0,
+        "holAttempts": 85,
+        "overallPeakRetryRPS": 39,
+        "recoverySecondsAfterHealthy": 4.0926898,
+        "retryOverdueP95Ms": 5684.364219,
+        "runId": "phase4.30f85343-e9c8-4efc-b986-167f5a8393a8",
+        "scenario": "B",
+        "strategy": "jitter",
+        "success": 60,
+        "unfinished": 0
+      }
+    ],
+    "phase4Source": "docs/phase-4-evidence.json",
+    "phase7": [
+      {
+        "businessRecoveryCompletionMs": 2498,
+        "dlq": 0,
+        "peakLag": 5,
+        "processingPeakRPS": 81,
+        "processingRPS": 73.63230317203632,
+        "publicationPeakRPS": 81,
+        "publicationRPS": 72.48353314221232,
+        "runId": "phase7.3e0b5aac-2400-43a4-a324-e39eedbb6fe2",
+        "strategy": "unlimited",
+        "success": 120,
+        "unfinished": 0
+      },
+      {
+        "businessRecoveryCompletionMs": 6842,
+        "dlq": 0,
+        "peakLag": 3,
+        "processingPeakRPS": 23,
+        "processingRPS": 19.62485457817843,
+        "publicationPeakRPS": 20,
+        "publicationRPS": 19.62049316653672,
+        "runId": "phase7.fe995b40-d87e-4f43-913d-07d5dd7b8504",
+        "strategy": "publication-limited",
+        "success": 120,
+        "unfinished": 0
+      },
+      {
+        "businessRecoveryCompletionMs": 8355,
+        "dlq": 0,
+        "peakLag": 120,
+        "processingPeakRPS": 20,
+        "processingRPS": 19.591893612000526,
+        "publicationPeakRPS": 81,
+        "publicationRPS": 72.80344660081319,
+        "runId": "phase7.2c92a440-b371-43d2-8a03-ff7a4327dfac",
+        "strategy": "recovery-limited-backlog",
+        "success": 120,
+        "unfinished": 0
+      }
+    ],
+    "phase7Source": "docs/phase-7-evidence.json"
+  },
+  "regression": {
+    "phase0To8IntegrationRerun": false,
+    "phase8ObservabilityRerun": false
+  },
+  "status": "PASS"
+}

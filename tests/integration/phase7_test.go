@@ -42,6 +42,7 @@ type phase7Fixture struct {
 	retry             inspector
 	workers           []*child
 	raw               map[string]any
+	rawDirectory      string
 	products          []int64
 	events            []event.OrderCreated
 }
@@ -85,6 +86,10 @@ func TestPhase7(t *testing.T) {
 }
 
 func newPhase7(t *testing.T, root, worker, cli, strategy string) *phase7Fixture {
+	return newPhase7WithOptions(t, root, worker, cli, strategy, 0, "")
+}
+
+func newPhase7WithOptions(t *testing.T, root, worker, cli, strategy string, repetition int, rawDirectory string) *phase7Fixture {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Minute)
 	db, err := mysql.Open(ctx)
@@ -136,7 +141,7 @@ func newPhase7(t *testing.T, root, worker, cli, strategy string) *phase7Fixture 
 			return true
 		})
 	}
-	f := &phase7Fixture{t: t, root: root, worker: worker, cli: cli, ctx: ctx, cancel: cancel, db: db, brokers: brokers, client: client, runID: runID, topics: topics, raw: map[string]any{"runId": runID, "strategy": strategy, "status": "FAIL", "startedAt": time.Now().UTC(), "offsetReset": false}}
+	f := &phase7Fixture{t: t, root: root, worker: worker, cli: cli, ctx: ctx, cancel: cancel, db: db, brokers: brokers, client: client, runID: runID, topics: topics, rawDirectory: rawDirectory, raw: map[string]any{"runId": runID, "strategy": strategy, "repetition": repetition, "status": "FAIL", "startedAt": time.Now().UTC(), "offsetReset": false}}
 	f.recovery = f.newInspector("recovery", topics["recovery"])
 	f.dlq = f.newInspector("dlq-observer", topics["dlq"])
 	f.retry = f.newInspector("retry-observer", topics["retry"])
@@ -151,7 +156,7 @@ func (f *phase7Fixture) close() {
 	}
 	f.raw["finishedAt"] = time.Now().UTC()
 	f.raw["topics"] = f.topics
-	savePhase7Raw(f.t, f.root, f.raw)
+	savePhase7Raw(f.t, f.root, f.raw, f.rawDirectory)
 	f.client.Transport.(*kafka.Transport).CloseIdleConnections()
 	f.db.Close()
 	f.cancel()
@@ -517,9 +522,12 @@ func perSecond(values []time.Time) map[string]int {
 	return result
 }
 
-func savePhase7Raw(t *testing.T, root string, raw map[string]any) {
+func savePhase7Raw(t *testing.T, root string, raw map[string]any, rawDirectory ...string) {
 	t.Helper()
 	dir := filepath.Join(root, "experiments/phase7")
+	if len(rawDirectory) > 0 && rawDirectory[0] != "" {
+		dir = rawDirectory[0]
+	}
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		t.Error(err)
 		return

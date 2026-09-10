@@ -1,0 +1,40 @@
+{
+  "capturedAt": "2026-09-10T09:21:54.5429201Z",
+  "cpuLogicalCount": 12,
+  "dockerVersion": "29.2.0",
+  "goArch": "amd64",
+  "goOS": "windows",
+  "goVersion": "go1.26.5",
+  "kafkaVersion": "4.2.0",
+  "mysqlVersion": "8.4.8",
+  "phase4": {
+    "base": "1s",
+    "cap": "8s",
+    "events": 60,
+    "maxRetries": 5,
+    "observation": "35s",
+    "products": 6,
+    "restoreAfter": "8s",
+    "seedSets": [
+      [
+        4101,
+        4102
+      ],
+      [
+        7301,
+        7302
+      ],
+      [
+        9201,
+        9202
+      ]
+    ]
+  },
+  "phase7": {
+    "peakDefinition": "maximum records in any sliding interval shorter than one second",
+    "products": 12,
+    "publicationRate": 20,
+    "records": 120,
+    "recoveryRate": 20
+  }
+}

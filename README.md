@@ -2,7 +2,7 @@
 
 Kafka 메시지는 재전달될 수 있다는 전제에서, 재고 반영의 중복을 막고 재시도·복구 부하를 통제하는 과정을 단계별 실험으로 증명하는 Go 프로젝트다.
 
-기존 티켓 예매 프로젝트에서 단순 DLQ 처리 후 남았던 질문에서 출발했다. Phase 5에서 DB commit 후 offset commit 전 재전달의 중복 차감을 **100 → 98 → 96**에서 **100 → 98 → 98**로 바꿨고, Phase 6~7에서 DLQ 복구와 Bulk Replay 부하를 통제했다. 현재 Phase 8에서는 Worker 집계 상태를 저 cardinality Prometheus metric으로 노출하고 Grafana dashboard와 실제 Kafka/MySQL 상태를 대조한다.
+기존 티켓 예매 프로젝트에서 단순 DLQ 처리 후 남았던 질문에서 출발했다. Phase 5에서 DB commit 후 offset commit 전 재전달의 중복 차감을 **100 → 98 → 96**에서 **100 → 98 → 98**로 바꿨고, Phase 6~7에서 DLQ 복구와 Bulk Replay 부하를 통제했다. Phase 8에서는 Worker 상태를 저 cardinality metric으로 관측했고, Phase 9에서는 Retry와 Recovery 핵심 비교를 각각 3회 반복해 유지되는 경향과 환경 편차를 분리했다.
 
 ## Architecture
 
@@ -120,6 +120,16 @@ flowchart LR
 
 [Phase 8 상세 문서](docs/phase-8-observability.md) · [검증 보고서](docs/phase-8-verification.md) · [Evidence](docs/phase-8-evidence.json) · [원시 실행](experiments/phase8/)
 
+### Phase 9 — Repeated Experiment Validation
+
+문제: Phase 4와 Phase 7의 전략별 단일 로컬 실행은 container startup, scheduler와 random seed 편차를 전략 효과로 오인할 수 있었다.
+
+선택·검증: Phase 4의 6개 cell과 Phase 7의 3개 cell을 독립된 새 환경 식별자로 각각 3회 실행했다. Phase 4는 세 deterministic seed pair와 실제 outage를 기록하고 공통 초기 8초와 DB healthy 이후 recovery를 분리했으며, Phase 7은 기존 sliding-window peak와 DB/Kafka reconciliation을 유지했다.
+
+핵심 결과: Fixed의 Retry 소진/DLQ와 Jitter의 HOL·수초 overdue는 반복됐다. 그러나 지속 유입 Fixed overdue는 기존 단일 run 2.089초와 달리 반복 run 14.8~15.5ms였고, Unlimited 처리량도 기존 약 72~74/s에서 반복 median 약 85/s로 달라졌다. Backlog Recovery limiter는 세 번 모두 processing peak 20/s와 peak lag 120을 보였다. n=3 로컬 관측이므로 통계적 우위나 운영 SLA로 일반화하지 않는다.
+
+[Phase 9 상세 문서](docs/phase-9-repeated-experiments.md) · [검증 보고서](docs/phase-9-verification.md) · [Evidence](docs/phase-9-evidence.json) · [원시 실행](experiments/phase9/)
+
 ## Run locally
 
 프로젝트 루트 PowerShell에서 실행한다.
@@ -200,6 +210,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase7.ps1 -C
 
 # Phase 8 Worker metrics, Prometheus and Grafana
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase8.ps1 -Check All
+
+# Phase 9 preserved repeated-experiment evidence audit and build verification
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase9.ps1 -Check All
 ```
 
 장애 검증은 공유 로컬 MySQL 컨테이너를 실제 중지하므로 다른 애플리케이션과 병행하지 않는다. 각 시나리오는 새 product, topic, group을 사용하며 기존 offset이나 inventory를 초기화하지 않는다. Phase 2 스크립트는 `-phase2-baseline`으로 과거 실패 동작을 명시적으로 재현하며 일반 Worker에는 이 옵션을 사용하지 않는다.
@@ -215,12 +228,12 @@ Phase 5 진입점은 과거 문서를 덮어쓰지 않고 회귀 결과를 Phase
 - Retry/DLQ 발행 성공과 source commit 사이 crash는 목적지 중복 발행을 만들 수 있다.
 - Retry 대기는 Worker의 다음 record 처리를 지연시키는 head-of-line blocking이 있다.
 - 단일 broker/RF=1 로컬 환경이며 broker HA를 검증하지 않았다.
-- Backoff/Jitter 비교는 단일 Worker/partition 구성과 각 비교 셀 1회 실행에 한정된다. 실제 DB 재기동 시간 편차와 HOL이 결과에 영향을 준다.
+- Backoff/Jitter 비교는 단일 Worker/partition 구성이다. Phase 9에서 각 비교 cell을 3회 반복했지만 실제 DB 기동, scheduler와 seed 편차가 남는다.
 - Phase 7 limiter는 단일 Recovery Worker의 최초 Store 진입만 제어하며 이후 Retry lineage 전체에 전역 quota를 적용하지 않는다.
 - Bulk Replay는 한 partition 범위만 지원하고 persistent checkpoint/resume가 없어 중간 재실행 시 Recovery duplicate와 처리 비용이 남는다.
 - 정확한 committed consumer-group lag metric은 구현하지 않았다. last-observed high-water mark를 committed lag로 표현하지 않는다.
 - Replay CLI는 short-lived process라 Prometheus scrape 대상이 아니며 publication 수치는 Phase 7 log/evidence에 남는다.
 - Worker metrics endpoint는 로컬 Docker scrape를 위해 host interface에 bind하므로 운영 환경에는 별도 network/auth 정책이 필요하다.
-- 다중 Worker rebalance, 운영 규모 처리량, 반복 실험의 통계적 유의성은 아직 검증하지 않았다.
+- 다중 Worker rebalance, 운영 규모 처리량과 반복 실험의 통계적 유의성은 검증하지 않았다. Phase 9 median/min/max는 Windows 로컬 Docker의 n=3 관측 범위다.
 
 앞으로 각 Phase는 코드·검증 완료, 원시 verification/evidence 보존, `docs/phase-N-*.md`의 동일한 11개 섹션 작성, Development Journey 갱신, 수치·링크 대조를 모두 마친 뒤 완료 commit을 만든다.
