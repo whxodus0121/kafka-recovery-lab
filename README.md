@@ -250,7 +250,6 @@ go run ./cmd/replay -dlq-topic inventory.dlq.v1 -partition 0 -offset 0 -recovery
 - destination Kafka publish와 source offset commit은 원자적이지 않아 destination duplicate와 처리 비용이 남을 수 있다.
 - 단일 FIFO Retry Worker가 미래 예약 record를 기다려 뒤의 due record를 막는 HOL이 있다.
 - Bulk Replay는 persistent checkpoint/resume와 multi-partition scheduling을 지원하지 않는다.
-- Replay CLI와 Recovery Worker의 기본 recovery topic 이름이 달라 함께 실행할 때 CLI에 `-recovery-topic inventory.recovery.v1`을 명시해야 한다.
 - Recovery limiter는 Recovery Topic에서 최초 Store 진입만 제한하며 이후 Retry lineage 전체 quota를 통제하지 않는다.
 - exact committed consumer-group lag metric은 구현하지 않았다.
 - 실험은 단일 broker, 단일 partition/Worker 중심의 Windows 로컬 Docker 환경에서 수행했다.

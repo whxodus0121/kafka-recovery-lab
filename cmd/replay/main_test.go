@@ -4,7 +4,7 @@ import "testing"
 
 func TestParseOptionsKeepsSingleAndBulkModesDistinct(t *testing.T) {
 	single, err := parseOptions([]string{"-partition", "0", "-offset", "10"})
-	if err != nil || single.startOffset != 10 || single.limit != 1 {
+	if err != nil || single.startOffset != 10 || single.limit != 1 || single.recoveryTopic != "inventory.recovery.v1" {
 		t.Fatal("single mode", single, err)
 	}
 	bulk, err := parseOptions([]string{"-partition", "0", "-start-offset", "100", "-limit", "120", "-publish-rate", "20"})

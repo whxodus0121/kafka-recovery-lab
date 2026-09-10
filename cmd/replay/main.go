@@ -39,7 +39,7 @@ func parseOptions(args []string) (options, error) {
 	var o options
 	set := flag.NewFlagSet("replay", flag.ContinueOnError)
 	set.StringVar(&o.dlqTopic, "dlq-topic", "inventory.dlq.v1", "DLQ topic containing the selected record")
-	set.StringVar(&o.recoveryTopic, "recovery-topic", "orders.recovery.v1", "destination recovery topic")
+	set.StringVar(&o.recoveryTopic, "recovery-topic", "inventory.recovery.v1", "destination recovery topic")
 	set.IntVar(&o.partition, "partition", -1, "DLQ partition")
 	set.Int64Var(&o.offset, "offset", -1, "single DLQ record offset")
 	set.Int64Var(&o.startOffset, "start-offset", -1, "first DLQ offset for bulk replay")

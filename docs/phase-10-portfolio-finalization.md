@@ -53,7 +53,7 @@ Phase 0~9 verification/evidence 수치와 `experiments/` raw JSON은 재계산, 
 
 ## 9. 결과와 한계
 
-문서 구조와 재현 명령은 현재 단일 broker, 단일 partition/Worker 중심 구현을 그대로 설명한다. persistent Replay checkpoint, destination publish와 source commit의 원자성, Retry FIFO HOL, 전체 Retry lineage quota와 exact committed lag는 해결된 것처럼 표현하지 않는다. Replay CLI와 Recovery Worker의 기본 recovery topic 불일치는 코드 동결 범위에서 변경하지 않고 실행 옵션과 README 한계로 공개했다.
+문서 구조와 재현 명령은 현재 단일 broker, 단일 partition/Worker 중심 구현을 그대로 설명한다. persistent Replay checkpoint, destination publish와 source commit의 원자성, Retry FIFO HOL, 전체 Retry lineage quota와 exact committed lag는 해결된 것처럼 표현하지 않는다. Phase 10 이후 확인된 Replay CLI와 Recovery Worker의 기본 recovery topic 불일치는 `inventory.recovery.v1`로 통일했다.
 
 Markdown의 Mermaid 검사는 dependency를 추가하지 않는 구조 검사다. GitHub renderer 자체의 pixel-level 출력이나 외부 링크의 장기 가용성을 보장하지 않는다.
 
