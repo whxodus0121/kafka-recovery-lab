@@ -1,0 +1,70 @@
+{
+  "finishedAt": "2026-09-10T04:07:47.0868675Z",
+  "groups": {
+    "main": "phase8.b499a637-cb3e-4ac3-b2c0-b8366af66592.main.group",
+    "main-fail": "phase8.b499a637-cb3e-4ac3-b2c0-b8366af66592.main-fail.group",
+    "recovery": "phase8.b499a637-cb3e-4ac3-b2c0-b8366af66592.recovery.group",
+    "retry": "phase8.b499a637-cb3e-4ac3-b2c0-b8366af66592.retry.group"
+  },
+  "metricScenarios": [
+    {
+      "after": 1,
+      "before": 0,
+      "query": "inventory_consumer_records_total{worker=\"main\",outcome=\"success\"}",
+      "queryTimestamp": "2026-09-10T04:07:08.4575259Z",
+      "scenario": "normal"
+    },
+    {
+      "after": 1,
+      "before": 0,
+      "query": "inventory_processing_duration_seconds_count{worker=\"main\",outcome=\"success\"}",
+      "queryTimestamp": "2026-09-10T04:07:08.4608608Z",
+      "scenario": "normal-processing-duration"
+    },
+    {
+      "after": 1,
+      "before": 0,
+      "query": "inventory_duplicate_total{worker=\"main\"}",
+      "queryTimestamp": "2026-09-10T04:07:10.4932786Z",
+      "scenario": "duplicate"
+    },
+    {
+      "after": 1,
+      "before": 0,
+      "query": "inventory_dlq_published_total{worker=\"main\",error_code=\"MALFORMED_JSON\"}",
+      "queryTimestamp": "2026-09-10T04:07:12.5262832Z",
+      "scenario": "dlq"
+    },
+    {
+      "after": 1,
+      "before": 0,
+      "query": "inventory_retry_published_total{worker=\"main\",error_code=\"DB_CONNECTION\"}",
+      "queryTimestamp": "2026-09-10T04:07:14.4716754Z",
+      "scenario": "retry"
+    },
+    {
+      "after": 1,
+      "before": 0,
+      "query": "inventory_consumer_records_total{worker=\"retry\",outcome=\"success\"}",
+      "queryTimestamp": "2026-09-10T04:07:15.7972992Z",
+      "scenario": "retry-worker"
+    },
+    {
+      "after": 1,
+      "before": 0,
+      "query": "inventory_retry_overdue_seconds_count{strategy=\"fixed\"}",
+      "queryTimestamp": "2026-09-10T04:07:15.7972992Z",
+      "scenario": "retry-overdue"
+    }
+  ],
+  "runId": "phase8.b499a637-cb3e-4ac3-b2c0-b8366af66592",
+  "startedAt": "2026-09-10T04:07:05.5584958Z",
+  "status": "FAIL",
+  "topics": {
+    "dlq": "phase8.b499a637-cb3e-4ac3-b2c0-b8366af66592.dlq",
+    "main": "phase8.b499a637-cb3e-4ac3-b2c0-b8366af66592.main",
+    "main-fail": "phase8.b499a637-cb3e-4ac3-b2c0-b8366af66592.main-fail",
+    "recovery": "phase8.b499a637-cb3e-4ac3-b2c0-b8366af66592.recovery",
+    "retry": "phase8.b499a637-cb3e-4ac3-b2c0-b8366af66592.retry"
+  }
+}

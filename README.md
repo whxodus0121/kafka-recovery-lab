@@ -2,7 +2,7 @@
 
 Kafka 메시지는 재전달될 수 있다는 전제에서, 재고 반영의 중복을 막고 재시도·복구 부하를 통제하는 과정을 단계별 실험으로 증명하는 Go 프로젝트다.
 
-기존 티켓 예매 프로젝트에서 단순 DLQ 처리 후 남았던 질문에서 출발했다. Phase 5에서 DB commit 후 offset commit 전 재전달의 중복 차감을 **100 → 98 → 96**에서 **100 → 98 → 98**로 바꿨고, Phase 6에서 단건 DLQ Replay를 실제 DB 복구까지 연결했다. 현재 Phase 7에서는 한 partition의 Bulk Replay와 publication/recovery 처리 rate를 독립적으로 제한하고 실제 timestamp·lag·SQL 결과로 비교한다.
+기존 티켓 예매 프로젝트에서 단순 DLQ 처리 후 남았던 질문에서 출발했다. Phase 5에서 DB commit 후 offset commit 전 재전달의 중복 차감을 **100 → 98 → 96**에서 **100 → 98 → 98**로 바꿨고, Phase 6~7에서 DLQ 복구와 Bulk Replay 부하를 통제했다. 현재 Phase 8에서는 Worker 집계 상태를 저 cardinality Prometheus metric으로 노출하고 Grafana dashboard와 실제 Kafka/MySQL 상태를 대조한다.
 
 ## Architecture
 
@@ -13,6 +13,8 @@ flowchart LR
     Kafka -->|FetchMessage<br/>inventory-main-v1| Worker[Go Inventory Worker]
     Worker -->|동일 InnoDB transaction<br/>processed_events + inventory| MySQL[(MySQL 8.4.8)]
     Worker -->|DB 성공 후<br/>CommitMessages| Kafka
+    Worker -->|bounded /metrics| Prometheus
+    Prometheus --> Grafana
 ```
 
 | 구성 | 선택 |
@@ -108,6 +110,16 @@ flowchart LR
 
 [Phase 7 상세 문서](docs/phase-7-replay-rate-limit.md) · [검증 보고서](docs/phase-7-verification.md) · [Evidence](docs/phase-7-evidence.json) · [원시 실행](experiments/phase7/)
 
+### Phase 8 — Prometheus / Grafana Observability
+
+문제: Retry, DLQ, Duplicate와 Recovery 상태를 확인하려면 structured log와 evidence를 직접 읽어야 했고, event 식별자를 metric label로 옮기면 cardinality가 메시지 수에 비례해 증가한다.
+
+선택·검증: Main/Retry/Recovery Worker에 독립 `/metrics` endpoint를 두고 worker, outcome, strategy와 bounded error_code만 label로 사용했다. Prometheus는 Windows host process를 scrape하고 Grafana datasource와 9개 panel은 Compose 시작 시 자동 provision한다.
+
+핵심 결과: Normal, processing latency, Duplicate, DLQ, Retry, overdue와 단건 Recovery metric이 실제 시나리오에서 각각 0→1로 증가했다. Recovery 10건/5s에서는 실제 limiter wait가 0→9였고, 세 target UP과 Kafka offset·MySQL 상태를 교차 확인했다. Grafana의 10개 PromQL target도 모두 성공했다.
+
+[Phase 8 상세 문서](docs/phase-8-observability.md) · [검증 보고서](docs/phase-8-verification.md) · [Evidence](docs/phase-8-evidence.json) · [원시 실행](experiments/phase8/)
+
 ## Run locally
 
 프로젝트 루트 PowerShell에서 실행한다.
@@ -123,21 +135,21 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/init-inventory.ps1 -
 
 `-Seed`는 product 1을 100으로 되돌린다. 기존 검증 데이터가 있는 환경에서는 생략하고, 활성 Worker나 미처리 record가 없는 초기 로컬 환경에서만 사용한다.
 
-별도 터미널에서 Main Worker, Retry Worker와 API를 실행한다.
+별도 터미널에서 Main Worker, Retry Worker, Recovery Worker와 API를 실행한다. Phase 8 대시보드에서 각 역할을 관측하려면 아래 metrics address를 유지한다.
 
 ```powershell
 . ./scripts/env.ps1
-go run ./cmd/worker
+go run ./cmd/worker -metrics-address :22112
 ```
 
 ```powershell
 . ./scripts/env.ps1
-go run ./cmd/worker -retry-worker
+go run ./cmd/worker -retry-worker -metrics-address :22113
 ```
 
 ```powershell
 . ./scripts/env.ps1
-go run ./cmd/worker -recovery-worker
+go run ./cmd/worker -recovery-worker -metrics-address :22114
 ```
 
 기본 group은 main `inventory-main-v1`, retry `inventory-retry-v1`이다. 환경 변수 `KAFKA_CONSUMER_GROUP`을 사용하면 각 프로세스에 서로 다른 group을 지정한다. 기본 추가 Retry는 3회, Fixed Delay는 2초다.
@@ -185,6 +197,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase6.ps1 -C
 
 # Phase 7 bulk replay and independent publication/recovery rate limits
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase7.ps1 -Check All
+
+# Phase 8 Worker metrics, Prometheus and Grafana
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase8.ps1 -Check All
 ```
 
 장애 검증은 공유 로컬 MySQL 컨테이너를 실제 중지하므로 다른 애플리케이션과 병행하지 않는다. 각 시나리오는 새 product, topic, group을 사용하며 기존 offset이나 inventory를 초기화하지 않는다. Phase 2 스크립트는 `-phase2-baseline`으로 과거 실패 동작을 명시적으로 재현하며 일반 Worker에는 이 옵션을 사용하지 않는다.
@@ -203,6 +218,9 @@ Phase 5 진입점은 과거 문서를 덮어쓰지 않고 회귀 결과를 Phase
 - Backoff/Jitter 비교는 단일 Worker/partition 구성과 각 비교 셀 1회 실행에 한정된다. 실제 DB 재기동 시간 편차와 HOL이 결과에 영향을 준다.
 - Phase 7 limiter는 단일 Recovery Worker의 최초 Store 진입만 제어하며 이후 Retry lineage 전체에 전역 quota를 적용하지 않는다.
 - Bulk Replay는 한 partition 범위만 지원하고 persistent checkpoint/resume가 없어 중간 재실행 시 Recovery duplicate와 처리 비용이 남는다.
+- 정확한 committed consumer-group lag metric은 구현하지 않았다. last-observed high-water mark를 committed lag로 표현하지 않는다.
+- Replay CLI는 short-lived process라 Prometheus scrape 대상이 아니며 publication 수치는 Phase 7 log/evidence에 남는다.
+- Worker metrics endpoint는 로컬 Docker scrape를 위해 host interface에 bind하므로 운영 환경에는 별도 network/auth 정책이 필요하다.
 - 다중 Worker rebalance, 운영 규모 처리량, 반복 실험의 통계적 유의성은 아직 검증하지 않았다.
 
 앞으로 각 Phase는 코드·검증 완료, 원시 verification/evidence 보존, `docs/phase-N-*.md`의 동일한 11개 섹션 작성, Development Journey 갱신, 수치·링크 대조를 모두 마친 뒤 완료 commit을 만든다.

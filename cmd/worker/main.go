@@ -19,6 +19,7 @@ import (
 	"kafka-recovery-lab/internal/inventory"
 	"kafka-recovery-lab/internal/kafka"
 	"kafka-recovery-lab/internal/mysql"
+	"kafka-recovery-lab/internal/observability"
 	"kafka-recovery-lab/internal/ratelimit"
 )
 
@@ -41,6 +42,7 @@ func run(logger *slog.Logger) error {
 	dlqTopic := flag.String("dlq-topic", "inventory.dlq.v1", "dead letter destination")
 	recoveryTopic := flag.String("recovery-topic", "inventory.recovery.v1", "recovery worker source")
 	recoveryRate := flag.Float64("recovery-rate", 0, "maximum Recovery processing starts per second; 0 is unlimited")
+	metricsAddress := flag.String("metrics-address", "", "HTTP address for /metrics; empty disables the endpoint")
 	maxRetries := flag.Int("max-retries", 3, "additional attempts after the initial failure")
 	delay := flag.Duration("retry-delay", 2*time.Second, "fixed delay, or base delay for exponential/jitter")
 	strategy := flag.String("retry-strategy", "fixed", "fixed, exponential or jitter (full jitter)")
@@ -90,11 +92,28 @@ func run(logger *slog.Logger) error {
 	if *recoveryRate < 0 || (*recoveryRate > 0 && !*recoveryWorker) {
 		return fmt.Errorf("recovery-rate must be non-negative and is valid only for recovery-worker")
 	}
+	workerRole := "main"
+	if *retryWorker {
+		workerRole = "retry"
+	}
+	if *recoveryWorker {
+		workerRole = "recovery"
+	}
+	var metrics *observability.Metrics
+	if *metricsAddress != "" {
+		metrics, err = observability.New(workerRole)
+		if err != nil {
+			return err
+		}
+	}
 	var policy *inventory.FailurePolicy
 	if !*baseline {
 		writer := kafka.NewFailureWriter(brokers)
 		defer writer.Close()
 		policy = &inventory.FailurePolicy{RetrySource: *retryWorker, RecoverySource: *recoveryWorker, RetryTopic: *retryTopic, DLQTopic: *dlqTopic, MaxRetries: *maxRetries, Delay: *delay, Strategy: *strategy, Cap: *capDelay, Seed: *seed, Publish: func(ctx context.Context, m kafkago.Message) error { return writer.WriteMessages(ctx, m) }}
+		if metrics != nil {
+			policy.Observer = metrics
+		}
 		if *recoveryWorker {
 			var pacer *ratelimit.Pacer
 			if *recoveryRate > 0 {
@@ -106,8 +125,12 @@ func run(logger *slog.Logger) error {
 			}
 			policy.BeforeApply = func(ctx context.Context, m kafkago.Message, e event.OrderCreated) error {
 				if pacer != nil {
-					if err := pacer.Wait(ctx); err != nil {
+					waited, err := pacer.WaitDuration(ctx)
+					if err != nil {
 						return err
+					}
+					if metrics != nil {
+						metrics.ObserveRecoveryRateLimitWait(waited)
 					}
 				}
 				logger.Info("recovery_processing_started", "topic", m.Topic, "partition", m.Partition, "offset", m.Offset,
@@ -139,8 +162,15 @@ func run(logger *slog.Logger) error {
 	}
 	reader := kafka.NewConsumer(brokers, group, *topic)
 	defer reader.Close()
+	if metrics != nil {
+		server, err := observability.Start(ctx, *metricsAddress, metrics.Handler())
+		if err != nil {
+			return fmt.Errorf("start metrics endpoint: %w", err)
+		}
+		defer server.Close()
+	}
 	logger.Info("worker_started", "groupId", group, "topic", *topic, "retryWorker", *retryWorker, "recoveryWorker", *recoveryWorker, "phase2Baseline", *baseline,
-		"retryStrategy", *strategy, "retryBase", delay.String(), "retryCap", capDelay.String(), "retrySeed", *seed, "recoveryRate", *recoveryRate)
+		"retryStrategy", *strategy, "retryBase", delay.String(), "retryCap", capDelay.String(), "retrySeed", *seed, "recoveryRate", *recoveryRate, "metricsAddress", *metricsAddress)
 	err = inventory.Consume(ctx, reader, (inventory.Store{DB: db, Hooks: hooks, LegacyBaseline: *baseline}).Decrement, logger, hooks, policy)
 	if ctx.Err() != nil {
 		logger.Info("worker_stopped", "reason", "context canceled")

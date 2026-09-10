@@ -24,23 +24,32 @@ func New(rate float64) (*Pacer, error) {
 }
 
 func (p *Pacer) Wait(ctx context.Context) error {
+	_, err := p.WaitDuration(ctx)
+	return err
+}
+
+func (p *Pacer) WaitDuration(ctx context.Context) (time.Duration, error) {
 	if err := ctx.Err(); err != nil {
-		return err
+		return 0, err
 	}
 	if p.last.IsZero() {
 		p.last = time.Now()
-		return nil
+		return 0, nil
 	}
 	wait := time.Until(p.last.Add(p.interval))
+	started := time.Now()
 	if wait > 0 {
 		timer := time.NewTimer(wait)
 		defer timer.Stop()
 		select {
 		case <-ctx.Done():
-			return ctx.Err()
+			return 0, ctx.Err()
 		case <-timer.C:
 		}
 	}
 	p.last = time.Now()
-	return nil
+	if wait <= 0 {
+		return 0, nil
+	}
+	return time.Since(started), nil
 }

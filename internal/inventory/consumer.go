@@ -46,6 +46,25 @@ func Consume(ctx context.Context, reader Reader, apply func(context.Context, eve
 			"key", string(m.Key), "valueSHA256", fmt.Sprintf("%x", sha256.Sum256(m.Value)))
 		log := logger.With("topic", m.Topic, "partition", m.Partition, "offset", m.Offset)
 		md := retryMetadata{Topic: m.Topic, Partition: m.Partition, Offset: m.Offset}
+		storeAttempted := false
+		storeDuration := time.Duration(0)
+		outcome := ""
+		observeOutcome := func(value string) {
+			if outcome != "" {
+				return
+			}
+			outcome = value
+			if policy == nil || policy.Observer == nil {
+				return
+			}
+			policy.Observer.ObserveRecord(value)
+			if storeAttempted {
+				policy.Observer.ObserveProcessing(value, storeDuration)
+				if policy.RecoverySource {
+					policy.Observer.ObserveRecoveryProcessed(value)
+				}
+			}
+		}
 		validMetadata := true
 		code := ""
 		retryable := false
@@ -62,6 +81,13 @@ func Consume(ctx context.Context, reader Reader, apply func(context.Context, eve
 				log.Info("retry_wait", "retryCount", md.Count, "nextAttemptAt", md.Next)
 				if err = waitAttempt(ctx, md.Next); err != nil {
 					return err
+				}
+				if policy.Observer != nil {
+					overdue := time.Since(md.Next)
+					if overdue < 0 {
+						overdue = 0
+					}
+					policy.Observer.ObserveRetryOverdue(policy.Strategy, overdue)
 				}
 			}
 		}
@@ -100,15 +126,23 @@ func Consume(ctx context.Context, reader Reader, apply func(context.Context, eve
 			}
 			dbCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 			var result Result
+			processingStarted := time.Now()
 			result, err = apply(dbCtx, e)
+			storeDuration = time.Since(processingStarted)
+			storeAttempted = true
 			cancel()
 			if err != nil {
 				log.Error("inventory_failed", "error", err)
 				code, retryable = classifyDB(err)
 			} else if result.Duplicate {
 				log.Info("inventory_duplicate")
+				if policy != nil && policy.Observer != nil {
+					policy.Observer.ObserveDuplicate()
+				}
+				observeOutcome("duplicate")
 			} else {
 				log.Info("inventory_committed")
+				observeOutcome("success")
 				if hooks.AfterCommit != nil {
 					if err := hooks.AfterCommit(ctx, e); err != nil {
 						return err
@@ -121,11 +155,24 @@ func Consume(ctx context.Context, reader Reader, apply func(context.Context, eve
 				return ctx.Err()
 			}
 			if policy == nil || code == "" {
+				observeOutcome("error")
 				return fmt.Errorf("processing at %s/%d/%d: %w", m.Topic, m.Partition, m.Offset, err)
 			}
 			destination, publishErr := policy.route(ctx, m, md, code, retryable, validMetadata)
 			if publishErr != nil {
+				observeOutcome("error")
 				return publishErr
+			}
+			if destination == policy.RetryTopic {
+				if policy.Observer != nil {
+					policy.Observer.ObserveRetryPublished(code)
+				}
+				observeOutcome("retry")
+			} else {
+				if policy.Observer != nil {
+					policy.Observer.ObserveDLQPublished(code)
+				}
+				observeOutcome("dlq")
 			}
 			log.Info("failure_published", "destination", destination, "errorCode", code, "retryCount", md.Count)
 		}

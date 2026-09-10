@@ -21,13 +21,19 @@ func TestPacerSpacingAndCancellation(t *testing.T) {
 	}
 	ctx := context.Background()
 	start := time.Now()
+	var waited time.Duration
 	for range 3 {
-		if err := pacer.Wait(ctx); err != nil {
+		duration, err := pacer.WaitDuration(ctx)
+		if err != nil {
 			t.Fatal(err)
 		}
+		waited += duration
 	}
 	if elapsed := time.Since(start); elapsed < 95*time.Millisecond {
 		t.Fatalf("pacer ran too quickly: %v", elapsed)
+	}
+	if waited < 95*time.Millisecond {
+		t.Fatalf("reported wait too short: %v", waited)
 	}
 
 	slow, _ := New(0.1)

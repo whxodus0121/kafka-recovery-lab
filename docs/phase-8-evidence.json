@@ -1,0 +1,239 @@
+{
+  "excludedFailedRuns": [
+    "experiments/phase8/observability-phase8.3eb2ef33-1075-45b6-8952-7dad5ff34cc1.json",
+    "experiments/phase8/observability-phase8.b499a637-cb3e-4ac3-b2c0-b8366af66592.json",
+    "experiments/phase8/observability-phase8.047d82f3-50d3-4afc-9f9a-0ef93ef46397.json",
+    "experiments/phase8/observability-phase8.0b720059-66cd-44eb-8253-fb38f3a06240.json"
+  ],
+  "generatedAt": "2026-09-10T04:24:47.0703317Z",
+  "observability": {
+    "cardinalityAudit": {
+      "boundedErrorCodes": true,
+      "forbiddenIdentifiersAbsent": true,
+      "metricNames": [
+        "inventory_consumer_records_total",
+        "inventory_processing_duration_seconds",
+        "inventory_retry_published_total",
+        "inventory_dlq_published_total",
+        "inventory_duplicate_total",
+        "inventory_retry_overdue_seconds",
+        "inventory_recovery_processed_total",
+        "inventory_recovery_rate_limit_wait_seconds"
+      ],
+      "observedLabelNames": [
+        "error_code",
+        "le",
+        "outcome",
+        "strategy",
+        "worker"
+      ],
+      "status": "PASS"
+    },
+    "database": {
+      "limitedRecoverySuccess": 10,
+      "normalInventory": 98,
+      "retryInventory": 97,
+      "singleRecoveryInventory": 99
+    },
+    "finishedAt": "2026-09-10T04:10:37.3163131Z",
+    "grafana": {
+      "dashboard": {
+        "panelCount": 9,
+        "title": "Kafka Recovery Lab",
+        "uid": "kafka-recovery-lab"
+      },
+      "datasource": {
+        "name": "Prometheus",
+        "uid": "prometheus",
+        "url": "http://prometheus:9090"
+      },
+      "health": "ok",
+      "panelQueries": [
+        {
+          "expression": "sum by (worker) (rate(inventory_consumer_records_total[1m]))",
+          "panel": "Processing Throughput",
+          "status": "success"
+        },
+        {
+          "expression": "sum by (worker, outcome) (rate(inventory_consumer_records_total[1m]))",
+          "panel": "Outcomes",
+          "status": "success"
+        },
+        {
+          "expression": "histogram_quantile(0.50, sum by (le, worker) (rate(inventory_processing_duration_seconds_bucket[5m])))",
+          "panel": "Processing Latency p50 / p95",
+          "status": "success"
+        },
+        {
+          "expression": "histogram_quantile(0.95, sum by (le, worker) (rate(inventory_processing_duration_seconds_bucket[5m])))",
+          "panel": "Processing Latency p50 / p95",
+          "status": "success"
+        },
+        {
+          "expression": "sum by (worker, error_code) (rate(inventory_retry_published_total[1m]))",
+          "panel": "Retry Publication Rate",
+          "status": "success"
+        },
+        {
+          "expression": "sum by (worker, error_code) (rate(inventory_dlq_published_total[1m]))",
+          "panel": "DLQ Publication Rate",
+          "status": "success"
+        },
+        {
+          "expression": "sum by (worker) (rate(inventory_duplicate_total[1m]))",
+          "panel": "Duplicate Rate",
+          "status": "success"
+        },
+        {
+          "expression": "histogram_quantile(0.95, sum by (le, strategy) (rate(inventory_retry_overdue_seconds_bucket[5m])))",
+          "panel": "Retry Overdue p95",
+          "status": "success"
+        },
+        {
+          "expression": "sum by (outcome) (rate(inventory_recovery_processed_total[1m]))",
+          "panel": "Recovery Processing Rate",
+          "status": "success"
+        },
+        {
+          "expression": "histogram_quantile(0.95, sum by (le) (rate(inventory_recovery_rate_limit_wait_seconds_bucket[5m])))",
+          "panel": "Recovery Limiter Wait p95",
+          "status": "success"
+        }
+      ]
+    },
+    "groups": {
+      "main": "phase8.8af29644-20e5-4020-b98d-c8e477a0cbab.main.group",
+      "main-fail": "phase8.8af29644-20e5-4020-b98d-c8e477a0cbab.main-fail.group",
+      "recovery": "phase8.8af29644-20e5-4020-b98d-c8e477a0cbab.recovery.group",
+      "retry": "phase8.8af29644-20e5-4020-b98d-c8e477a0cbab.retry.group"
+    },
+    "kafka": {
+      "dlqEnd": 12,
+      "failedMainCommitted": 1,
+      "mainCommitted": 3,
+      "recoveryCommitted": 11,
+      "recoveryEnd": 11,
+      "retryCommitted": 1
+    },
+    "lagMetric": {
+      "implemented": false,
+      "reason": "No exact committed-group lag collector was added; broker/API polling would expand this phase and last-observed high-water mark would misstate the meaning."
+    },
+    "metricScenarios": [
+      {
+        "after": 1,
+        "before": 0,
+        "query": "inventory_consumer_records_total{worker=\"main\",outcome=\"success\"}",
+        "queryTimestamp": "2026-09-10T04:10:22.4776963Z",
+        "scenario": "normal"
+      },
+      {
+        "after": 1,
+        "before": 0,
+        "query": "inventory_processing_duration_seconds_count{worker=\"main\",outcome=\"success\"}",
+        "queryTimestamp": "2026-09-10T04:10:22.4776963Z",
+        "scenario": "normal-processing-duration"
+      },
+      {
+        "after": 1,
+        "before": 0,
+        "query": "inventory_duplicate_total{worker=\"main\"}",
+        "queryTimestamp": "2026-09-10T04:10:24.5035392Z",
+        "scenario": "duplicate"
+      },
+      {
+        "after": 1,
+        "before": 0,
+        "query": "inventory_dlq_published_total{worker=\"main\",error_code=\"MALFORMED_JSON\"}",
+        "queryTimestamp": "2026-09-10T04:10:26.4338921Z",
+        "scenario": "dlq"
+      },
+      {
+        "after": 1,
+        "before": 0,
+        "query": "inventory_retry_published_total{worker=\"main\",error_code=\"DB_CONNECTION\"}",
+        "queryTimestamp": "2026-09-10T04:10:28.4404056Z",
+        "scenario": "retry"
+      },
+      {
+        "after": 1,
+        "before": 0,
+        "query": "inventory_consumer_records_total{worker=\"retry\",outcome=\"success\"}",
+        "queryTimestamp": "2026-09-10T04:10:29.767292Z",
+        "scenario": "retry-worker"
+      },
+      {
+        "after": 1,
+        "before": 0,
+        "query": "inventory_retry_overdue_seconds_count{strategy=\"fixed\"}",
+        "queryTimestamp": "2026-09-10T04:10:29.767292Z",
+        "scenario": "retry-overdue"
+      },
+      {
+        "after": 1,
+        "before": 0,
+        "query": "inventory_recovery_processed_total{outcome=\"success\"}",
+        "queryTimestamp": "2026-09-10T04:10:32.9179795Z",
+        "scenario": "recovery"
+      },
+      {
+        "after": 9,
+        "before": 0,
+        "query": "sum(inventory_recovery_rate_limit_wait_seconds_count)",
+        "queryTimestamp": "2026-09-10T04:10:36.9223196Z",
+        "scenario": "recovery-rate-limit"
+      }
+    ],
+    "processes": {
+      "main": 21972,
+      "recovery": 27316,
+      "retry": 12416
+    },
+    "prometheusTargets": [
+      {
+        "health": "up",
+        "instance": "host.docker.internal:22112",
+        "lastScrape": "2026-09-10T04:10:36.424087125Z",
+        "role": "main"
+      },
+      {
+        "health": "up",
+        "instance": "host.docker.internal:22114",
+        "lastScrape": "2026-09-10T04:10:36.891376208Z",
+        "role": "recovery"
+      },
+      {
+        "health": "up",
+        "instance": "host.docker.internal:22113",
+        "lastScrape": "2026-09-10T04:10:35.709720234Z",
+        "role": "retry"
+      }
+    ],
+    "rateLimit": {
+      "configuredRate": 5,
+      "input": 10,
+      "recoveryCommittedOffset": 11,
+      "waitHistogramCount": 9
+    },
+    "replayCLIMetrics": {
+      "reason": "The replay CLI is short-lived; publication measurements remain in structured logs and Phase 7 evidence without Pushgateway.",
+      "scraped": false
+    },
+    "runId": "phase8.8af29644-20e5-4020-b98d-c8e477a0cbab",
+    "sourceFile": "experiments/phase8/observability-phase8.8af29644-20e5-4020-b98d-c8e477a0cbab.json",
+    "sourceSHA256": "ce0c986c424e99354a9bb81528d6dc9de7acb2be57883f989affe58ca096d60e",
+    "startedAt": "2026-09-10T04:10:19.1064731Z",
+    "status": "PASS",
+    "topics": {
+      "dlq": "phase8.8af29644-20e5-4020-b98d-c8e477a0cbab.dlq",
+      "main": "phase8.8af29644-20e5-4020-b98d-c8e477a0cbab.main",
+      "main-fail": "phase8.8af29644-20e5-4020-b98d-c8e477a0cbab.main-fail",
+      "recovery": "phase8.8af29644-20e5-4020-b98d-c8e477a0cbab.recovery",
+      "retry": "phase8.8af29644-20e5-4020-b98d-c8e477a0cbab.retry"
+    }
+  },
+  "phase4PerformanceRerun": false,
+  "phase7PerformanceRerun": false,
+  "phase9Implemented": false,
+  "status": "PASS"
+}

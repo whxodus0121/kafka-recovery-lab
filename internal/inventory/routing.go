@@ -25,6 +25,17 @@ type FailurePolicy struct {
 	random                      *mathrand.Rand
 	Publish                     func(context.Context, kafka.Message) error
 	BeforeApply                 func(context.Context, kafka.Message, event.OrderCreated) error
+	Observer                    Observer
+}
+
+type Observer interface {
+	ObserveRecord(outcome string)
+	ObserveProcessing(outcome string, duration time.Duration)
+	ObserveRetryPublished(errorCode string)
+	ObserveDLQPublished(errorCode string)
+	ObserveDuplicate()
+	ObserveRetryOverdue(strategy string, duration time.Duration)
+	ObserveRecoveryProcessed(outcome string)
 }
 
 type retryMetadata struct {
