@@ -56,7 +56,7 @@ Bulk 중 malformed envelope를 만나면 해당 DLQ 좌표와 이미 발행된 �
 | Publication Limited | 20 / 0 | 19.62 / 20 | 19.62 / 23 | 3 | 6,842 ms | 6,842 ms | 120 / 0 / 0 |
 | Backlog + Recovery Limited | 0 / 20 | 72.80 / 81 | 19.59 / 20 | 120 | 2,196 ms | 8,355 ms | 120 / 0 / 0 |
 
-세 전략 모두 inventory 합계 12,000→11,880, processed_events 120건이었다. peak는 임의의 1초 sliding window 안의 시도 수이며 정확한 장기 RPS 보장값으로 해석하지 않는다. 상세 timestamp, 초별 bin, offset, PID와 raw hash는 [Evidence](phase-7-evidence.json)에 있다.
+세 전략 모두 inventory 합계 12,000→11,880, processed_events 120건이었다. peak는 임의의 1초 sliding window 안의 시도 수이며 정확한 장기 RPS 보장값으로 해석하지 않는다. 상세 timestamp, 초별 bin, offset, PID와 raw hash를 검증 당시 함께 대조했다.
 
 Bulk 24건을 같은 범위로 두 번 Replay한 결과 첫 실행은 신규 24건, 두 번째는 Duplicate 24건이었다. inventory 11,976과 marker 24는 두 번째 실행 뒤에도 같았고 Recovery committed offset만 24→48로 진행했다. 단건 CLI 회귀도 1건 DB 반영과 committed 1을 확인했다.
 

@@ -6,7 +6,7 @@ Kafka의 at-least-once delivery에서 발생하는 Consumer 실패, 재전달, R
 
 기존 티켓 예매 프로젝트에서는 Consumer 실패 메시지를 DLQ로 격리했지만, DLQ 발행만으로 비즈니스 복구가 끝나는지와 DB commit 이후 Kafka offset commit 전에 장애가 나면 어떤 상태가 남는지는 충분히 검증하지 못했다.
 
-이 프로젝트에서는 그 경계를 직접 중단해 중복 side effect를 재현하고, Retryable/Non-Retryable 분류, Backoff와 Jitter, MySQL idempotency, DLQ Replay, Recovery rate control 순서로 해결 범위를 확장했다. 각 결론은 application log만이 아니라 Kafka offset, MySQL 상태와 보존된 raw evidence를 교차 확인했다.
+이 프로젝트에서는 그 경계를 직접 중단해 중복 side effect를 재현하고, Retryable/Non-Retryable 분류, Backoff와 Jitter, MySQL idempotency, DLQ Replay, Recovery rate control 순서로 해결 범위를 확장했다. 각 결론은 application log만이 아니라 Kafka offset과 MySQL 상태를 교차 확인해 verification 문서에 정리했다.
 
 ## Core Goal
 
@@ -175,9 +175,14 @@ Phase 4의 6개 cell과 Phase 7의 3개 cell을 각각 3회 반복하고 median/
 ├── monitoring/   # Prometheus/Grafana provisioning
 ├── scripts/      # 환경 준비와 Phase별 검증
 ├── tests/        # 실제 Kafka/MySQL integration harness
-├── experiments/  # 보존된 raw experiment evidence
-├── docs/         # 상세 설계, verification과 evidence index
-└── compose.yaml
+├── docs/         # Phase 0~9 상세 설계와 verification
+├── .env.example
+├── .gitattributes
+├── .gitignore
+├── compose.yaml
+├── go.mod
+├── go.sum
+└── README.md
 ```
 
 ## How to Run
@@ -240,7 +245,7 @@ go run ./cmd/replay -dlq-topic inventory.dlq.v1 -partition 0 -offset 0 -recovery
 
 ## Verification
 
-검증은 mock 결과가 아니라 실제 Kafka/MySQL integration scenario를 사용한다. SQL 상태, Kafka topic/partition/offset, consumer group commit과 application 결과를 교차 확인하고 Retry, DLQ, idempotency, Replay/Recovery 및 rate control의 raw JSON을 보존했다. Phase 9에서는 핵심 Phase 4/7 cell을 각각 3회 반복해 median/min/max와 환경 편차를 기록했다.
+검증은 mock 결과가 아니라 실제 Kafka/MySQL integration scenario를 사용한다. SQL 상태, Kafka topic/partition/offset, consumer group commit과 application 결과를 교차 확인하고 Retry, DLQ, idempotency, Replay/Recovery 및 rate control 결과를 verification 문서에 정리했다. Phase 9에서는 핵심 Phase 4/7 cell을 각각 3회 반복해 median/min/max와 환경 편차를 기록했다.
 
 문서별 재현 명령과 판정은 [Documentation Index](docs/README.md)에서 확인할 수 있다.
 

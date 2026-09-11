@@ -69,7 +69,7 @@ Consumer는 `inventory_duplicate`와 `inventory_committed`를 구분한다. Dupl
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase5.ps1 -Check All
 ```
 
-검증은 새 product/topic/group을 만들고 기존 행이나 offset을 초기화하지 않는다. marker 개수·내용, SQL 재고, Kafka end/committed offset을 Worker 밖에서 조회했다. Worker PID와 원본 Kafka record, crash/restart 시점도 [Evidence](phase-5-evidence.json)에 남겼다.
+검증은 새 product/topic/group을 만들고 기존 행이나 offset을 초기화하지 않는다. marker 개수·내용, SQL 재고, Kafka end/committed offset을 Worker 밖에서 조회했다. Worker PID와 원본 Kafka record, crash/restart 시점도 함께 대조했다.
 
 핵심 결과는 Phase 2 Before **100→98→96**, Phase 5 After **100→98→98**이다. After에서는 첫 crash 직후 marker 1개와 재고 98, source committed -1을 확인했다. 재시작 후 같은 좌표를 읽었지만 재고와 marker timestamp/hash는 바뀌지 않고 offset만 1로 진행했다.
 
@@ -81,7 +81,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase5.ps1 -C
 
 첫 실행의 CrashAfter와 CrashBefore는 Worker 처리 이전 Kafka topic 생성에서 5초 관리 요청 timeout으로 실패했다. 오류는 각각 `context deadline exceeded`, `i/o timeout`이었다. 다른 다섯 시나리오는 성공했다. 초기 로그와 실패 항목을 보존하고 실험용 CreateTopics 요청만 30초로 분리한 뒤 전체 7개 시나리오가 통과했다. 정확한 broker 지연의 근본 원인까지 확정하지는 않았다. Worker의 DB/Kafka 처리 제한은 늘리지 않았다.
 
-과거 evidence가 현재 결과로 덮이지 않도록 Phase 4 helper에 raw/output 경로 지정만 추가했다. 이전 Phase 4 원본은 그대로 두고 이번 회귀 원본은 `experiments/phase5/regression/`에 저장한다. Phase 2 baseline은 기존 `-phase2-baseline` 옵션에서만 marker 처리를 우회한다. 기본 실행에는 우회가 없다.
+과거 검증 결과를 덮지 않도록 Phase 4 helper에 raw/output 경로 지정만 추가했다. 검증 당시 이전 Phase 4 원본과 이번 회귀 원본을 분리했다. Phase 2 baseline은 기존 -phase2-baseline 옵션에서만 marker 처리를 우회한다. 기본 실행에는 우회가 없다.
 
 Phase 4 회귀의 여섯 전략 시나리오는 모두 기능적으로 PASS했지만 네 실행의 실제 MySQL 장애 길이가 과거 성능 비교 조건인 8~12초를 벗어나 audit은 FAIL했다. 재측정에서도 12초 초과와 35초 내 미복구가 관측됐다. 로그에서 Phase 5 schema나 idempotency 변경에 의한 MySQL 오류는 확인되지 않았고 근본 원인은 `UNVERIFIED`다. Phase 5는 Retry delay·strategy·실험 계산을 변경하지 않았으므로 환경 시간이 맞을 때까지 성능 실험을 반복하지 않았다. 기존 Phase 4 evidence와 비교 기준은 그대로 보존했다.
 

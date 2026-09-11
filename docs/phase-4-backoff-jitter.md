@@ -69,7 +69,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase4.ps1 -C
 
 DB 중단과 연결 실패를 확인한 시각을 t=0으로 삼는다. t=8초에 복구 명령을 요청하고 t=35초까지 관측한다. 실제 발행 시각, 복구 명령 반환, 첫 외부 `SELECT 1` 성공은 별도로 기록한다. Broker lag는 목표 500ms 간격으로 읽되 조회 시작과 완료 시각을 모두 보존한다.
 
-실측 표와 15개 검증 판정은 [검증 보고서](phase-4-verification.md)에, 계산 결과와 개별 재시도 시각은 [Evidence](phase-4-evidence.json)에 있다. Evidence의 `File`이 가리키는 [원시 실행 파일](../experiments/phase4/)에는 Kafka record, Header, Worker PID와 전체 로그, SQL 재고, offset 시계열이 남아 있다.
+실측 표와 15개 검증 판정, 계산 결과와 개별 재시도 시각은 [검증 보고서](phase-4-verification.md)에 정리했다. 검증 당시 Kafka record, Header, Worker PID, 로그, SQL 재고와 offset 시계열을 교차 확인했다.
 
 ## 8. 발생한 문제
 

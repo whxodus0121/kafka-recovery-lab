@@ -6,7 +6,7 @@
 
 최종 Phase 3 시나리오 **PASS 8 / FAIL 0 / UNVERIFIED 0**. 빌드·정적 검사, Phase 0/1 회귀, 명시적인 Phase 2 baseline A–D, Retry/DLQ topic 생성도 PASS다. 게이트의 마지막 두 항목은 문서 검토와 로컬 commit 결과다.
 
-이 문서는 최종 성공 실행을 표로 표시한다. 최초 초기화 실패 네 건은 evidence의 `initializationFailures`에 별도로 남겼다. `scenarios`에는 실행된 성공 16건이 누적되어 있으며, 최신 여덟 건을 아래 표에 사용한다. 원시 자료: [phase-3-evidence.json](phase-3-evidence.json). 해설: [phase-3-retry-dlq.md](phase-3-retry-dlq.md).
+이 문서는 최종 성공 실행을 표로 표시한다. 최초 초기화 실패 네 건과 성공 16건도 검증 당시 함께 대조했으며, 최신 여덟 건을 아래 표에 사용한다. 해설은 [phase-3-retry-dlq.md](phase-3-retry-dlq.md)에 있다.
 
 | 검증 | 재고 초기→최종 | Main commit | Retry end / commit | DLQ end | 판정 |
 | --- | --- | --- | --- | --- | --- |
@@ -97,7 +97,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase3.ps1 -C
 go test '-tags=integration,phase2,phase3' -count=1 -timeout=4m -v -run '^TestPhase3/(Normal|Recovery|Metadata|RetryPublishFailure)$' ./tests/integration
 ```
 
-최종 검증은 `PHASE3_GATES.md`의 동일 명령을 순차 실행하고 exit=0·성공 token·출력 SHA-256을 기록했다. Phase 2 정상 경로를 복사하지 않고 같은 Worker에 `-phase2-baseline`을 전달해 과거 실패 정책을 명시했다. 일반 실행은 Phase 3 정책이다.
+최종 검증은 동일 스크립트의 명령을 순차 실행하고 exit=0·성공 token·출력 SHA-256을 기록했다. Phase 2 정상 경로를 복사하지 않고 같은 Worker에 -phase2-baseline을 전달해 과거 실패 정책을 명시했다. 일반 실행은 Phase 3 정책이다.
 
 회귀 출력은 `bin/phase3-regression.json`으로 분리한 뒤 Phase 3 evidence에 포함했다. 기존 Phase 0–2 verification/evidence와 상세 문서는 수정하지 않았다.
 

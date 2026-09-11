@@ -40,7 +40,7 @@ Bulk 24건의 첫 Replay는 신규 반영 24건이었다. 같은 DLQ 범위의 �
 | 14 | DB 결과 | PASS | inventory 11,880, marker 120 |
 | 15 | Bulk duplicate Idempotency | PASS | 신규 24, Duplicate 24, 추가 차감 0 |
 | 16 | CLI/business 완료 분리 | PASS | backlog 실행 2,196 ms와 8,355 ms |
-| 17 | Phase 5/6 핵심 회귀 | PASS | 보존 evidence, 단건, Store/idempotency unit |
+| 17 | Phase 5/6 핵심 회귀 | PASS | 기존 검증 결과, 단건, Store/idempotency unit |
 | 18 | 문서/evidence | PASS | raw 6개, evidence, 검증·상세 문서·gates |
 | 19 | Phase 8 기능 없음 | PASS | checkpoint/scheduler/분산 limiter 미구현 |
 
@@ -56,9 +56,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase7.ps1 -C
 
 모든 명령 exit 0이었다. Phase 4의 실제 성능 실험과 과거 raw evidence는 재실행하거나 수정하지 않았다.
 
-## Evidence와 한계
+## 검증 근거와 한계
 
-[phase-7-evidence.json](phase-7-evidence.json)은 선택된 PASS raw의 상대 경로와 SHA-256, 실제 publication/processing timestamp, 초별 bin, 평균·peak, end/committed offset, inventory, marker, PID를 보존한다. [experiments/phase7](../experiments/phase7/)의 실패 실행은 성공 결과로 덮어쓰지 않는 구조다.
+선택한 PASS 실행의 실제 publication/processing timestamp, 초별 bin, 평균·peak, end/committed offset, inventory, marker와 PID를 교차 확인했다. 실패 실행을 성공 결과로 바꾸지 않았다.
 
 Rate peak는 OS scheduling 영향을 받는 1초 sliding-window 관측값이다. Recovery rate는 최초 Recovery business 처리에만 적용되며 이후 Retry Worker를 통제하지 않는다. 여러 partition, checkpoint/resume, crash 자동 복구, 반복 실험 통계, 운영 규모는 `UNVERIFIED`다.
 

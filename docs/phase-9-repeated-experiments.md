@@ -39,7 +39,7 @@ Phase 7은 각 run마다 새 topic, group, event와 12개 product를 만들었�
 ## 6. 핵심 계약
 
 - 모든 cell은 추가 선택 없이 정확히 3개의 valid run을 사용한다.
-- 기존 raw evidence는 수정하거나 삭제하지 않고 `experiments/phase9`에 새 evidence를 저장한다.
+- 기존 결과와 새 반복 실행을 분리해 비교했으며, 공개 저장소에는 사람이 읽는 집계와 해석을 유지한다.
 - Phase 4 실제 outage를 8~12초 필터로 걸러내지 않는다.
 - 첫 8초 Retry와 실제 DB healthy 이후 recovery를 별도로 집계한다.
 - 낮은 peak는 success/DLQ/unfinished와 함께 해석한다.
@@ -106,4 +106,4 @@ peak 하나만으로 전략을 선택할 수 없다. Retry 수, DLQ, recovery, H
 
 ## 11. 다음 Phase 연결
 
-Phase 9는 실험 근거의 범위를 보강하는 단계로 끝낸다. Phase 10의 포트폴리오 최종 재작성이나 새 Retry·scheduler·observability 기능은 구현하지 않았다.
+Phase 9는 실험 근거의 범위를 보강하는 단계로 끝낸다. 새 Retry·scheduler·observability 기능은 구현하지 않았다.

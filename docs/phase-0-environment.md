@@ -84,7 +84,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1 -Check Al
 | MySQL 영속성 | probe `707be59fdadd4af0871046095ef4617b`를 재시작 전후 조회 후 1행 정리 | PASS |
 | 전체 사용자 검증 항목 | PASS 14 / FAIL 0 / UNVERIFIED 0 | PASS |
 
-원시 명령, 이미지 digest, 출력은 [Phase 0 검증 보고서](phase-0-verification.md)와 [`GATES.md`](../GATES.md)에 보존되어 있다.
+원시 명령, 이미지 digest와 출력에 근거한 판정은 [Phase 0 검증 보고서](phase-0-verification.md)에 정리했다.
 
 ## 8. 발생한 문제
 

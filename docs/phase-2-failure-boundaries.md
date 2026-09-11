@@ -97,7 +97,7 @@ committed offset:  -1 → -1 → 1
 record:           동일 topic / partition 0 / offset 0 / eventId
 ```
 
-원시 eventId, productId, PID, record hash와 로그는 [Phase 2 evidence](phase-2-evidence.json), 명령·외부 CLI 교차 확인은 [검증 보고서](phase-2-verification.md)에 있다.
+원시 eventId, productId, PID, record hash와 로그는 Phase 2 evidence, 명령·외부 CLI 교차 확인은 [검증 보고서](phase-2-verification.md)에 있다.
 
 ## 8. 발생한 문제
 

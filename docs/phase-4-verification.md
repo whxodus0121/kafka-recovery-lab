@@ -25,7 +25,7 @@ A의 실제 발행 구간은 Fixed 0.078초, Exponential 0.101초, Jitter 0.231�
 
 ## 전략별 실제 결과
 
-RPS는 DB query나 TCP 연결 시도 수가 아닌 **애플리케이션 Retry 시작 횟수**다. t=0 기준 1초 bin으로 계산하며, 전체 원시 시작 시각과 0 bin을 포함한 시계열은 Evidence에 있다.
+RPS는 DB query나 TCP 연결 시도 수가 아닌 **애플리케이션 Retry 시작 횟수**다. t=0 기준 1초 bin으로 계산했으며, 검증 당시 전체 원시 시작 시각과 0 bin을 포함해 집계했다.
 
 | 시나리오 / 전략 | 전체 peak RPS | 전체 Retry | 공통 8초 Retry / peak | 성공 | DLQ | 미완료 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -108,17 +108,9 @@ Build에는 `gofmt`, `go test ./...`, `go vet ./...`, `go build ./...`, `go mod 
 
 Phase 2 C 회귀 topic은 `phase2.c.d75fe78b-7205-4915-accf-4f74c1748e7d`, partition 0/offset 0이다. Worker PID 32140→20088, 재고 100→98→96으로 같은 비즈니스 side effect의 중복이 여전히 재현됐다. 과거 evidence는 수정하지 않았고 이번 회귀는 Phase 4 evidence의 `Regression`에 포함했다.
 
-## 원시 기록과 발생한 문제
+## 검증 기록과 발생한 문제
 
-[Evidence](phase-4-evidence.json)의 `Metrics[].File`/`SHA256`에서 다음 원본을 추적할 수 있다. 원본은 덮어쓰지 않는다.
-
-- [A Fixed](../experiments/phase4/fixed-A-phase4.f04af141-6e49-4c5b-a73d-04ae62d45e8f.json)
-- [A Exponential](../experiments/phase4/exponential-A-phase4.6a85262f-e140-46cd-b2ec-dc711a252f4a.json)
-- [A Full Jitter](../experiments/phase4/jitter-A-phase4.d1f57651-0d9a-4d31-83d9-6b5172f8722d.json)
-- [B Fixed](../experiments/phase4/fixed-B-phase4.825a4ff1-76d3-4bd8-8986-180d1a943547.json)
-- [B Exponential](../experiments/phase4/exponential-B-phase4.e51c9c5a-4ad3-4d06-82b2-c66c5bce8fc4.json)
-- [B Full Jitter](../experiments/phase4/jitter-B-phase4.30f85343-e9c8-4efc-b986-167f5a8393a8.json)
-- [제외한 첫 A Fixed](../experiments/phase4/fixed-A-phase4.659378b2-d121-4889-9917-3df29903a0e9.json): 실행은 완료했지만 실제 장애 24.498초로 비교 조건 FAIL. `ExcludedRuns`에 사유와 hash를 기록했다. 긴 기동의 근본 원인은 확정하지 않았다.
+검증 당시 raw evidence와 SHA-256을 기반으로 일곱 실행을 대조했다. 공개 저장소에는 Fixed, Exponential, Full Jitter의 A/B 결과와 비교 조건을 사람이 읽을 수 있는 이 문서로 유지한다. 제외한 첫 A Fixed는 실제 장애 24.498초로 비교 조건 FAIL이었으며 긴 기동의 근본 원인은 확정하지 않았다.
 
 초기 회귀는 Phase 2 A의 초기 snapshot 이전에 FAIL했다. 최초 전체 오류 출력은 보존되지 않아 정확한 문구는 확인 불가다. 새 topic leader 준비 경계를 보완한 뒤 전체 회귀가 PASS했다. 초기 집계는 MySQL의 비JSON 진단 때문에 FAIL했으며, 드라이버 진단 보존·별도 집계 후 모든 비교 셀의 대조가 PASS했다. 제외 셀 재실행 및 회귀 evidence 생성 전의 중간 Audit 실패도 최종 PASS로 소급하지 않는다.
 

@@ -11,7 +11,7 @@
 - 실제 Phase 4 outage: 9.701~11.166초, 결과 필터링 없음
 - Phase 7의 9회 모두 success 120 / DLQ 0 / unfinished 0
 
-상세 median/min/max와 기존 단일 run 비교는 [phase-9-repeated-experiments.md](phase-9-repeated-experiments.md), 각 raw 경로와 SHA-256은 [phase-9-evidence.json](phase-9-evidence.json)에 기록했다.
+상세 median/min/max와 기존 단일 run 비교는 [phase-9-repeated-experiments.md](phase-9-repeated-experiments.md)에 정리했다. 검증 당시 각 raw 경로와 SHA-256을 대조했다.
 
 ## 완료 조건
 
@@ -38,7 +38,7 @@
 | 19 | raw와 SHA-256 | PASS | Phase 4 18개, Phase 7 9개, environment 1개 연결 |
 | 20 | median/min/max와 기존 결과 비교 | PASS | evidence와 상세 문서 기록 |
 | 21 | 문서/evidence/gates | PASS | Phase 9 결과물과 README 링크 |
-| 22 | Phase 10 기능 없음 | PASS | 새 전략, scheduler, metric, dashboard 변경 없음 |
+| 22 | 범위 외 기능 없음 | PASS | 새 전략, scheduler, metric, dashboard 변경 없음 |
 
 ## 실행 명령
 

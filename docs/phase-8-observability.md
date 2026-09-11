@@ -71,7 +71,7 @@ Prometheus scrape interval은 2초다. 세 Worker target은 실험 중 모두 UP
 | Recovery | recovery success | 0 → 1 | 단건 Replay, inventory 100→99 |
 | Recovery rate limit | wait histogram count | 0 → 9 | 10건, 5/s, Recovery committed 11 |
 
-Kafka 최종 상태는 main committed 3, failed Main 1, Retry 1, Recovery end/committed 11, DLQ end 12였다. 소규모 rate-limit 10건은 각각 inventory 100→99와 marker 1을 확인했다. 실제 PID, query timestamp, topic/group, raw source hash는 [Evidence](phase-8-evidence.json)에 있다.
+Kafka 최종 상태는 main committed 3, failed Main 1, Retry 1, Recovery end/committed 11, DLQ end 12였다. 소규모 rate-limit 10건은 각각 inventory 100→99와 marker 1을 확인했다. 실제 PID, query timestamp, topic/group과 raw source hash를 검증 당시 함께 대조했다.
 
 Grafana datasource UID `prometheus`는 `http://prometheus:9090`으로 provision됐다. `Kafka Recovery Lab` dashboard는 9개 panel과 10개 PromQL target을 가지며 모두 Grafana datasource proxy를 통해 `status=success`를 반환했다.
 

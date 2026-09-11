@@ -49,9 +49,9 @@ Rollback의 SQL 실패는 별도 transaction이 inventory row 잠금을 잡고 �
 
 Conflict는 정상 이벤트, 변경 payload, 원래 이벤트를 같은 partition의 offset 0·1·2에 발행했다. 실제 DLQ 원본은 offset 1의 변경 payload와 같았고 오류 코드는 EVENT_ID_CONFLICT였다. 마지막 원래 payload는 정상 Duplicate로 처리돼 source committed는 3이었다. Retry topic에는 발행되지 않았다.
 
-## Evidence 위치와 해석
+## 검증 근거와 해석
 
-[phase-5-evidence.json](phase-5-evidence.json)의 `scenarios`는 실행 이력을 append한다. 같은 scenario의 마지막 항목이 최종 실행이며 초기 실패도 지우지 않는다. 각 항목에는 event/hash, SQL marker와 재고, broker snapshot, Worker PID/exit/log, 실제 Kafka record가 포함된다. rollback·concurrency는 허용된 DB-level 검증이라 Kafka record는 만들지 않는다.
+검증 당시 실행 이력은 같은 scenario의 초기 실패를 지우지 않고 마지막 항목을 최종 실행으로 판정했다. event/hash, SQL marker와 재고, broker snapshot, Worker PID/exit/log와 실제 Kafka record를 교차 확인했다. rollback·concurrency는 허용된 DB-level 검증이라 Kafka record를 만들지 않았다.
 
 초기 실행은 topic 생성 관리 요청의 5초 제한에 걸린 2개 FAIL과 나머지 5개 PASS였다. 초기 로그를 보존하고 관리 요청만 30초로 분리했다. 이후 7개가 모두 PASS했다. Worker의 처리 timeout을 늘리거나 비즈니스 오류를 우회하지 않았다. 최초 실패의 정확한 broker 지연 원인까지 검증한 것은 아니다.
 
@@ -76,7 +76,7 @@ Phase 4 회귀 실행에서는 Fixed, Exponential, Full Jitter의 여섯 기능 
 | 11 | payload conflict | PASS | 변경 payload DLQ EVENT_ID_CONFLICT, 기존 재고·marker 보존 |
 | 12 | Retry topic duplicate | PASS | 재고 98·marker 1, 신규 반영 0·Duplicate 1 |
 | 13 | 실제 Kafka offset | PASS | broker end/committed와 원본 record 직접 조회 |
-| 14 | Evidence/verification | PASS | 실행 이력 append, 실패와 외부 SQL/broker/프로세스 증거 보존 |
+| 14 | 검증 근거와 보고서 | PASS | 실패와 외부 SQL/broker/프로세스 증거를 함께 대조 |
 | 15 | 상세 문서/README | PASS | 같은 11개 섹션과 Development Journey 연결 |
 | 16 | Phase 6 없음 | PASS | Replay/Recovery/Rate Limit 및 HOL 개선 미구현 |
 

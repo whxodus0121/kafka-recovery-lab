@@ -1,3 +1,1 @@
-# Preserve raw evidence SHA-256 across Windows/Linux checkouts.
-experiments/phase4/*.json text eol=lf
-experiments/phase5/regression/*.json text eol=lf
+# No repository-specific attributes are currently required.

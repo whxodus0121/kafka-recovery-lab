@@ -22,10 +22,9 @@
 
 수정 5개: `.env.example`, `README.md`, `cmd/smoke/mysql.go`, `internal/config/config.go`, `scripts/env.ps1`.
 
-신규 19개:
+당시 신규 파일은 19개였다. 다음은 그중 공개 저장소에 유지하는 코드·스크립트·문서 17개다:
 
 ```text
-PHASE1_GATES.md
 cmd/api/main.go
 cmd/worker/main.go
 internal/event/order_created.go
@@ -42,7 +41,6 @@ scripts/init-inventory.ps1
 scripts/seed-inventory.sql
 scripts/verify-phase1.ps1
 tests/integration/phase1_test.go
-docs/phase-1-evidence.json
 docs/phase-1-verification.md
 ```
 
@@ -57,7 +55,6 @@ docs/phase-1-verification.md
 | `cmd/smoke/mysql.go` | 기존 smoke를 공유 DB 연결 함수로 연결 |
 | `internal/config/config.go` | 기존 설정을 유지하며 API 주소·group 기본값 제공 |
 | `scripts/env.ps1` | 새 선택 변수 허용, 기존 Phase 0 .env 호환 |
-| `PHASE1_GATES.md` | 실행·소스·문서·커밋 확인 장부 |
 | `cmd/api/main.go` | net/http 서버, Producer 수명과 정상 종료 |
 | `cmd/worker/main.go` | 별도 Consumer 프로세스, DB·Reader 수명과 정상 종료 |
 | `internal/event/order_created.go` | 이벤트 구조, crypto/rand UUID v4, UTC와 필수 값 검증 |
@@ -74,7 +71,6 @@ docs/phase-1-verification.md
 | `scripts/seed-inventory.sql` | 로컬 product 1 재고 100 초기화 |
 | `scripts/verify-phase1.ps1` | Build/Phase0/Flow 검증 진입점 |
 | `tests/integration/phase1_test.go` | 실제 자식 프로세스와 Kafka/DB/HTTP 독립 관측 |
-| `docs/phase-1-evidence.json` | 실제 이벤트, DB 수량, group offset, PID, 프로세스 로그 |
 | `docs/phase-1-verification.md` | 이 보고서 |
 
 Reader 인터페이스와 HTTP의 publish 함수는 테스트 경계에만 사용한다. 범용 Repository/Factory/Event Bus 계층은 없다.
@@ -84,7 +80,7 @@ Reader 인터페이스와 HTTP의 publish 함수는 테스트 경계에만 사�
 ```text
 .
 ├── .env.example, .gitignore, compose.yaml, go.mod, go.sum
-├── README.md, GATES.md, PHASE1_GATES.md
+├── README.md
 ├── cmd/
 │   ├── api/main.go
 │   ├── worker/main.go
@@ -105,7 +101,6 @@ Reader 인터페이스와 HTTP의 publish 함수는 테스트 경계에만 사�
 └── docs/
     ├── phase-0-verification.md
     ├── phase-1-verification.md
-    └── phase-1-evidence.json
 ```
 
 `.git/`, `.env`, `bin/`는 로컬 관리·비공개·빌드 산출물이다. 선택적 게이트 도구의 `.unlazy/`도 ignored이며 실행 의존성이 아니다.

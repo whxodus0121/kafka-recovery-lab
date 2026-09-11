@@ -21,7 +21,7 @@ fault는 CLI에서 특정 eventId에만 지정한다. 기본 hook은 nil이며 �
 
 ## 실측 결과
 
-아래 별도 실측 표와 [JSON](phase-2-evidence.json)의 최신 PASS 실행을 대조한다. JSON에는 첫 관측기 실패와 재현성 확인 실행도 누적 보존했다. `-1`은 해당 group에 committed offset이 없음을 뜻하며 offset 0 record를 commit하면 다음 읽기 위치인 1이 저장된다.
+아래 표는 최종 PASS 실행과 첫 관측기 실패 및 재현성 확인 실행을 함께 검토해 정리했다. -1은 해당 group에 committed offset이 없음을 뜻하며 offset 0 record를 commit하면 다음 읽기 위치인 1이 저장된다.
 
 | Scenario | 초기 → 장애 직후 → 재시작 후 inventory | committed offset: 전 → 장애 중 → 재시작 후 | 판정 |
 | --- | --- | --- | --- |
@@ -46,7 +46,7 @@ C는 첫 DB commit의 성공(98), broker offset 미commit(-1), 동일 topic/part
 | 11–12 | Poison 재전달과 같은 partition 후속 메시지 방해 | PASS: D |
 | 13 | offset reset 없음 | PASS: 실험 코드·실행 명령 검토, 새 group 사용 |
 | 14 | Phase 3 이상 기능 없음 | PASS: 코드 diff와 의존성 검토 |
-| 15 | 실제 evidence JSON 보존 | PASS: 성공 및 실패 실행 기록 보존 |
+| 15 | 성공·실패 검증 기록 | PASS: 실행 결과와 판정을 verification에 정리 |
 | 16 | Scenario별 판정 | PASS: A/B/C/D 모두 PASS |
 
 최종 완료 조건 16개: PASS 16 / FAIL 0 / UNVERIFIED 0. 이는 최종 조건 판정이며 개발 중 실패 실행이 없었다는 뜻이 아니다. 실행별 판정은 JSON에 따로 보존한다.
@@ -64,7 +64,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase2.ps1 -C
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase2.ps1 -Check D
 ```
 
-최종 게이트는 동일 스크립트의 Build, Regression, A, B, C, D를 순차 실행하며 각 exit 0과 성공 token을 확인한다. 실행 shell, 작업 경로, 출력 fingerprint는 `PHASE2_GATES.md`에 있다. Build는 gofmt, go test ./..., go vet ./..., go build ./..., go mod verify 및 integration 태그 컴파일/정적 검사를 수행한다. Regression은 기존 Phase 0 스크립트와 Phase 1 정상 흐름 테스트를 재사용한다. Phase 1 과거 문서/JSON은 수정하지 않았다.
+최종 검증은 동일 스크립트의 Build, Regression, A, B, C, D를 순차 실행하며 각 exit 0과 성공 token을 확인했다. Build는 gofmt, go test ./..., go vet ./..., go build ./..., go mod verify 및 integration 태그 컴파일/정적 검사를 수행한다. Regression은 기존 Phase 0 스크립트와 Phase 1 정상 흐름 테스트를 재사용한다.
 
 문제와 해결:
 
@@ -87,8 +87,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase2.ps1 -C
 | tests/integration/phase2_test.go | 실제 Worker 두 프로세스·DB·broker로 A–D 검증, 누적 증거 저장 |
 | scripts/verify-phase2.ps1 | 단계별 순차 검증 실행 |
 | README.md | 현재 Phase와 재현 방법·한계 |
-| PHASE2_GATES.md | 완료 조건과 실행 증거 |
-| docs/phase-2-verification.md / phase-2-evidence.json | 보고서와 실제 상태/이벤트/PID/로그 |
+| docs/phase-2-verification.md | 실제 상태, 이벤트, PID와 로그를 정리한 공개 검증 보고서 |
 
 추가 dependency 0개. Go 1.26.5, Kafka 4.2.0, MySQL 8.4.8, kafka-go v0.4.51, go-sql-driver/mysql v1.10.0을 유지한다. 기존 간접 모듈은 edwards25519 v1.2.0(MySQL 인증), klauspost/compress v1.15.9와 pierrec/lz4/v4 v4.1.15(Kafka codec)다. go.mod/go.sum, Compose, API, 이벤트 계약, migration은 변경하지 않았다.
 

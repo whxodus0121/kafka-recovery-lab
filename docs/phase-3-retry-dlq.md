@@ -109,7 +109,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase3.ps1 -C
 
 Recovery는 MySQL 재기동 시간이 지연보다 길어지는 것을 피하고 실제 대기를 관측하기 위해 검증 옵션으로 Fixed Delay 12초를 사용했다. 기본값과 Exhaustion은 2초다. retry 처리 로그의 시각이 Header의 next-attempt-at 이상인지 비교했으며 지연을 정확히 맞춘다는 성능 보장은 하지 않는다.
 
-최종 판정, 실행별 좌표·PID·시각은 [검증 보고서](phase-3-verification.md)와 [증거 JSON](phase-3-evidence.json)에 있다. 이번 문서는 기록된 실측을 설명하며 추가 부하 수치를 추정하지 않았다.
+최종 판정, 실행별 좌표·PID·시각은 [검증 보고서](phase-3-verification.md)와 증거 JSON에 있다. 이번 문서는 기록된 실측을 설명하며 추가 부하 수치를 추정하지 않았다.
 
 ## 8. 발생한 문제
 

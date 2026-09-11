@@ -70,9 +70,9 @@ PASS 이전 네 raw 실행은 그대로 보존했다.
 
 초기 Build 회귀는 Phase 1 checker의 dependency 무변경 조건이 허용된 Phase 8 의존성까지 거부했다. Phase 8 checker에서 전체 Go 검증을 직접 실행해 PASS했고 과거 checker는 바꾸지 않았다.
 
-## Evidence와 한계
+## 검증 근거와 한계
 
-[phase-8-evidence.json](phase-8-evidence.json)은 PASS raw 경로와 SHA-256, endpoint, target health, query timestamp와 전후 값, DB/Kafka 상태, PID, Grafana provisioning, cardinality 결과를 보존한다. [experiments/phase8](../experiments/phase8/)에는 실패 4개와 PASS 1개가 각각 남아 있다.
+PASS 실행의 endpoint, target health, query timestamp와 전후 값, DB/Kafka 상태, PID, Grafana provisioning과 cardinality 결과를 교차 확인했다. 실패 4개와 PASS 1개를 구분해 판정했다.
 
 정확한 committed consumer-group lag, 운영 network/TLS/auth, 장기 metric 보존, 반복 부하 통계는 `UNVERIFIED`다. Replay CLI는 short-lived라 scrape하지 않았다.
 

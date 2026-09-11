@@ -6,13 +6,13 @@
 
 Go 호스트 실행 코드와 Kafka/MySQL 두 컨테이너를 구성했다. 사용자 검증 14개 항목을 실제 실행 또는 명시적인 소스·의존성 검사로 확인했다. 최종 판정은 **PASS 14 / FAIL 0 / UNVERIFIED 0**이다. 초기 실패는 13번에 별도로 보존한다.
 
-완료 장부 `GATES.md`는 실행 검증 6개와 수동 소스·문서 검토 2개로 총 8개이며, **met 8 / unmet 0 / abandoned 0**이다.
+당시 내부 완료 장부는 실행 검증 6개와 수동 소스·문서 검토 2개로 총 8개이며, **met 8 / unmet 0 / abandoned 0**이다.
 
 Phase 1 이상의 구현은 없다. Go 코드의 Kafka 메시지 왕복과 MySQL SQL 실행, 컨테이너 재시작 후 데이터 유지까지 확인했다. 미래 메시지 처리·장애 복구 기능은 이 판정에 포함하지 않는다.
 
 ## 2. 생성·수정 파일 목록
 
-빈 폴더에서 시작했으므로 다음 프로젝트 파일 15개는 모두 신규 생성이다.
+빈 폴더에서 시작했으므로 프로젝트 파일 15개가 모두 신규 생성됐다. 다음은 그중 공개 저장소에 유지하는 14개다.
 
 ```text
 .env.example
@@ -20,7 +20,6 @@ Phase 1 이상의 구현은 없다. Go 코드의 Kafka 메시지 왕복과 MySQL
 compose.yaml
 go.mod
 go.sum
-GATES.md
 README.md
 cmd/smoke/main.go
 cmd/smoke/kafka.go
@@ -43,7 +42,6 @@ docs/phase-0-verification.md
 | `compose.yaml` | 공식 이미지 태그·digest 고정, 단일 KRaft Kafka, InnoDB MySQL, healthcheck, 두 named volume |
 | `go.mod` | Go 버전과 직접·간접 모듈 버전 |
 | `go.sum` | 모듈 다운로드 무결성 checksum |
-| `GATES.md` | 실제 검증 명령, 판정과 출력 해시 증거 |
 | `README.md` | Phase 0 범위·환경 설정·실행·중지·제약 |
 | `cmd/smoke/main.go` | 연결 검증 CLI, 제한 시간·취소 처리 |
 | `cmd/smoke/kafka.go` | 고유 테스트 메시지 동기 발행과 동일 메시지 소비 |
@@ -65,7 +63,6 @@ kafka-recovery-lab/
 ├── compose.yaml
 ├── go.mod
 ├── go.sum
-├── GATES.md
 ├── README.md
 ├── cmd/smoke/
 │   ├── main.go
@@ -201,7 +198,7 @@ PERSISTENCE_PASS id=707be59fdadd4af0871046095ef4617b
 
 추가 실제 조회: `server.properties`의 KRaft/자동 생성 설정, `SHOW TABLES`, `SELECT COUNT(*) FROM phase0_probe`, `kafka-get-offsets.sh`의 orders topic offset, `docker inspect`의 MySQL mount, `docker image inspect`의 RepoDigests. 민감한 환경 변수 전체나 실제 password는 출력하지 않았다.
 
-개발 도구 버전: Docker Desktop 4.60.1, Engine/CLI 29.2.0, Compose v5.0.2. 기존 설치를 사용했다. 게이트 실행에는 로컬 unlazy 스킬의 `gate-lint.mjs`, `gate-check.mjs --approve --timeout 600 GATES.md`를 사용했다. 이 스킬은 다른 개발자의 프로젝트 실행에 필요하지 않다.
+개발 도구 버전: Docker Desktop 4.60.1, Engine/CLI 29.2.0, Compose v5.0.2. 기존 설치를 사용했다. 당시 게이트 실행에는 로컬 unlazy 스킬을 사용했으며, 이 스킬은 다른 개발자의 프로젝트 실행에 필요하지 않다.
 
 ## 12. 사용자 검증 항목별 최종 판정
 

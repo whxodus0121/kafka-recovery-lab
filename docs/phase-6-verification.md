@@ -56,9 +56,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase6.ps1 -C
 
 Phase 4의 여섯 성능 실험은 실행하지 않았다. Phase 6가 delay 계산을 바꾸지 않았으므로 계산 단위 테스트와 보존 evidence만 확인했다. 최초 Regression은 Phase 4 evidence의 실제 키 `Status`를 소문자로 찾은 검사 코드 때문에 FAIL했고, 원본을 바꾸지 않고 검사만 수정한 뒤 PASS했다.
 
-## Evidence와 한계
+## 검증 근거와 한계
 
-[phase-6-evidence.json](phase-6-evidence.json)은 각 실행의 DLQ/Recovery/Retry record, header, end/committed offset, SQL 상태, PID와 시각을 보존한다. 실패 실행을 성공으로 바꾸거나 과거 Phase evidence를 수정하지 않았다.
+각 실행의 DLQ/Recovery/Retry record, header, end/committed offset, SQL 상태, PID와 시각을 검증 당시 교차 확인해 이 문서에 정리했다. 실패 실행을 성공으로 바꾸지 않았다.
 
 추가 외부 dependency는 없다. 기존 `github.com/segmentio/kafka-go`, `database/sql`, MySQL driver만 사용하며 `go.mod`, `go.sum`, Compose와 DB schema는 변경하지 않았다.
 

@@ -45,7 +45,7 @@ try {
                         if($lines[$i] -match '^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$' -and $lines[$i-1] -notmatch '\|'){throw "Table separator without header in $($file.FullName)"}
                     }
                 }
-                for($phase=0;$phase -le 10;$phase++){
+                for($phase=0;$phase -le 9;$phase++){
                     if((Get-Content docs/README.md -Raw) -notmatch "\| $phase \|"){throw "docs index missing Phase $phase"}
                 }
                 Write-Output 'PHASE10_MARKDOWN_PASS'

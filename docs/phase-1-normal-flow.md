@@ -84,7 +84,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase1.ps1 -C
 | 정상 재시작 | Worker PID 3052 → 33184, Stable 가입 후 5초간 추가 처리 0 | PASS |
 | 회귀·범위 | Phase 0 PASS, Retry/DLQ/Idempotency 없음 | PASS |
 
-최종 committed/end는 partition 0 `3/3`, 1 `1/1`, 2 `2/2`, 3 `2/2`, 4 `-1/0`, 5 `-1/0`이었다. `-1`은 저장된 group offset이 없다는 실제 응답이다. 상세 record와 로그는 [Phase 1 evidence](phase-1-evidence.json), 판정과 명령은 [검증 보고서](phase-1-verification.md)에 보존했다.
+최종 committed/end는 partition 0 3/3, 1 1/1, 2 2/2, 3 2/2, 4 -1/0, 5 -1/0이었다. -1은 저장된 group offset이 없다는 실제 응답이다. 상세 record와 로그를 바탕으로 한 판정과 명령은 [검증 보고서](phase-1-verification.md)에 정리했다.
 
 ## 8. 발생한 문제
 
