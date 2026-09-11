@@ -6,7 +6,7 @@ Kafka의 at-least-once delivery에서 발생하는 Consumer 실패, 재전달, R
 
 기존 티켓 예매 프로젝트에서는 Consumer 실패 메시지를 DLQ로 격리했지만, DLQ 발행만으로 비즈니스 복구가 끝나는지와 DB commit 이후 Kafka offset commit 전에 장애가 나면 어떤 상태가 남는지는 충분히 검증하지 못했다.
 
-이 프로젝트에서는 그 경계를 직접 중단해 중복 side effect를 재현하고, Retryable/Non-Retryable 분류, Backoff와 Jitter, MySQL idempotency, DLQ Replay, Recovery rate control 순서로 해결 범위를 확장했다. 각 결론은 application log만이 아니라 Kafka offset과 MySQL 상태를 교차 확인해 verification 문서에 정리했다.
+이 프로젝트에서는 그 경계를 직접 중단해 중복 side effect를 재현하고, Retryable/Non-Retryable 분류, Backoff와 Jitter, MySQL idempotency, DLQ Replay, Recovery rate control 순서로 해결 범위를 확장했다. 각 결론은 application log만이 아니라 Kafka offset과 MySQL 상태를 교차 확인해 각 Phase 상세 문서에 정리했다.
 
 ## Core Goal
 
@@ -173,11 +173,10 @@ Phase 4의 6개 cell과 Phase 7의 3개 cell을 각각 3회 반복하고 median/
 ├── internal/     # event, inventory, retry, rate limit와 observability 구현
 ├── migrations/   # inventory와 processed_events schema
 ├── monitoring/   # Prometheus/Grafana provisioning
-├── scripts/      # 환경 준비와 Phase별 검증
+├── scripts/      # 환경 준비와 기본 검증
 ├── tests/        # 실제 Kafka/MySQL integration harness
-├── docs/         # Phase 0~9 상세 설계와 verification
+├── docs/         # Phase 0~9 상세 문서
 ├── .env.example
-├── .gitattributes
 ├── .gitignore
 ├── compose.yaml
 ├── go.mod
@@ -199,9 +198,16 @@ Phase 4의 6개 cell과 Phase 7의 3개 cell을 각각 3회 반복하고 median/
 . ./scripts/env.ps1 -Init
 go mod download
 docker compose up -d --wait
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1 -Check Topics
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase3.ps1 -Check Topics
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase6.ps1 -Check Topics
+$topics = @(
+  @{ Name = 'orders.created.v1'; Partitions = 6 },
+  @{ Name = 'inventory.retry.v1'; Partitions = 1 },
+  @{ Name = 'inventory.dlq.v1'; Partitions = 1 },
+  @{ Name = 'inventory.recovery.v1'; Partitions = 1 }
+)
+foreach ($topic in $topics) {
+  docker compose exec -T kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:19092 --create --if-not-exists --topic $topic.Name --partitions $topic.Partitions --replication-factor 1 --config cleanup.policy=delete --config retention.ms=604800000
+  if ($LASTEXITCODE -ne 0) { throw "Topic creation failed: $($topic.Name)" }
+}
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/init-inventory.ps1 -Seed
 ```
 
@@ -241,13 +247,17 @@ go run ./cmd/replay -dlq-topic inventory.dlq.v1 -partition 0 -offset 0 -recovery
 - Prometheus: <http://127.0.0.1:9090>
 - Grafana: <http://127.0.0.1:3000>
 
-장애 실험은 실제 MySQL 컨테이너를 중단한다. 실행 절차와 격리 조건은 각 Phase verification 문서를 따른다.
+장애 실험은 실제 MySQL 컨테이너를 중단한다. 실행 절차, 격리 조건과 결과는 각 Phase 상세 문서에 기록했다.
 
 ## Verification
 
-검증은 mock 결과가 아니라 실제 Kafka/MySQL integration scenario를 사용한다. SQL 상태, Kafka topic/partition/offset, consumer group commit과 application 결과를 교차 확인하고 Retry, DLQ, idempotency, Replay/Recovery 및 rate control 결과를 verification 문서에 정리했다. Phase 9에서는 핵심 Phase 4/7 cell을 각각 3회 반복해 median/min/max와 환경 편차를 기록했다.
+- 실제 Kafka/MySQL integration scenario를 tests/integration에 구현했다.
+- DB 상태, Kafka offset과 Consumer 처리 결과를 교차 확인했다.
+- Phase 9에서 핵심 Retry/Recovery 실험을 반복 실행했다.
+- 각 Phase 상세 문서의 실행 및 검증 절에 결과와 한계를 기록했다.
+- 기본 빌드 검증: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1 -Check Build
 
-문서별 재현 명령과 판정은 [Documentation Index](docs/README.md)에서 확인할 수 있다.
+→ [Documentation Index](docs/README.md)
 
 ## Known Limitations
 

@@ -84,15 +84,13 @@ DLQ envelope에는 난수 `dlqId`, 원래 key와 raw value, original 좌표, ret
 ## 7. 실행 및 검증
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase3.ps1 -Check Topics
 # 터미널 A
 . ./scripts/env.ps1
 go run ./cmd/worker
 # 터미널 B
 . ./scripts/env.ps1
 go run ./cmd/worker -retry-worker
-# 애플리케이션을 중지한 별도 검증 실행
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase3.ps1 -Check All
+# 장애 시나리오 구현은 tests/integration/phase3_test.go에 유지한다.
 ```
 
 실험은 매번 새 product와 main/retry/dlq topic 및 별도 group을 생성한다. 기존 helper로 실제 Worker PID, broker OffsetFetch, record 좌표와 Header, 외부 SQL 재고를 비교했다. source offset을 reset하지 않는다.
@@ -109,7 +107,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase3.ps1 -C
 
 Recovery는 MySQL 재기동 시간이 지연보다 길어지는 것을 피하고 실제 대기를 관측하기 위해 검증 옵션으로 Fixed Delay 12초를 사용했다. 기본값과 Exhaustion은 2초다. retry 처리 로그의 시각이 Header의 next-attempt-at 이상인지 비교했으며 지연을 정확히 맞춘다는 성능 보장은 하지 않는다.
 
-최종 판정, 실행별 좌표·PID·시각은 [검증 보고서](phase-3-verification.md)와 증거 JSON에 있다. 이번 문서는 기록된 실측을 설명하며 추가 부하 수치를 추정하지 않았다.
+최종 판정과 실행별 좌표·PID·시각은 이 문서에 정리했다. 기록된 실측을 설명하며 추가 부하 수치를 추정하지 않았다.
 
 ## 8. 발생한 문제
 

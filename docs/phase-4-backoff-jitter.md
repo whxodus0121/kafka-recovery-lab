@@ -62,14 +62,18 @@ go run ./cmd/worker -retry-worker -retry-strategy jitter -retry-delay 1s -retry-
 ## 7. 실행 및 검증
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase4.ps1 -Check All
+gofmt -l cmd internal tests
+go test ./...
+go vet ./...
+go build ./...
+go mod verify
 ```
 
 시나리오 A는 60건을 ACK를 기다리며 지연 없이 연속 발행한다. 시나리오 B는 같은 60건을 200ms 간격, 목표 5건/초로 발행해 DB 장애와 복구에 걸쳐 유입시킨다. 각 실행은 상품 6개, 상품별 재고 100, quantity 1, topic별 partition 1, Main/Retry 각각 1개, Worker당 DB pool 1개다. DB 처리 timeout은 기존 10초, 연결 timeout은 기존 5초다.
 
 DB 중단과 연결 실패를 확인한 시각을 t=0으로 삼는다. t=8초에 복구 명령을 요청하고 t=35초까지 관측한다. 실제 발행 시각, 복구 명령 반환, 첫 외부 `SELECT 1` 성공은 별도로 기록한다. Broker lag는 목표 500ms 간격으로 읽되 조회 시작과 완료 시각을 모두 보존한다.
 
-실측 표와 15개 검증 판정, 계산 결과와 개별 재시도 시각은 [검증 보고서](phase-4-verification.md)에 정리했다. 검증 당시 Kafka record, Header, Worker PID, 로그, SQL 재고와 offset 시계열을 교차 확인했다.
+실측 표와 15개 검증 판정, 계산 결과와 개별 재시도 시각은 이 문서에 정리했다. 검증 당시 Kafka record, Header, Worker PID, 로그, SQL 재고와 offset 시계열을 교차 확인했다.
 
 ## 8. 발생한 문제
 

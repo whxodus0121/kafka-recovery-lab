@@ -1,6 +1,6 @@
 # Phase 0 - 재현 가능한 Kafka·MySQL 로컬 환경
 
-작성 기준: Phase 0 완료 commit `856f76148bc864084c1e6b57e5ccd5eadf89fdd3`, 기존 검증 보고서와 현재까지 보존된 코드.
+작성 기준: Phase 0 완료 commit `856f76148bc864084c1e6b57e5ccd5eadf89fdd3`, 기존 검증 결과와 현재까지 보존된 코드.
 
 ## 1. 목표
 
@@ -84,7 +84,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1 -Check Al
 | MySQL 영속성 | probe `707be59fdadd4af0871046095ef4617b`를 재시작 전후 조회 후 1행 정리 | PASS |
 | 전체 사용자 검증 항목 | PASS 14 / FAIL 0 / UNVERIFIED 0 | PASS |
 
-원시 명령, 이미지 digest와 출력에 근거한 판정은 [Phase 0 검증 보고서](phase-0-verification.md)에 정리했다.
+원시 명령, 이미지 digest와 출력에 근거한 판정은 이 문서의 실행 및 검증 절에 정리했다.
 
 ## 8. 발생한 문제
 

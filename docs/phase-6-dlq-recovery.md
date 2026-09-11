@@ -49,12 +49,16 @@ malformed JSON envelope, key/value 누락, 잘못된 원본 좌표, 불완전하
 ## 7. 실행 및 검증
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase6.ps1 -Check All
+gofmt -l cmd internal tests
+go test ./...
+go vet ./...
+go build ./...
+go mod verify
 ```
 
 실제 Retry Exhaustion DLQ를 선택한 첫 CLI 성공 직후 inventory 100, marker 0, Recovery end 1, committed -1이었다. Recovery Worker가 처리한 뒤 inventory 98, marker 1, committed 1이 됐다. 같은 DLQ를 다시 Replay한 record는 Duplicate로 처리돼 inventory 98과 marker 1을 유지하고 committed만 2로 진행했다.
 
-Recovery DB 연결 실패는 retry-count=1 record를 만들었고 정상 Retry Worker가 처리해 inventory 98과 marker 1을 만들었다. 상품 없음은 다시 DLQ로 이동했고, 그 DLQ를 재Replay한 결과 실제 envelope count가 1에서 2로 증가했다. 상세 좌표와 PID는 [검증 보고서](phase-6-verification.md)에 정리했다.
+Recovery DB 연결 실패는 retry-count=1 record를 만들었고 정상 Retry Worker가 처리해 inventory 98과 marker 1을 만들었다. 상품 없음은 다시 DLQ로 이동했고, 그 DLQ를 재Replay한 결과 실제 envelope count가 1에서 2로 증가했다. 상세 좌표와 PID도 이 문서에 정리했다.
 
 ## 8. 발생한 문제
 

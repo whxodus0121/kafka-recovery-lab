@@ -66,7 +66,11 @@ Consumer는 `inventory_duplicate`와 `inventory_committed`를 구분한다. Dupl
 ## 7. 실행 및 검증
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase5.ps1 -Check All
+gofmt -l cmd internal tests
+go test ./...
+go vet ./...
+go build ./...
+go mod verify
 ```
 
 검증은 새 product/topic/group을 만들고 기존 행이나 offset을 초기화하지 않는다. marker 개수·내용, SQL 재고, Kafka end/committed offset을 Worker 밖에서 조회했다. Worker PID와 원본 Kafka record, crash/restart 시점도 함께 대조했다.
@@ -75,7 +79,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase5.ps1 -C
 
 100회 Kafka 전달은 handler 100회, 신규 DB 반영 1회, Duplicate 99회였다. JSON 필드 순서와 UTC 표기를 바꾼 같은 이벤트도 포함했다. 별도 DB 연결 16개를 사용하는 동시 검증에서는 첫 transaction을 commit 전에 잡아두고, DB process list에서 경쟁 INSERT 15개를 확인한 뒤 해제했다. 신규 반영 1회, Duplicate 15회, marker 1개였다. 이것은 다중 Kafka Worker 검증이 아니라 동일 transaction 함수의 실제 DB 동시성 검증이다.
 
-상세 판정·좌표·회귀 결과는 [검증 보고서](phase-5-verification.md)에 정리했다.
+상세 판정·좌표·회귀 결과는 이 문서에 정리했다.
 
 ## 8. 발생한 문제
 

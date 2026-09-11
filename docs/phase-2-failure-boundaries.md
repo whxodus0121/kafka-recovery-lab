@@ -47,7 +47,7 @@ Scenario별 새 product, 단일 partition topic, consumer group을 사용했다.
 - `internal/fault/hooks.go`: 특정 eventId 하나에만 `before-db`, `before-db-commit`, `after-db-commit` 동작을 연결한다. 기본 실행은 모든 hook이 nil이다.
 - `cmd/worker/main.go`: 실험용 CLI에서 fault 지점·eventId·격리 topic을 받는다. fault 설정은 이벤트 payload와 분리했다.
 - `tests/integration/phase2_test.go`: 실제 Worker 프로세스를 종료시키고 Worker 밖에서 SQL과 Kafka broker API로 상태를 측정한다.
-- `scripts/verify-phase2.ps1`: Build, Phase 0·1 Regression, A~D를 순차 실행한다.
+- tests/integration/phase2_test.go: Build 이후 Phase 0·1 회귀와 A~D 장애 경계를 실제 Worker, Kafka와 MySQL로 검증한다.
 
 `before-db-commit`은 exit 86, `after-db-commit`은 exit 87로 Go defer를 우회한다. 범용 fault framework나 업무 retry loop는 추가하지 않았다.
 
@@ -77,7 +77,11 @@ Scenario C hook은 `apply`가 성공해 DB commit이 끝난 후, `CommitMessages
 ## 7. 실행 및 검증
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-phase2.ps1 -Check All
+gofmt -l cmd internal tests
+go test ./...
+go vet ./...
+go build ./...
+go mod verify
 ```
 
 | Scenario | 장애 직후 | 재시작 후 | 판정 |
@@ -97,7 +101,7 @@ committed offset:  -1 → -1 → 1
 record:           동일 topic / partition 0 / offset 0 / eventId
 ```
 
-원시 eventId, productId, PID, record hash와 로그는 Phase 2 evidence, 명령·외부 CLI 교차 확인은 [검증 보고서](phase-2-verification.md)에 있다.
+원시 eventId, productId, PID, record hash와 로그, 외부 CLI 교차 확인을 바탕으로 한 판정은 이 문서에 정리했다.
 
 ## 8. 발생한 문제
 
