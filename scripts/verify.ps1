@@ -49,7 +49,7 @@ try {
     foreach ($item in $checks) {
         switch ($item) {
             'Build' {
-                $unformatted = & gofmt -l cmd internal
+                $unformatted = & gofmt -l cmd internal tests
                 if ($LASTEXITCODE -ne 0 -or $unformatted) { throw 'gofmt verification failed' }
                 Invoke-Checked go @('mod', 'verify')
                 Invoke-Checked go @('test', './...')
@@ -60,10 +60,10 @@ try {
             'Infrastructure' {
                 Invoke-Checked docker @('compose', 'config', '--quiet')
                 $services = & docker compose config --services
-                if ($LASTEXITCODE -ne 0 -or (($services | Sort-Object) -join ',') -ne 'kafka,mysql') { throw 'Unexpected Compose services' }
+                if ($LASTEXITCODE -ne 0 -or (($services | Sort-Object) -join ',') -ne 'grafana,kafka,mysql,prometheus') { throw 'Unexpected Compose services' }
                 Invoke-Checked docker @('compose', 'up', '-d', '--wait', '--wait-timeout', '180')
                 $containerIDs = @(& docker compose ps -q)
-                if ($LASTEXITCODE -ne 0 -or $containerIDs.Count -ne 2) { throw 'Expected exactly two containers' }
+                if ($LASTEXITCODE -ne 0 -or $containerIDs.Count -ne 4) { throw 'Expected exactly four containers' }
                 # Inspect only required fields. Avoid parsing Compose's complete
                 # JSON status (including host paths) through Windows code pages.
                 foreach ($service in $services) {
