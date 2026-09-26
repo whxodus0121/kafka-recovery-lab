@@ -107,6 +107,8 @@ Phase 9에서 Phase 4 Scenario A의 60-event burst를 전략별 3회 반복했�
 
 Replay publication 완료와 DB business recovery 완료는 다른 상태다. Publication limiter는 Recovery Topic 유입을, Recovery limiter는 backlog가 이미 있어도 최초 Store 진입 속도를 각각 통제한다.
 
+아래 캡처는 별도 한 번의 `recovery-limited-backlog` 실제 실행 결과이며, 위 표의 Phase 9 반복 median과는 구분된다.
+
 ![Recovery rate limiting](docs/images/phase-7-recovery-rate-limit.png)
 
 ### Observability
