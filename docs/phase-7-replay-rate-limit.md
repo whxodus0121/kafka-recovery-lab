@@ -58,6 +58,10 @@ Bulk 중 malformed envelope를 만나면 해당 DLQ 좌표와 이미 발행된 �
 
 세 전략 모두 inventory 합계 12,000→11,880, processed_events 120건이었다. peak는 임의의 1초 sliding window 안의 시도 수이며 정확한 장기 RPS 보장값으로 해석하지 않는다. 상세 timestamp, 초별 bin, offset, PID와 raw hash를 검증 당시 함께 대조했다.
 
+아래 캡처는 별도 한 번의 실제 `recovery-limited-backlog` 실행 결과다. publication 평균 77.31/s·peak 80, processing 평균 19.42/s·peak 20, peak lag 120, CLI 1,858ms, business recovery 8,121ms였으며 Phase 9 반복 median으로 해석하지 않는다.
+
+![Phase 7 recovery rate limiting](images/phase-7-recovery-rate-limit.png)
+
 Bulk 24건을 같은 범위로 두 번 Replay한 결과 첫 실행은 신규 24건, 두 번째는 Duplicate 24건이었다. inventory 11,976과 marker 24는 두 번째 실행 뒤에도 같았고 Recovery committed offset만 24→48로 진행했다. 단건 CLI 회귀도 1건 DB 반영과 committed 1을 확인했다.
 
 ## 8. 발생한 문제

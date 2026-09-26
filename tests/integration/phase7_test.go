@@ -369,6 +369,9 @@ func (f *phase7Fixture) comparison(publishRate, recoveryRate float64, backlog bo
 	f.raw["cliPID"] = cli.cmd.Process.Pid
 	f.raw["cliLog"] = cli.log.text()
 	f.raw["workerLog"] = worker.log.text()
+	if backlog {
+		f.t.Logf("scenario=%s input=%d recovery_rate=%.0f/s publication_average_rps=%.2f publication_peak_rps=%d processing_average_rps=%.2f processing_peak_rps=%d peak_lag=%d replay_cli_completion_ms=%d business_recovery_completion_ms=%d success=%d dlq=%d unfinished=%d inventory=%d->%d processed_events=%d", f.raw["strategy"].(string), f.raw["inputCount"].(int), f.raw["recoveryRate"].(float64), f.raw["publicationRPS"].(float64), f.raw["publicationPeakRPS"].(int), f.raw["processingRPS"].(float64), f.raw["processingPeakRPS"].(int), f.raw["recoveryPeakLag"].(int64), f.raw["cliDurationMs"].(int64), f.raw["businessRecoveryDurationMs"].(int64), f.raw["success"].(int), f.raw["dlq"].(int), f.raw["unfinished"].(int), f.raw["initialInventory"].(int64), f.raw["finalInventory"].(int64), f.raw["processedEvents"].(int))
+	}
 }
 
 func (f *phase7Fixture) bulkDuplicate() {

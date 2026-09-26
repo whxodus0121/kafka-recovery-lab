@@ -101,6 +101,8 @@ committed offset:  -1 → -1 → 1
 record:           동일 topic / partition 0 / offset 0 / eventId
 ```
 
+![Phase 2 DB commit 이후 offset commit 전 crash](images/phase-2-crash-window.png)
+
 원시 eventId, productId, PID, record hash와 로그, 외부 CLI 교차 확인을 바탕으로 한 판정은 이 문서에 정리했다.
 
 ## 8. 발생한 문제

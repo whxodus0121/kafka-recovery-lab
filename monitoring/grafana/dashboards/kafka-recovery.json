@@ -39,8 +39,8 @@
       },
       "targets": [
         {
-          "expr": "sum by (worker) (rate(inventory_consumer_records_total[1m]))",
-          "legendFormat": "{{worker}} {{outcome}} {{error_code}} {{strategy}}",
+          "expr": "sum by (worker) (rate(inventory_consumer_records_total[1m])) > 0",
+          "legendFormat": "{{worker}}",
           "refId": "A"
         }
       ],
@@ -78,8 +78,8 @@
       },
       "targets": [
         {
-          "expr": "sum by (worker, outcome) (rate(inventory_consumer_records_total[1m]))",
-          "legendFormat": "{{worker}} {{outcome}} {{error_code}} {{strategy}}",
+          "expr": "sum by (worker, outcome) (rate(inventory_consumer_records_total[1m])) > 0",
+          "legendFormat": "{{worker}} {{outcome}}",
           "refId": "A"
         }
       ],
@@ -161,8 +161,8 @@
       },
       "targets": [
         {
-          "expr": "sum by (worker, error_code) (rate(inventory_retry_published_total[1m]))",
-          "legendFormat": "{{worker}} {{outcome}} {{error_code}} {{strategy}}",
+          "expr": "sum by (error_code) (rate(inventory_retry_published_total[1m])) > 0",
+          "legendFormat": "{{error_code}}",
           "refId": "A"
         }
       ],
@@ -200,8 +200,8 @@
       },
       "targets": [
         {
-          "expr": "sum by (worker, error_code) (rate(inventory_dlq_published_total[1m]))",
-          "legendFormat": "{{worker}} {{outcome}} {{error_code}} {{strategy}}",
+          "expr": "sum by (error_code) (rate(inventory_dlq_published_total[1m])) > 0",
+          "legendFormat": "{{error_code}}",
           "refId": "A"
         }
       ],
@@ -239,8 +239,8 @@
       },
       "targets": [
         {
-          "expr": "sum by (worker) (rate(inventory_duplicate_total[1m]))",
-          "legendFormat": "{{worker}} {{outcome}} {{error_code}} {{strategy}}",
+          "expr": "sum by (worker) (rate(inventory_duplicate_total[1m])) > 0",
+          "legendFormat": "{{worker}}",
           "refId": "A"
         }
       ],
@@ -317,8 +317,8 @@
       },
       "targets": [
         {
-          "expr": "sum by (outcome) (rate(inventory_recovery_processed_total[1m]))",
-          "legendFormat": "{{worker}} {{outcome}} {{error_code}} {{strategy}}",
+          "expr": "sum by (outcome) (rate(inventory_recovery_processed_total[1m])) > 0",
+          "legendFormat": "{{outcome}}",
           "refId": "A"
         }
       ],

@@ -196,7 +196,7 @@ func (f *phase8Fixture) run() {
 	retryEvent := f.newProductEvent(100, 3)
 	retryValue, _ := json.Marshal(retryEvent)
 	retrySuccessBefore := f.prometheusValue(`inventory_consumer_records_total{worker="retry",outcome="success"}`)
-	overdueBefore := f.prometheusValue(`inventory_retry_overdue_seconds_count{strategy="fixed"}`)
+	overdueBefore := f.prometheusValue(`sum(inventory_retry_overdue_seconds_count{strategy="fixed"})`)
 	f.sample("retry", `inventory_retry_published_total{worker="main",error_code="DB_CONNECTION"}`, func() {
 		f.publish(f.topics["main-fail"], kafka.Message{Key: []byte(retryEvent.OrderID), Value: retryValue})
 		await(f.t, "retry completed", func() bool {
@@ -204,13 +204,13 @@ func (f *phase8Fixture) run() {
 		})
 	}, 1)
 	retrySuccessAfter := f.awaitMetric(`inventory_consumer_records_total{worker="retry",outcome="success"}`, 1)
-	overdueAfter := f.awaitMetric(`inventory_retry_overdue_seconds_count{strategy="fixed"}`, 1)
+	overdueAfter := f.awaitMetric(`sum(inventory_retry_overdue_seconds_count{strategy="fixed"})`, 1)
 	f.recordSample("retry-worker", `inventory_consumer_records_total{worker="retry",outcome="success"}`, retrySuccessBefore, retrySuccessAfter)
-	f.recordSample("retry-overdue", `inventory_retry_overdue_seconds_count{strategy="fixed"}`, overdueBefore, overdueAfter)
+	f.recordSample("retry-overdue", `sum(inventory_retry_overdue_seconds_count{strategy="fixed"})`, overdueBefore, overdueAfter)
 
 	recoveryEvent := f.newProductEvent(100, 1)
 	singleDLQOffset := f.publishDeadLetters(recoveryEvent)
-	f.sample("recovery", `inventory_recovery_processed_total{outcome="success"}`, func() {
+	f.sample("recovery", `sum(inventory_recovery_processed_total{outcome="success"})`, func() {
 		f.runReplay("-offset", strconv.FormatInt(singleDLQOffset, 10), "", "")
 		await(f.t, "single recovery", func() bool { return f.inspectors["recovery"].committed()[0] == 1 })
 	}, 1)
@@ -229,7 +229,7 @@ func (f *phase8Fixture) run() {
 	bulkDLQOffset := f.publishDeadLetters(limitedEvents...)
 	f.runReplay("-start-offset", strconv.FormatInt(bulkDLQOffset, 10), "-limit", "10")
 	await(f.t, "limited recovery", func() bool { return f.inspectors["recovery"].committed()[0] == 11 })
-	f.awaitMetric(`inventory_recovery_processed_total{outcome="success"}`, 10)
+	f.awaitMetric(`sum(inventory_recovery_processed_total{outcome="success"})`, 10)
 	waitCount := f.awaitAtLeast(`sum(inventory_recovery_rate_limit_wait_seconds_count)`, 8)
 	f.recordSample("recovery-rate-limit", `sum(inventory_recovery_rate_limit_wait_seconds_count)`, waitBefore, waitCount)
 	for _, e := range limitedEvents {
@@ -489,9 +489,29 @@ func (f *phase8Fixture) grafanaAudit() map[string]any {
 		} `json:"dashboard"`
 	}
 	f.getJSON("http://127.0.0.1:3000/api/dashboards/uid/kafka-recovery-lab", &dashboard)
+	expectedQueries := map[string][]string{
+		"Processing Throughput":        {`sum by (worker) (rate(inventory_consumer_records_total[1m])) > 0`},
+		"Outcomes":                     {`sum by (worker, outcome) (rate(inventory_consumer_records_total[1m])) > 0`},
+		"Processing Latency p50 / p95": {`histogram_quantile(0.50, sum by (le, worker) (rate(inventory_processing_duration_seconds_bucket[5m])))`, `histogram_quantile(0.95, sum by (le, worker) (rate(inventory_processing_duration_seconds_bucket[5m])))`},
+		"Retry Publication Rate":       {`sum by (error_code) (rate(inventory_retry_published_total[1m])) > 0`},
+		"DLQ Publication Rate":         {`sum by (error_code) (rate(inventory_dlq_published_total[1m])) > 0`},
+		"Duplicate Rate":               {`sum by (worker) (rate(inventory_duplicate_total[1m])) > 0`},
+		"Retry Overdue p95":            {`histogram_quantile(0.95, sum by (le, strategy) (rate(inventory_retry_overdue_seconds_bucket[5m])))`},
+		"Recovery Processing Rate":     {`sum by (outcome) (rate(inventory_recovery_processed_total[1m])) > 0`},
+		"Recovery Limiter Wait p95":    {`histogram_quantile(0.95, sum by (le) (rate(inventory_recovery_rate_limit_wait_seconds_bucket[5m])))`},
+	}
 	queries := []map[string]any{}
+	seenPanels := map[string]bool{}
 	for _, panel := range dashboard.Dashboard.Panels {
-		for _, target := range panel.Targets {
+		expected, exists := expectedQueries[panel.Title]
+		if !exists || seenPanels[panel.Title] || len(panel.Targets) != len(expected) {
+			f.t.Fatal("unexpected Grafana panel contract", panel.Title)
+		}
+		seenPanels[panel.Title] = true
+		for index, target := range panel.Targets {
+			if target.Expr != expected[index] {
+				f.t.Fatal("Grafana PromQL mismatch", panel.Title, target.Expr)
+			}
 			var response struct {
 				Status string `json:"status"`
 			}
@@ -502,7 +522,7 @@ func (f *phase8Fixture) grafanaAudit() map[string]any {
 			queries = append(queries, map[string]any{"panel": panel.Title, "expression": target.Expr, "status": response.Status})
 		}
 	}
-	if health.Database != "ok" || datasource.UID != "prometheus" || datasource.URL != "http://prometheus:9090" || dashboard.Dashboard.UID != "kafka-recovery-lab" || len(dashboard.Dashboard.Panels) != 9 || len(queries) != 10 {
+	if health.Database != "ok" || datasource.UID != "prometheus" || datasource.URL != "http://prometheus:9090" || dashboard.Dashboard.UID != "kafka-recovery-lab" || dashboard.Dashboard.Title != "Kafka Recovery Lab" || len(dashboard.Dashboard.Panels) != len(expectedQueries) || len(seenPanels) != len(expectedQueries) || len(queries) != 10 {
 		f.t.Fatal("Grafana provisioning mismatch")
 	}
 	return map[string]any{"health": health.Database, "datasource": map[string]any{"name": datasource.Name, "uid": datasource.UID, "url": datasource.URL}, "dashboard": map[string]any{"title": dashboard.Dashboard.Title, "uid": dashboard.Dashboard.UID, "panelCount": len(dashboard.Dashboard.Panels)}, "panelQueries": queries}

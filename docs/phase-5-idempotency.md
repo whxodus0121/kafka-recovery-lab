@@ -77,6 +77,8 @@ go mod verify
 
 핵심 결과는 Phase 2 Before **100→98→96**, Phase 5 After **100→98→98**이다. After에서는 첫 crash 직후 marker 1개와 재고 98, source committed -1을 확인했다. 재시작 후 같은 좌표를 읽었지만 재고와 marker timestamp/hash는 바뀌지 않고 offset만 1로 진행했다.
 
+![Phase 5 idempotent redelivery](images/phase-5-idempotency.png)
+
 100회 Kafka 전달은 handler 100회, 신규 DB 반영 1회, Duplicate 99회였다. JSON 필드 순서와 UTC 표기를 바꾼 같은 이벤트도 포함했다. 별도 DB 연결 16개를 사용하는 동시 검증에서는 첫 transaction을 commit 전에 잡아두고, DB process list에서 경쟁 INSERT 15개를 확인한 뒤 해제했다. 신규 반영 1회, Duplicate 15회, marker 1개였다. 이것은 다중 Kafka Worker 검증이 아니라 동일 transaction 함수의 실제 DB 동시성 검증이다.
 
 상세 판정·좌표·회귀 결과는 이 문서에 정리했다.

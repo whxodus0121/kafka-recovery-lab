@@ -72,6 +72,14 @@ Retry/DLQ/Recovery destination 발행이 성공한 뒤 source offset을 commit�
 
 Phase 2에서는 같은 topic/partition/offset과 eventId가 다시 전달되어 재고가 두 번 감소했다. Phase 5에서는 동일 eventId의 canonical payload를 Duplicate로 판정해 offset은 진행하되 추가 inventory update는 실행하지 않았다.
 
+Phase 2 Before — `100 → 98 → 96`
+
+![DB commit 이후 offset commit 전 crash](docs/images/phase-2-crash-window.png)
+
+Phase 5 After — `100 → 98 → 98`
+
+![Idempotent redelivery](docs/images/phase-5-idempotency.png)
+
 ### Repeated Retry comparison
 
 Phase 9에서 Phase 4 Scenario A의 60-event burst를 전략별 3회 반복했다.
@@ -99,9 +107,13 @@ Phase 9에서 Phase 4 Scenario A의 60-event burst를 전략별 3회 반복했�
 
 Replay publication 완료와 DB business recovery 완료는 다른 상태다. Publication limiter는 Recovery Topic 유입을, Recovery limiter는 backlog가 이미 있어도 최초 Store 진입 속도를 각각 통제한다.
 
+![Recovery rate limiting](docs/images/phase-7-recovery-rate-limit.png)
+
 ### Observability
 
 Main, Retry와 Recovery Worker의 Prometheus target이 모두 UP인 상태에서 Retry, DLQ, Duplicate, Recovery와 limiter wait metric의 실제 증가를 Kafka/MySQL 결과와 대조했다. Grafana는 Compose에서 datasource와 9개 panel을 자동 provision하며 10개 PromQL query를 검증했다. 정확한 committed consumer-group lag collector는 구현하지 않았다.
+
+![Kafka Recovery Grafana dashboard](docs/images/phase-8-grafana-dashboard.png)
 
 ## Development Journey
 

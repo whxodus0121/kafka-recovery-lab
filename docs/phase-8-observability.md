@@ -75,6 +75,10 @@ Kafka 최종 상태는 main committed 3, failed Main 1, Retry 1, Recovery end/co
 
 Grafana datasource UID `prometheus`는 `http://prometheus:9090`으로 provision됐다. `Kafka Recovery Lab` dashboard는 9개 panel과 10개 PromQL target을 가지며 모두 Grafana datasource proxy를 통해 `status=success`를 반환했다.
 
+Grafana에서는 실제 발생한 Retry/DLQ error_code와 처리 결과 series만 표시하도록 0-valued pre-registered series를 filtering했다.
+
+![Phase 8 Kafka Recovery Grafana dashboard](images/phase-8-grafana-dashboard.png)
+
 ## 8. 발생한 문제
 
 Docker Desktop이 중지돼 최초 이미지 pull이 실패했고 daemon 기동 후 재시도했다. Windows가 TCP 2038~2137을 예약해 예시 포트 2112~2114 bind가 거절됐으므로 repository 기본 target을 22112~22114로 변경했다.

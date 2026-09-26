@@ -308,6 +308,15 @@ func (f *phase5Fixture) crash(name string) {
 		f.t.Fatal("duplicate routed")
 	}
 	f.capture("afterRestart")
+	if name == "CrashAfter" {
+		before := f.evidence["before"].(map[string]any)
+		afterCrash := f.evidence["afterCrash"].(map[string]any)
+		afterRestart := f.evidence["afterRestart"].(map[string]any)
+		beforeOffsets := before["broker"].([]map[string]any)[0]["offsets"].(snapshot)
+		afterCrashOffsets := afterCrash["broker"].([]map[string]any)[0]["offsets"].(snapshot)
+		afterRestartOffsets := afterRestart["broker"].([]map[string]any)[0]["offsets"].(snapshot)
+		f.t.Logf("scenario=%s inventory=%d->%d->%d marker=%d->%d->%d committed=%d->%d->%d redelivery=same topic/partition/offset/eventId duplicate=%t", name, before["inventory"], afterCrash["inventory"], afterRestart["inventory"], before["processed"].(processedRow).Count, afterCrash["processed"].(processedRow).Count, afterRestart["processed"].(processedRow).Count, beforeOffsets.Committed[0], afterCrashOffsets.Committed[0], afterRestartOffsets.Committed[0], second.log.count("inventory_duplicate") == 1)
+	}
 }
 
 func (f *phase5Fixture) repeated() {

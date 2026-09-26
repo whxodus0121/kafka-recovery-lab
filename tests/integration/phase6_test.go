@@ -244,17 +244,24 @@ func (f *phase6Fixture) exhaustionRecoveryTwice() {
 	if f.inspect["recovery"].ends()[0] != 1 || stock(f.t, f.ctx, f.db, e.ProductID) != 100 || processed(f.t, f.ctx, f.db, e.EventID).Count != 0 || f.inspect["recovery"].committed()[0] != -1 {
 		f.t.Fatal("publication incorrectly counted as business recovery")
 	}
+	afterPublicationInventory := stock(f.t, f.ctx, f.db, e.ProductID)
+	afterPublicationMarker := processed(f.t, f.ctx, f.db, e.EventID).Count
+	afterPublicationCommitted := f.inspect["recovery"].committed()[0]
 	firstRecord := f.inspect["recovery"].read(0, 0)
 	recovery := f.startWorker("recovery", false)
 	await(f.t, "first business recovery", func() bool {
 		return f.inspect["recovery"].committed()[0] == 1 && stock(f.t, f.ctx, f.db, e.ProductID) == 98 && processed(f.t, f.ctx, f.db, e.EventID).Count == 1
 	})
 	firstMarker := processed(f.t, f.ctx, f.db, e.EventID)
+	afterFirstRecoveryInventory := stock(f.t, f.ctx, f.db, e.ProductID)
+	afterFirstRecoveryCommitted := f.inspect["recovery"].committed()[0]
 	secondCLI := f.replay(0, f.topics["recovery"], true)
 	await(f.t, "duplicate business recovery", func() bool { return f.inspect["recovery"].committed()[0] == 2 })
 	secondRecord := f.inspect["recovery"].read(0, 1)
 	recovery.stop(f.t)
 	secondMarker := processed(f.t, f.ctx, f.db, e.EventID)
+	afterSecondReplayInventory := stock(f.t, f.ctx, f.db, e.ProductID)
+	afterSecondReplayCommitted := f.inspect["recovery"].committed()[0]
 	if stock(f.t, f.ctx, f.db, e.ProductID) != 98 || firstMarker != secondMarker || recovery.log.count("inventory_committed") != 1 || recovery.log.count("inventory_duplicate") != 1 || f.inspect["dlq"].ends()[0] != 1 {
 		f.t.Fatal("replaying the same DLQ record changed the side effect")
 	}
@@ -265,6 +272,10 @@ func (f *phase6Fixture) exhaustionRecoveryTwice() {
 	f.evidence["selectedDLQ"] = map[string]any{"topic": dlqRecord.Topic, "partition": dlqRecord.Partition, "offset": dlqRecord.Offset, "envelope": letter}
 	f.evidence["firstReplay"] = map[string]any{"cli": firstCLI, "record": firstRecord, "inventoryAfterPublication": 100, "markerAfterPublication": 0, "inventoryAfterRecovery": 98, "marker": firstMarker, "committedOffset": 1}
 	f.evidence["secondReplay"] = map[string]any{"cli": secondCLI, "record": secondRecord, "inventory": 98, "marker": secondMarker, "committedOffset": 2}
+	firstReplayEvent, firstReplayErr := event.Decode(firstRecord.Value)
+	secondReplayEvent, secondReplayErr := event.Decode(secondRecord.Value)
+	f.t.Logf("scenario=ExhaustionRecoveryTwice after_replay_publication inventory=%d marker=%d recovery_committed=%d after_first_recovery inventory=%d marker=%d recovery_committed=%d after_second_replay inventory=%d marker=%d recovery_committed=%d duplicate=%t", afterPublicationInventory, afterPublicationMarker, afterPublicationCommitted, afterFirstRecoveryInventory, firstMarker.Count, afterFirstRecoveryCommitted, afterSecondReplayInventory, secondMarker.Count, afterSecondReplayCommitted, recovery.log.count("inventory_duplicate") == 1)
+	f.t.Logf("same_original_eventId=%t second_replay_new_db_side_effect=%t", firstReplayErr == nil && secondReplayErr == nil && firstReplayEvent.EventID == e.EventID && secondReplayEvent.EventID == e.EventID, firstMarker != secondMarker || recovery.log.count("inventory_committed") != 1)
 }
 
 func (f *phase6Fixture) recoveryRetry() {
